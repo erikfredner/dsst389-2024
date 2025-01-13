@@ -1,0 +1,84 @@
+---
+title: "Markdown and Quarto"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+execute:
+  echo: true
+  warning: false
+  message: false
+  error: true
+format:
+  html:
+    anchor-sections: true
+    code-tools: false
+    embed-resources: true
+    link-external-icon: true
+    link-external-newwindow: true
+    number-sections: true
+    smooth-scroll: true
+    toc: true
+editor:
+  markdown:
+    wrap: 72
+---
+
+## Why Learn Scientific Publishing Software?
+
+Even if your data and visualizations are excellent, they won't make an impact unless communicated effectively. Scientific publishing software enables you to create professional, data-driven documents, slideshows, and websites. Throughout this semester, we’ll practice these skills, building on your existing knowledge of RMarkdown and/or Quarto documents.
+
+## Markdown
+
+Markdown is a lightweight markup language used to format plain text for conversion into HTML and other formats. You do **not** need to know HTML to use Markdown.
+
+In DSST289, you encountered Markdown in notebooks but likely wrote only small amounts of it. In this course, you’ll learn how to fully utilize Markdown.
+
+### Complete the Markdown Tutorial
+
+[CommonMark](https://commonmark.org) is a widely-used implementation of Markdown for scientific publishing applications, such as Pandoc, GitHub, and Quarto.
+
+::: callout-important
+Complete the [CommonMark Markdown tutorial](https://commonmark.org/help/tutorial/).
+
+This will teach you essential Markdown syntax. The tutorial should take approximately **10 minutes**.
+:::
+
+## Quarto
+
+Quarto is a publishing system that combines Markdown text and code cells where you write and execute R code. If you have not used Quarto (`.qmd`) files before, they are the successor to Rmarkdown (`.Rmd`) files.
+
+### Documents
+
+Quarto documents have several advantages, including the ability to generate multiple outputs from a single document. For example, you can create a PDF, a website, and a slideshow from the same source file.
+
+Watch this video to understand how Quarto documents can be used to create multiple different outputs:
+
+{{< video https://www.youtube.com/watch?v=_f3latmOhew >}}
+
+### Data Dashboards
+
+An increasingly important task for data scientists is creating **data dashboards**. Data dashboards are interactive tools for visualizing and exploring data on the web. They allow users to interact with data dynamically, making complex information more accessible and actionable. Experience with dashboards is an increasingly common expectation for data science jobs.
+
+::: callout-important
+Explore [this example dashboard](https://datadashboard.fda.gov/ora/cd/recalls.htm) about recalls from the US Food and Drug Administration (FDA).
+:::
+
+Now, watch this video to learn how to create dashboards using Quarto:
+
+{{< video https://www.youtube.com/watch?v=HW7QbqI4fH0 >}}
+
+## Summary
+
+### Tasks
+
+- [ ] Complete the CommonMark Markdown tutorial.
+- [ ] Explore the FDA dashboard.
+- [ ] Watch the video about getting started with Quarto.
+- [ ] Watch the video introducing data dashboards in Quarto.
+
+### Takeaways
+
+- Markdown simplifies formatting for documents and integrates well with scientific publishing workflows.
+- Quarto enhances document versatility, enabling multi-format outputs.
+- Data dashboards are essential tools for modern data scientists, facilitating interactive data visualization and analysis.
