@@ -1,0 +1,417 @@
+---
+title: "Markdown & Quarto"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    toc: true
+    toc-depth: 1
+    slide-level: 3
+    slide-number: true
+    preview-links: auto
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+```{r}
+#| echo: false
+#| warning: false
+
+library(tidyverse)
+```
+
+
+# So what?
+
+## Why learn Markdown?
+
+-   Widely used in data science, online (e.g., ChatGPT), and in academia
+    (e.g., Pandoc)
+
+-   Excellent way to write and preserve complex documents in plain text
+    (i.e., not in a fragile format like Word or Google Docs)
+
+-   Markdown is always used, but rarely taught
+
+## What is CommonMark?
+
+-   [CommonMark](https://commonmark.org) is a standardized version of
+    [the original Markdown
+    syntax](https://daringfireball.net/projects/markdown/syntax)
+
+-   Major implementations (e.g.,
+    [GitHub](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax))
+    use CommonMark
+
+## Why Quarto?
+
+- Quarto (`.qmd`) supersedes R Markdown (`.Rmd`)
+  - Supports **R**, **Python**, and other languages
+  - Provides more flexible outputs than R Markdown, including data dashboards
+  - Uses CommonMark Markdown
+
+# Markdown
+
+## Basics
+
+- **Headings**: Use `#` for Level 1, `##` for Level 2, etc.
+  - For example, `## Something`  produces:
+  ```html
+  <h2>Something</h2>
+  ```
+- *Italics* = `*italics*`. **Bold** = `**bold**`.
+- **Lists**: Use `-` for bulleted lists and `1.` for numbered
+- **Hyperlinks**: `[text](https://example.com)`
+- **Images**: `![alt text](path/to/image.png)`
+
+## Draw rendered Markdown
+
+```
+# Cats
+
+They're not dogs.
+
+## My favorite things about them
+
+1. Indifferent to human suffering
+2. Soft
+
+## Where to find them
+
+On [the internet](https://en.wikipedia.org/wiki/Cat).
+
+![Cat](images/cat.jpeg)
+```
+
+---
+
+:::{.scrollable}
+<h1>Cats</h1>
+
+They're not dogs.
+
+<h2>My favorite things about them</h2>
+
+1. Indifferent to human suffering
+2. Soft
+
+<h2>Where to find them</h2>
+
+On [the internet](https://en.wikipedia.org/wiki/Cat).
+
+![Cat](images/cat.jpeg)
+:::
+
+## Monospace fonts
+
+Monospace a string by surrounding it with backticks (\`):
+
+```
+My variable is named `df`.
+```
+
+<br>
+
+How that renders
+
+My variable is named `df`.
+
+<br>
+
+Monospace is conventionally used for variables, objects, and inline code.
+
+## Blockquotes
+
+Markdown
+
+```
+Regular text
+
+> Blockquoted text
+```
+
+<br>
+
+How that renders
+
+Regular text
+
+> Blockquoted text
+
+## Footnotes
+
+There are two ways to write footnotes in Markdown:
+
+1. Inline footnotes
+2. Labeled footnotes
+
+### Inline footnotes
+
+Markdown:
+
+```
+This is true.^[Except when it's not.]
+```
+
+<br>
+
+
+How that renders on a Quarto slide:
+
+This is true.^[Except when it's not.]
+
+### Labeled footnotes
+
+Markdown:
+
+```
+Here is a numbered note,[^1] and a named note.[^named]
+
+[^1]: Here is the footnote.
+
+[^named]: Here's the named footnote.
+```
+
+<br>
+
+How that renders:
+
+Here is a numbered note,[^1] and a named note.[^named]
+
+[^1]: Here is the footnote.
+
+[^named]: Here's the named footnote.
+
+## Tables
+
+There are two main ways we will make Markdown tables:
+
+1. [Manually](https://quarto.org/docs/authoring/tables.html)
+2. Automatically from data
+
+### Manual tables
+
+Markdown:
+
+```
+| fruit  | price  |
+|--------|--------|
+| apple  | 2.05   |
+| pear   | 1.37   |
+| orange | 3.09   |
+```
+
+How that renders:
+
+| fruit  | price  |
+|--------|--------|
+| apple  | 2.05   |
+| pear   | 1.37   |
+| orange | 3.09   |
+
+### Automatic tables
+
+- Manually making large or complex Markdown tables is a pain
+- We will see how to automatically format R objects as Markdown tables using `kable` in the next section
+
+# Quarto documents
+
+## Elements
+
+- Markdown prose
+- Code cells
+- YAML front matter
+
+## YAML
+
+YAML originally stood for "Yet Another Markup Language."
+
+Quarto documents begin with a YAML section, which is surrounded by `---`.
+
+### Basic YAML
+
+When you create a new Quarto document in RStudio, it will generate a document with the following YAML block at the top:
+
+```
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+```
+
+### More complex YAML
+
+```
+---
+title: "Kindred"
+author: "Octavia Butler"
+date: 1979-06-15
+format: pdf
+toc: true
+---
+```
+
+- `format` sets the output format.
+  - Options include `html` (website), `pdf`, and many more.
+- `toc` adds a table of contents.
+  - `toc` links to your headers as defined by `#` and `##`, etc.
+- There are [tons](https://quarto.org/docs/reference/formats/opml.html) of options that can be set in the YAML block.
+- `df-print: kable` sets all of your tables to pretty-print.
+
+## Using Code Chunks
+
+Just like R Markdown, Quarto uses code chunks:
+
+```` markdown
+```{{r}}
+library(tidyverse)
+```
+````
+
+### Setting execution options
+
+You can set [execution options](https://quarto.org/docs/computations/execution-options.html) within individual chunks to suppress warnings, choose whether to execute the cell, echo the code, etc. like so:
+
+```` markdown
+```{{r}}
+#| echo: true
+#| warning: false
+
+library(tidyverse)
+```
+````
+
+The `#|` at the beginning of the line indicates that you are setting an option, not executing R code or writing a comment.
+
+## Callouts
+
+[Callouts](https://quarto.org/docs/authoring/callouts.html) highlight points you don't want your readers to miss:
+
+```
+::: {.callout-note}
+Note that there are five types of callouts, including:
+`note`, `warning`, `important`, `tip`, and `caution`.
+:::
+```
+
+<br>
+
+::: {.callout-note}
+Note that there are five types of callouts, including:
+`note`, `warning`, `important`, `tip`, and `caution`.
+:::
+
+## Inline calculations
+
+You can dynamically fill values (strings, numbers) in your Markdown prose using data.
+
+### Setup
+
+```{r}
+#| echo: true
+#| label: fruit
+
+fruit_prices <- tibble(
+  fruit = c("apple", "pear", "orange"),
+  price = c(2.05, 1.37, 3.09)
+)
+
+max_price <- fruit_prices |>
+  summarize(max_price = max(price)) |>
+  pull(max_price)
+
+max_fruit <- fruit_prices |>
+  filter(price == max_price) |>
+  pull(fruit)
+```
+
+### Usage
+
+Markdown
+
+```` markdown
+The most expensive fruit this week was the `{{r}} max_fruit`, which cost $`{{r}} max_price`.
+````
+
+<br>
+
+How that renders
+
+The most expensive fruit this week was the `{r} max_fruit`, which cost $`{r} max_price`.
+
+## Figures
+
+In addition to printing figures, you can:
+
+- give them captions
+- label them
+- use those labels for cross-references
+
+### Captions
+
+```` markdown
+```{{r}}
+#| fig-cap: "Fruits in the store by price."
+
+fruit_prices |>
+  ggplot(aes(x = fruit, y = price)) +
+  geom_col()
+```
+````
+
+```{r}
+#| fig-cap: "Fruits in the store by price."
+#| label: fig-fruit
+
+fruit_prices |>
+  ggplot(aes(x = fruit, y = price)) +
+  geom_col()
+```
+
+### Labels
+
+To use as cross-references, figure labels must begin with `fig-`
+
+```` markdown
+```{{r}}
+#| fig-cap: "Fruits in the store by price."
+#| label: fig-fruit
+
+fruit_prices |>
+  ggplot(aes(x = fruit, y = price)) +
+  geom_col()
+```
+````
+
+### Cross-references
+
+Putting it all together:
+
+``` markdown
+As we see in @fig-fruit, the `{{r}} max_fruit` was the most expensive.
+```
+
+<br>
+
+How that renders
+
+As we see in @fig-fruit, the `{r} max_fruit` was the most expensive.
+
+## Summary
+
+- Markdown is useful for many kinds of writing, including Quarto
+- Quarto documents have features to make scientific writing accurate and (relatively) easy
+- Learning these concepts now will allow you to practice them throughout the semester
+
+### Resources
+
+- Quarto's ["Get Started"](https://quarto.org/docs/get-started/hello/rstudio.html)
+- *R for Data Science* [chapter](https://r4ds.hadley.nz/quarto)

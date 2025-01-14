@@ -2,6 +2,7 @@
 title: "Introduction"
 subtitle: "DSST389: Advanced Data Science"
 author: "Erik Fredner"
+institute: "University of Richmond"
 date: today
 format:
   revealjs:
@@ -31,7 +32,7 @@ e.g.,
 
 1. Professor Erik Fredner
 2. He/him
-3. Old coffee
+3. "It is what it is."
 
 # Why (advanced) data science?
 
@@ -84,6 +85,10 @@ Raj Chetty et al. use Census data to study economic mobility based on where chil
 
 See [The Opportunity Atlas](https://www.opportunityatlas.org).
 
+### Is the Love Song Dying?
+
+*The Pudding*'s data journalism resembles the kind of thing we will be doing in this class. A good recent example is, ["Is the Love Song Dying?"](https://pudding.cool/2024/11/love-songs/)
+
 ### Examples
 
 Title               DS for...
@@ -92,6 +97,7 @@ Inside Airbnb       Activism
 IMG_0001            Art
 Netflix Prize       Business
 College Scorecard   Government
+Love Song           Journalism
 Opportunity Atlas   Research
 
 ## What is Advanced Data Science?
