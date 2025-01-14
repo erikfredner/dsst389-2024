@@ -29,6 +29,7 @@ nocite: |
   @wickhamDataScienceImport2023
   @wickhamMasteringShinyBuild2021
   @wickhamPackagesOrganizeTest2023
+  @jamesIntroductionStatisticalLearning2021
 
 header-includes:
   - \usepackage{fontspec}
@@ -193,37 +194,37 @@ I ask you to do these things in this order when you can't figure something out:
 - I reserve the right to change the schedule.
   - If I change the schedule, I will inform you as far in advance as possible.
 
-Date      Topic
---------- ---------------------------------------------
-01-13     Introduction
-01-15     Quarto and Markdown
-01-22     **NO CLASS**
-01-27     `tidyverse` review
-01-29     Text processing and Zipf
-02-03     Sampling and corpora
-02-05     Sentiment analysis
-02-10     n-grams and correlation
-02-12     **Group Project 1**
-02-17     tf-idf and KNN
-02-19     Gradient boosted trees and text classification
-02-24     Principal components analysis
-02-26     Authorship attribution
-03-03     Topic modeling
-03-05     **Group Project 2**
-03-10     *Spring Break*
-03-12     *Spring Break*
-03-17     Network analysis
-03-19     Word embeddings
-03-24     Data ethics and surveillance capitalism
-03-26     APIs
-03-31     Web Scraping
-04-02     Text and data cleaning
-04-07     LLMs
-04-09     **Code Interviews**
-04-14     **Group Project 3**
-04-16     Workshop
-04-21     Workshop
-04-23     **Final Project presentations**
+Meeting  Date      Topic
+-------- --------- ---------------------------------------------
+1        01-13     Introduction
+2        01-15     Quarto and Markdown
+         01-22     **NO CLASS**
+3        01-27     `tidyverse` review
+4        01-29     Text processing and Zipf
+5        02-03     Sampling and corpora
+6        02-05     Sentiment analysis
+7        02-10     n-grams and correlation
+8        02-12     **Group Project 1**
+9        02-17     tf-idf and KNN
+10       02-19     Gradient boosted trees and text classification
+11       02-24     Principal components analysis
+12       02-26     Authorship attribution
+13       03-03     Topic modeling
+14       03-05     **Group Project 2**
+         03-10     *Spring Break*
+         03-12     *Spring Break*
+15       03-17     Network analysis
+16       03-19     Word embeddings
+17       03-24     Data ethics and surveillance capitalism
+18       03-26     APIs
+19       03-31     Web Scraping
+20       04-02     Text and data cleaning
+21       04-07     LLMs
+22       04-09     **Code Interviews**
+23       04-14     **Group Project 3**
+24       04-16     Workshop
+25       04-21     Workshop
+26       04-23     **Final Project presentations**
 
 
 ## Communication
