@@ -1,0 +1,58 @@
+---
+title: "`tidyverse` Review"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+execute:
+  echo: true
+  warning: false
+  message: false
+  error: true
+format:
+  html:
+    anchor-sections: true
+    code-tools: false
+    embed-resources: true
+    link-external-icon: true
+    link-external-newwindow: true
+    number-sections: true
+    smooth-scroll: true
+    toc: true
+editor:
+  markdown:
+    wrap: 72
+---
+
+## Overview
+
+While everyone in this class has taken DSST289, many have done so at different times, and with different instructors.
+
+This reading assignment reviews key concepts from 289 and covers some of my expectations for code in the class. (If these expectations are different from your prior classes, those differences likely reflect changes in the world of R since you took 289.)
+
+## A few firm rules
+
+- Use the base R pipe (`|>`), not the `magrittr` pipe (`%>%`)
+  - You can set this as a keyboard shortcut in RStudio
+- Use `<-` to assign outputs to objects. *Do not* use `=`.
+- Use `tidyverse` functions instead of base R whenever possible.
+  - e.g., `as_factor()` is `tidyverse`; `as.factor()` is `{base}`.
+- Style your code in accordance with the [`tidyverse` style guide](https://style.tidyverse.org/)
+  - We will learn how to use [`styler`](https://styler.r-lib.org/) and [`lintr`](https://lintr.r-lib.org/) to automatically format and check style
+- Code without comments and/or documentation is incomplete
+
+## Reading
+
+In this class, I will use the verb **read** to indicate that I expect you to read something carefully.
+
+When you can read something more casually, I will use a different verb like **review** or even **skim**.
+
+The readings below include exercises. You are *not* required to complete the exercises, though I encourage you to do so if you think you would benefit from practice.
+
+:::{.callout-important}
+Using paper and pencil, take notes as you read. Identify at least **three** things that you either learned for the first time or remembered from 289 while reading.
+:::
+
+- [ ] Review [chapter 3](https://r4ds.hadley.nz/data-transform) of *R4DS*
+- [ ] Read [chapter 4](https://r4ds.hadley.nz/workflow-style) of *R4DS*
+- [ ] Review [chapter 5](https://r4ds.hadley.nz/data-tidy) of *R4DS*

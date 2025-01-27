@@ -1,0 +1,563 @@
+year,ward,cost,category,program,description,category_street,pct_income_under25,pct_income_25_50,pct_income_50_100,pct_income_100_150,pct_income_over150,pct_white,pct_hispanic,pct_black,pct_asian,plurality
+2015,20,$3700,Streets & Transportation,Street Speed Hump Menu,ON E 50TH PL FROM S PEORIA ST (900 W) TO S MORGAN ST (1000 W),Pedestrian,53.01,24.54,16.21,4.43,1.81,14.59,13.8,77.69,1.72,black
+2016,49,$11431,Streets & Transportation,Alley Apron Menu,6700 N GREENVIEW AVE,Car,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2022,14,$11341.36,Streets & Transportation,Street Resurfacing (2022),ON W 49TH ST FROM 4413 W TO S KOSTNER AVE (4400 W),Car,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2013,14,$5146,Streets & Transportation,Sidewalk Menu,ON W 54TH ST FROM S SACRAMENTO AV (3000 W) TO S ALBANY AV (3100 W),Pedestrian,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2015,43,$700,Streets & Transportation,"In-Road ""State Law Stop For Pedestrians"" Signs",N CLARK ST & W SCHUBERT AVE,Pedestrian,13.54,10.77,27.47,18.03,30.2,83.93,5.6,5.01,6.96,white
+2016,9,$71205,Streets & Transportation,Street Resurfacing Menu,ON S WENTWORTH AVE FROM W 99TH ST (9900 S) TO W 100TH ST (10000 S),Car,38.72,24.75,24.84,7.99,3.7,5.61,4.96,92.55,0.15,black
+2013,22,$17429,Streets & Transportation,Sidewalk Menu,ON S KOMENSKY AVE FROM W 32 ST (3200 S) TO Dead End (3225 S),Pedestrian,30.71,32.85,26.02,7.91,2.5,58.47,85.69,5.54,0.41,hispanic
+2022,17,$53202.57,Streets & Transportation,Street Resurfacing (2022),ON W 73RD ST FROM S HOMAN AVE (3400 W) TO S ST LOUIS AVE (3500 W),Car,41.31,30.79,20.74,5.09,2.07,9.5,19.79,75.48,0.29,black
+2014,47,$0,Streets & Transportation,Resurfacing Alley Speed,N WINCHESTER AVE & W AINSLIE ST&N WOLCOTT AVE &,Car,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2020,13,$350,Streets & Transportation,"In-Road ""State Law Stop For Pedestrians"" Signs",W 63RD ST & S MENARD AVE,Pedestrian,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2017,15,$1400,Streets & Transportation,Alley Speed Hump Menu (2017),S DAMEN AVE & W 48TH ST&S WINCHESTER AVE & W 49TH ST,Pedestrian,36.61,34.26,22,4.99,2.13,45.96,73.88,19.26,1.98,hispanic
+2015,8,$3200,Lighting,Street Light Upgrade Menu,ON E 73RD ST FROM S CONSTANCE AVE (1820 E) TO S STONY ISLAND AVE (1600 E) . Current W.O # : 11530802 -,NA,38.52,25.69,24.18,8.08,3.53,1.62,1.21,96.77,0.24,black
+2012,38,$17318,Streets & Transportation,Sidewalk Menu,ON N AUSTIN AVE FROM W DAKIN ST (3932 N) TO W IRVING,Pedestrian,19.54,20.31,33.82,16.5,9.84,82.86,24.7,1.55,4.72,white
+2012,34,$38981,Streets & Transportation,Street Resurfacing Menu,ON S SANGAMON ST FROM W 100 ST (10000 S) TO W 101 ST (10100 S),Car,33.38,24,27.52,11.02,4.07,2.88,3.5,93.01,0.19,black
+2012,20,$7855,Streets & Transportation,Sidewalk Menu,ON E 68TH ST FROM S ST LAWRENCE AV (600 E) TO S ST,Pedestrian,53.01,24.54,16.21,4.43,1.81,14.59,13.8,77.69,1.72,black
+2019,23,$63929.82,Streets & Transportation,Street Resurfacing (2019),ON E 65TH PL FROM S HOMAN AVE (3400 W) TO S ST LOUIS AVE (3500 W),Car,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2014,14,$8420,Streets & Transportation,Sidewalk Menu,ON S LOTUS AVE FROM W 51ST ST (5100 S) TO W 52ND ST (5200 S),Pedestrian,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2019,17,$41875.85,Streets & Transportation,Sidewalk (2019),7300 S MARSHFIELD AVE,Pedestrian,41.31,30.79,20.74,5.09,2.07,9.5,19.79,75.48,0.29,black
+2014,46,$26946,Streets & Transportation,Alley Resurfacing Menu,N HALSTED ST & W ADDISON ST&N BROADWAY & W WAVELAND AVE,Car,27.39,18.54,27.77,14.4,11.9,67.71,12.88,18.39,7.65,white
+2014,33,$79962,Streets & Transportation,Street Resurfacing Menu,ON W CULLOM AVE FROM N SPAULDING AVE (3300 W) TO N KEDZIE AVE (3200 W),Car,19.94,24.22,29.62,14.15,12.08,71.64,47.93,4.41,9.26,white
+2015,44,$700,Streets & Transportation,"In-Road ""State Law Stop For Pedestrians"" Signs",W BELMONT AVE & N ORCHARD ST,Pedestrian,13.74,15.14,28.47,18.86,23.79,86.15,6.85,3.03,7.02,white
+2016,31,$0,Streets & Transportation,Alley Speed Hump,N KOSTNER AVE & W BELMONT AVE&N LOWELL AVE & W BARRY AVE,Pedestrian,26.42,25.25,30.96,11.43,5.94,53.55,76.84,3.18,1.92,hispanic
+2018,13,$12684.54,Streets & Transportation,Alley Apron Menu (2018),6635 W 59TH ST,Car,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2021,37,$8090.43,Streets & Transportation,Sidewalk (2021),901 N KEYSTONE AVE,Pedestrian,40.7,27.9,23.41,5.49,2.5,8.04,26,71.26,0.37,black
+2012,17,$110271,Streets & Transportation,Curb & Gutter Menu,ON S YALE AVE FROM W 80 ST (8000 S) TO W 81 ST (8100 S),Car,41.31,30.79,20.74,5.09,2.07,9.5,19.79,75.48,0.29,black
+2019,21,$10806.09,Streets & Transportation,Sidewalk (2019),9300 S UNION AVE,Pedestrian,37.97,23.43,25.98,8.59,4.02,1.18,1.15,96.84,0.24,black
+2018,48,$90000,Streets & Transportation,Street Resurfacing Menu (2018),W BRYN MAWR AVE & N SHERIDAN RD,Car,27.55,24.5,27.89,10.81,9.25,66.05,14.5,14.91,12.94,white
+2022,37,$29539.1,Streets & Transportation,Alley Resurfacing (2022),W NORTH AVE & N LOTUS AVE&N LINDER AVE & W LE MOYNE ST; 5445 W NORTH AVE,Car,40.7,27.9,23.41,5.49,2.5,8.04,26,71.26,0.37,black
+2014,24,$3700,Streets & Transportation,Street Speed Hump Menu,ON W LEXINGTON ST FROM S ALBANY AVE (3100 W) TO S KEDZIE AVE (3200 W),Pedestrian,45.5,27.1,20.35,5.37,1.68,13.02,22,74.93,0.28,black
+2015,15,$1400,Streets & Transportation,Alley Speed Hump Menu,W 46TH ST & S TALMAN AVE&W 47TH ST & S ROCKWELL ST,Pedestrian,36.61,34.26,22,4.99,2.13,45.96,73.88,19.26,1.98,hispanic
+2012,43,$1260,Streets & Transportation,Bollard Menu,ON N COMMONWEALTH AVE FROM 2376 N TO W BELDEN AV (2300 N),Car,13.54,10.77,27.47,18.03,30.2,83.93,5.6,5.01,6.96,white
+2016,47,$600,Streets & Transportation,In-Road 'State Law Stop For Pedestrians' Signs Menu,W MONTROSE AVE & N CLAREMONT AVE,Pedestrian,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2019,9,$52353.41,Streets & Transportation,Sidewalk (2019),ON W 102ND ST FROM S LAFAYETTE AVE (30 W) TO S STATE ST (0 E),Pedestrian,38.72,24.75,24.84,7.99,3.7,5.61,4.96,92.55,0.15,black
+2015,12,$400,Lighting,Street Light Upgrade Menu,2141 S CALIFORNIA AVE . Current W.O # : 11531200 -,NA,30.14,31.55,26.76,8.28,3.27,44.05,68.69,12.96,9.25,hispanic
+2021,50,$46126.96,Streets & Transportation,Street Resurfacing (2021),ON N FAIRFIELD AVE FROM W DEVON AVE (6400 N) TO W ARTHUR AVE (6500 N),Car,22.01,25.95,28.31,13.19,10.54,56.45,17,12.83,21.91,white
+2023,13,$18429.23,Streets & Transportation,Sidewalk (2023),5708 S SAYRE AVE; 5756 S SAYRE AVE,Pedestrian,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2013,11,$20637,Streets & Transportation,Sidewalk Menu,ON S UNION AVE FROM W 46 ST (4600 S) TO W 47 ST (4700 S),Pedestrian,27.46,24,26.41,12.5,9.63,47.3,22.98,6.97,35.6,white
+2016,41,$37250,Streets & Transportation,Street Resurfacing Menu,ON N OLYMPIA AVE FROM W NORWOOD ST (6030 N) TO W PETERSON AVE (6000 N),Car,17.36,17.73,30.52,16.4,17.99,86.31,14.1,1.16,5.21,white
+2022,30,$8365.02,Streets & Transportation,Sidewalk (2022),4727 W BERENICE AVE,Pedestrian,20.36,28.69,30.68,12.32,7.95,68.82,66.64,2,3.14,white
+2022,48,$600,Streets & Transportation,"In-Road ""State Law Stop For Pedestrians"" Sign",N CLARK ST & W SUMMERDALE AVE,Pedestrian,27.55,24.5,27.89,10.81,9.25,66.05,14.5,14.91,12.94,white
+2016,3,$36103,Streets & Transportation,Sidewalk Menu,ON W 16TH ST FROM S CLARK ST (100 W) TO S DEARBORN ST (36 W),Pedestrian,33.11,16.03,23.03,13.22,14.61,23.16,4.82,63.03,9.81,black
+2013,24,$46098,Streets & Transportation,Sidewalk Menu,ON S TRUMBULL AVE FROM W 21 ST (2046 S) TO W CERMAK RD (2200 S),Pedestrian,45.5,27.1,20.35,5.37,1.68,13.02,22,74.93,0.28,black
+2022,36,$3907.92,Streets & Transportation,Sidewalk (2022),2110 N MERRIMAC AVE,Pedestrian,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2023,45,$725,Streets & Transportation,Alley Speed Hump (2023),N MILWAUKEE AVE & W HUTCHINSON ST&W CULLOM AVE & N LAMON AVE,Pedestrian,16.16,20.11,32.72,16.95,14.06,77.63,26.87,1.62,7.96,white
+2016,1,$53063,Streets & Transportation,Street Resurfacing Menu,ON N OAKLEY AVE FROM W ERIE ST (640 N) TO W SUPERIOR ST (730 N),Car,17.54,15.25,28.21,17.65,21.34,78.92,34.38,5.54,4.02,white
+2021,11,$500,Lighting,Street Light Upgrade (2021),3512 S PARNELL AVE,NA,27.46,24,26.41,12.5,9.63,47.3,22.98,6.97,35.6,white
+2013,16,$0,Streets & Transportation,Resurfacing Street Speed,ON S MAPLEWOOD AVE FROM W 57TH ST (5700 S) TO W 58TH ST (5800 S),Car,44.72,29.07,20.18,4.36,1.67,17.16,41.78,55.68,0.32,black
+2019,17,$53719.46,Streets & Transportation,Street Resurfacing (2019),ON S GREEN ST FROM W 78TH ST (7800 S) TO W 79TH ST (7900 S),Car,41.31,30.79,20.74,5.09,2.07,9.5,19.79,75.48,0.29,black
+2019,26,$2350,Streets & Transportation,Street Speed Hump (2019),1400 N KARLOV AVE,Pedestrian,26.98,24.24,27.84,12.06,8.88,49.68,60.68,11.7,1.66,hispanic
+2013,36,$51984,Streets & Transportation,Street Resurfacing Menu,ON N PIONEER AVE FROM W SCHOOL ST (3300 N) TO W ROSCOE ST (3400 N),Car,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2017,3,$8762.54,Streets & Transportation,Alley Resurfacing Menu (2017),W GARFIELD BLVD & S PRINCETON AVE:S WELLS ST & W 57TH ST,Car,33.11,16.03,23.03,13.22,14.61,23.16,4.82,63.03,9.81,black
+2015,42,$3600,Beautification,Street Light Pole Painting Menu,ON W ONTARIO ST FROM N ORLEANS ST (340 W) TO N KINGSBURY ST (500 W) 400 Watt Changeout and Pole Painting,NA,12.23,8.49,25.32,18.39,35.57,73.34,5.98,4.62,18.51,white
+2014,4,$29170,Streets & Transportation,Pedestrian Refuge Island,E 48TH ST & S LAKE PARK AVE,Pedestrian,34.69,17.76,23.36,11.39,12.8,25.02,4.3,60.88,10.35,black
+2018,24,$3700,Streets & Transportation,Street Speed Hump (2018),ON S HARDING AVE FROM W 13TH ST (1300 S) TO W 14TH ST (1400 S),Pedestrian,45.5,27.1,20.35,5.37,1.68,13.02,22,74.93,0.28,black
+2013,11,$131358,Streets & Transportation,Street Resurfacing Menu,ON S EMERALD AVE FROM W 37 ST (3700 S) TO W PERSHING RD (3900 S),Car,27.46,24,26.41,12.5,9.63,47.3,22.98,6.97,35.6,white
+2021,50,$500,Lighting,Street Light Upgrade (2021),7411 N WASHTENAW AVE,NA,22.01,25.95,28.31,13.19,10.54,56.45,17,12.83,21.91,white
+2018,39,$95564.45,Streets & Transportation,Street Resurfacing (1-5) (2018),ON N BERNARD ST FROM W FOSTER AVE (5200 N) TO W BALMORAL AVE (5400 N),Car,17.7,19.27,28.5,16.32,18.22,66.88,23.4,2.66,19,white
+2015,10,$16801,Streets & Transportation,Street Resurfacing Menu (1-5),ON E 84TH ST FROM S MACKINAW AVE (3330 E) TO S GREEN BAY AVE (3400 E),Car,34.32,25.26,27.32,9.13,3.97,66.54,59.49,25.22,0.23,white
+2014,14,$4577,Streets & Transportation,Sidewalk Menu,ON S KEDZIE AVE FROM W 51ST ST (5100 S) TO W 52ND ST (5200 S),Pedestrian,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2017,48,$60000,Streets & Transportation,Pedestrian Refuge Island Menu (2017),W NORWOOD ST & N BROADWAY,Pedestrian,27.55,24.5,27.89,10.81,9.25,66.05,14.5,14.91,12.94,white
+2015,46,$80960,Streets & Transportation,Street Resurfacing Menu,ON N MALDEN ST FROM W WILSON AVE (4600 N) TO W LELAND AVE (4700 N),Car,27.39,18.54,27.77,14.4,11.9,67.71,12.88,18.39,7.65,white
+2020,47,$8887.84,Streets & Transportation,Sidewalk (2020),4709 N DAMEN AVE,Pedestrian,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2021,14,$6170.57,Streets & Transportation,Sidewalk (2021),4734-4742 W 51ST ST,Pedestrian,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2016,37,$9258,Streets & Transportation,Curb & Gutter Menu,1656 N LUNA AVE,Car,40.7,27.9,23.41,5.49,2.5,8.04,26,71.26,0.37,black
+2018,13,$1301.16,Streets & Transportation,Curb & Gutter Menu (2018),3949 W 58TH ST,Car,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2019,13,$40000,Streets & Transportation,Street Resurfacing (2019),ON W 60TH ST FROM S MASON AVE (5930 W) TO S AUSTIN AVE (6000 W),Car,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2022,6,$252.74,Lighting,Floodlight (2022),E 75TH ST & S PRAIRIE AVE,NA,45.01,23.37,23.7,5.03,2.89,1.19,1.82,96.38,0.07,black
+2018,34,$29446.16,Streets & Transportation,Curb & Gutter (2018),ON S ASHLAND AVE FROM W 111TH ST (11100 S) TO W PRYOR AVE (11160 S),Car,33.38,24,27.52,11.02,4.07,2.88,3.5,93.01,0.19,black
+2022,37,$700,Streets & Transportation,Alley Speed Hump (2022),910 N AVERS AVE,Pedestrian,40.7,27.9,23.41,5.49,2.5,8.04,26,71.26,0.37,black
+2017,21,$3700,Streets & Transportation,Street Speed Hump (2018),ON S PRINCETON AVE FROM W 88TH ST (8800 S) TO W 89TH ST (8900 S),Pedestrian,37.97,23.43,25.98,8.59,4.02,1.18,1.15,96.84,0.24,black
+2018,3,$136975.22,Streets & Transportation,Street Resurfacing Menu (2018),ON E 45TH ST FROM S STATE ST (1 W) TO S PRAIRIE AVE (300 E),Car,33.11,16.03,23.03,13.22,14.61,23.16,4.82,63.03,9.81,black
+2019,31,$0,Streets & Transportation,Street Speed Hump Replacement (2019),ON W ALTGELD ST FROM N LARAMIE AVE (5200 W) TO N LOCKWOOD AVE (5300 W),Pedestrian,26.42,25.25,30.96,11.43,5.94,53.55,76.84,3.18,1.92,hispanic
+2012,37,$700,Lighting,Street Light Upgrade,ON LUNA FROM W BLOOMINGDALE AV (1800 N) TO W CORTLAND ST (1846 N),NA,40.7,27.9,23.41,5.49,2.5,8.04,26,71.26,0.37,black
+2013,2,$3200,Lighting,Street Light Upgrade,ON W MAXWELL ST FROM S BLUE ISLAND AVE (1133 W) TO S MORGAN ST (1000 W),NA,16.73,11.76,27.36,16.57,27.58,80.23,9.71,7.06,6.96,white
+2012,25,$25259,Streets & Transportation,Sidewalk Menu,ON W 19TH ST FROM S BISHOP ST (1444 W) TO S LAFLIN ST (1500 W),Pedestrian,27.08,20.27,25.88,12.03,14.74,52.65,48.07,8.27,15.29,white
+2016,11,$1850,Streets & Transportation,Street Speed Hump Menu,ON W 37TH ST FROM S LITUANICA AVE (900 W) TO S SANGAMON ST (938 W),Pedestrian,27.46,24,26.41,12.5,9.63,47.3,22.98,6.97,35.6,white
+2013,4,$64687,Streets & Transportation,Curb & Gutter Menu,ON S DORCHESTER AVE FROM E 50TH ST (5000 S) TO E HYDE PARK BLVD (5100 S),Car,34.69,17.76,23.36,11.39,12.8,25.02,4.3,60.88,10.35,black
+2015,48,$6000,Schools & Libraries,Miscellaneous Other Projects,5900 N WINTHROP AVE After School Matters mural for Swift Elementary -,NA,27.55,24.5,27.89,10.81,9.25,66.05,14.5,14.91,12.94,white
+2019,34,$78453.62,Streets & Transportation,Curb & Gutter (2019),ON S PARNELL AVE FROM W 119TH ST (11900 S) TO W 120TH ST (12000 S),Car,33.38,24,27.52,11.02,4.07,2.88,3.5,93.01,0.19,black
+2017,45,$1850,Streets & Transportation,Street Speed Hump (2017),ON W LELAND AVE FROM N LAVERGNE AVE (5000 W) TO N LAPORTE AVE (4932 W),Pedestrian,16.16,20.11,32.72,16.95,14.06,77.63,26.87,1.62,7.96,white
+2015,11,$92687,Streets & Transportation,Street Resurfacing Menu (1-5),ON W 37TH ST FROM S LOWE AVE (630 W) TO S HALSTED ST (800 W),Car,27.46,24,26.41,12.5,9.63,47.3,22.98,6.97,35.6,white
+2015,24,$700,Streets & Transportation,Alley Speed Hump Menu,S TROY ST & W 21ST ST&S ALBANY AVE & W CERMAK RD,Pedestrian,45.5,27.1,20.35,5.37,1.68,13.02,22,74.93,0.28,black
+2018,37,$3047.99,Streets & Transportation,Sidewalk Menu (2018),5431-5435 W POTOMAC AVE,Pedestrian,40.7,27.9,23.41,5.49,2.5,8.04,26,71.26,0.37,black
+2022,25,$17077.67,Streets & Transportation,Sidewalk (2022),1504 W CULLERTON ST,Pedestrian,27.08,20.27,25.88,12.03,14.74,52.65,48.07,8.27,15.29,white
+2013,34,$5000,Lighting,Street Light Upgrade,ON W 103RD ST FROM S HALSTED ST (800 W) TO S SEELEY AV (2020 W),NA,33.38,24,27.52,11.02,4.07,2.88,3.5,93.01,0.19,black
+2022,8,$36695.81,Streets & Transportation,Sidewalk (2022),8201 S DORCHESTER AVE,Pedestrian,38.52,25.69,24.18,8.08,3.53,1.62,1.21,96.77,0.24,black
+2014,23,$8039,Streets & Transportation,Sidewalk Menu,ON W 63RD PL FROM S OAK PARK AVE (6800 W) TO S NEW ENGLAND AVE (6900 W),Pedestrian,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2023,4,$3705.44,Streets & Transportation,Sidewalk (2023),715 E BOWEN AVE,Pedestrian,34.69,17.76,23.36,11.39,12.8,25.02,4.3,60.88,10.35,black
+2018,45,$10545.31,Streets & Transportation,Sidewalk Menu (2018),5622-5626 N CENTRAL AVE,Pedestrian,16.16,20.11,32.72,16.95,14.06,77.63,26.87,1.62,7.96,white
+2018,47,$26767.75,Streets & Transportation,Alley Resurfacing (2018),W CULLOM AVE & N LEAVITT ST&W MONTROSE AVE & N BELL AVE,Car,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2014,25,$3394,Streets & Transportation,Sidewalk Menu,ON W 21ST ST FROM S WOOD ST (1800 W) TO S WOLCOTT AVE (1900 W),Pedestrian,27.08,20.27,25.88,12.03,14.74,52.65,48.07,8.27,15.29,white
+2017,15,$22953,Lighting,Street Light Piggy Back Only (2017),ON S PAULINA ST FROM W 59TH ST (5900 S) TO W 61ST ST (6100 S),NA,36.61,34.26,22,4.99,2.13,45.96,73.88,19.26,1.98,hispanic
+2021,26,$0,Streets & Transportation,Alley Speed Hump Replacement (2021),W HIRSCH ST & N ST LOUIS AVE&N CENTRAL PARK AVE & W BEACH AVE,Pedestrian,26.98,24.24,27.84,12.06,8.88,49.68,60.68,11.7,1.66,hispanic
+2013,2,$21634,Streets & Transportation,Street Resurfacing Menu,ON N TALMAN AVE FROM W MAYPOLE AVE (130 N) TO W WASHINGTON BLVD (100 N),Car,16.73,11.76,27.36,16.57,27.58,80.23,9.71,7.06,6.96,white
+2012,47,$800,Streets & Transportation,In-Road 'State Law Stop For Pedestrians' Signs Menu,N BELL AVE & W MONTROSE AVE,Pedestrian,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2018,32,$11755.7,Streets & Transportation,Curb & Gutter Menu (2018),3152 N LEAVITT ST,Car,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white
+2014,19,$16190,Streets & Transportation,Street Resurfacing Menu,ON E 105TH ST FROM S OAKLEY AVE (2300 W) TO S CLAREMONT AVE (2330 W),Car,13.31,18.49,31.9,18.22,18.09,73.18,10.68,19.71,1.42,white
+2021,3,$500,Lighting,Street Light Upgrade (2021),4319 S STATE ST,NA,33.11,16.03,23.03,13.22,14.61,23.16,4.82,63.03,9.81,black
+2023,41,$56957.43,Streets & Transportation,Street Resurfacing (2023),ON N OLEANDER AVE FROM W BERWYN AVE (5300 N) TO W FOSTER AVE (5200 N),Car,17.36,17.73,30.52,16.4,17.99,86.31,14.1,1.16,5.21,white
+2014,40,$20252,Streets & Transportation,Street Resurfacing Menu,ON W BALMORAL AVE FROM N LINCOLN AVE (2520 W) TO N ROCKWELL ST (2600 W),Car,20.79,22.92,26.56,15.06,14.67,67.28,21.87,6.39,16.86,white
+2014,45,$32669,Streets & Transportation,Street Resurfacing Menu,ON W WAVELAND AVE FROM N TRIPP AVE (4240 W) TO N,Car,16.16,20.11,32.72,16.95,14.06,77.63,26.87,1.62,7.96,white
+2017,13,$2162.65,Streets & Transportation,Sidewalk Menu (2017),5543 S MEADE AVE,Pedestrian,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2023,18,$68124.01,Streets & Transportation,Street Resurfacing (2023),ON S TALMAN AVE FROM W 80TH ST (8000 S) TO W 81ST ST (8100 S),Car,19.31,22.82,35.66,15.31,6.9,31.36,33.12,47.8,0.61,black
+2019,41,$39731.58,Streets & Transportation,Street Resurfacing (2019),ON W HOOD AVE FROM 7248 W TO N HARLEM AVE (7200 W),Car,17.36,17.73,30.52,16.4,17.99,86.31,14.1,1.16,5.21,white
+2012,11,$784,Streets & Transportation,Sidewalk Menu,4234 S Emerald,Pedestrian,27.46,24,26.41,12.5,9.63,47.3,22.98,6.97,35.6,white
+2014,44,$7649,Streets & Transportation,Alley Apron Menu,ON W SCHOOL ST FROM 1240 W TO N RACINE AVE (1200 W),Car,13.74,15.14,28.47,18.86,23.79,86.15,6.85,3.03,7.02,white
+2013,27,$1880,Streets & Transportation,Sidewalk Menu,ON N LAWNDALE AVE FROM W FERDINAND ST (500 N) TO W HARRISON ST (600 S),Pedestrian,32.28,14.93,21.22,13.39,18.19,36.97,14.4,47.37,5.17,black
+2023,40,$5507.7,Streets & Transportation,Sidewalk (2023),5629 N MAPLEWOOD AVE,Pedestrian,20.79,22.92,26.56,15.06,14.67,67.28,21.87,6.39,16.86,white
+2020,34,$2100,Streets & Transportation,Alley Speed Hump (2020),W 124TH ST & S WALLACE ST&S PARNELL AVE & W 125TH ST,Pedestrian,33.38,24,27.52,11.02,4.07,2.88,3.5,93.01,0.19,black
+2018,47,$0,Streets & Transportation,"In-Road ""State Law Stop For Pedestrians"" Signs (2018)",W MONTROSE AVE & N HERMITAGE AVE,Pedestrian,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2016,14,$26795,Streets & Transportation,Sidewalk Menu,ON S KILDARE AVE FROM W 47TH ST (4700 S) TO W 48TH ST (4800 S),Pedestrian,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2017,17,$0,Streets & Transportation,Street Speed Hump Replacement (2017),ON W 72ND ST FROM S HONORE ST (1830 W) TO S WINCHESTER AVE (1930 W),Pedestrian,41.31,30.79,20.74,5.09,2.07,9.5,19.79,75.48,0.29,black
+2015,34,$39150,Lighting,Street Light Upgrade Piggy Back Menu,ON S MARSHFIELD AVE FROM W 115TH ST (11500 S) TO W 119TH ST (11900 S) W O # : 11533400,NA,33.38,24,27.52,11.02,4.07,2.88,3.5,93.01,0.19,black
+2017,18,$3700,Streets & Transportation,Street Speed Hump (2017),ON W 81ST PL FROM S SPRINGFIELD AVE (3900 W) TO S PULASKI RD (4000 W),Pedestrian,19.31,22.82,35.66,15.31,6.9,31.36,33.12,47.8,0.61,black
+2014,39,$4000,"Plants, Gardens, & Sustainability",Miscellaneous Other,5405 W DEVON AVE tree planting - various locations,NA,17.7,19.27,28.5,16.32,18.22,66.88,23.4,2.66,19,white
+2012,15,$192000,Lighting,Street Light Residential Staggered Piggy Back Menu,ON ARTESIAN FROM W 60 ST (6000 S) TO W 63 ST (6300 S),NA,36.61,34.26,22,4.99,2.13,45.96,73.88,19.26,1.98,hispanic
+2019,48,$9894.65,Streets & Transportation,Curb & Gutter (2019),5329-5335 N GLENWOOD AVE,Car,27.55,24.5,27.89,10.81,9.25,66.05,14.5,14.91,12.94,white
+2017,48,$4992.61,Streets & Transportation,Alley Resurfacing Menu (2017),1310 W BRYN MAWR AVE:5617 N WAYNE AVE,Car,27.55,24.5,27.89,10.81,9.25,66.05,14.5,14.91,12.94,white
+2018,13,$3436.35,Streets & Transportation,Sidewalk Menu (2018),6125 S MCVICKER AVE,Pedestrian,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2013,47,$400,Lighting,Street Light Upgrade,4719 N TALMAN AVE,NA,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2012,42,$35170,Streets & Transportation,Curb & Gutter Menu,ON E WALTON ST FROM N MIES VAN DER ROHE WY (236 E) TO N MIES VAN DER ROHE WY (236 E),Car,12.23,8.49,25.32,18.39,35.57,73.34,5.98,4.62,18.51,white
+2022,21,$4491.67,Streets & Transportation,Bollard (2022),101 W 83RD ST,Car,37.97,23.43,25.98,8.59,4.02,1.18,1.15,96.84,0.24,black
+2013,21,$708,Streets & Transportation,Sidewalk Menu,ON S JUSTINE ST FROM W 79TH ST (7900 S) TO W 80TH ST (8000 S),Pedestrian,37.97,23.43,25.98,8.59,4.02,1.18,1.15,96.84,0.24,black
+2020,9,$17090.81,Streets & Transportation,Sidewalk (2020),10458 S CALUMET AVE; ON E 105TH ST FROM S FOREST AVE (300 E) TO S CALUMET AVE,Pedestrian,38.72,24.75,24.84,7.99,3.7,5.61,4.96,92.55,0.15,black
+2020,28,$40380.25,Streets & Transportation,Alley Resurfacing (2020),S CICERO AVE & W JACKSON BLVD&W QUINCY ST & S LAVERGNE AVE,Car,46.4,21.73,21.03,5.57,5.26,14.92,8.19,74.88,4.71,black
+2020,47,$350,Streets & Transportation,"In-Road ""State Law Stop For Pedestrians"" Signs",N LINCOLN AVE & W HUTCHINSON ST,Pedestrian,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2023,23,$1232.44,Streets & Transportation,Sidewalk (2023),5325 S NEVA AVE,Pedestrian,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2018,10,$120000,Streets & Transportation,Concrete Alley Menu (2018),S EWING AVE & E 103RD ST&S AVENUE L & E 104TH ST,Car,34.32,25.26,27.32,9.13,3.97,66.54,59.49,25.22,0.23,white
+2018,19,$45134.05,Streets & Transportation,Street Resurfacing (2018),ON N OAKLEY BLVD FROM W 103RD ST (10300 S) TO W 104TH ST (10400 S),Car,13.31,18.49,31.9,18.22,18.09,73.18,10.68,19.71,1.42,white
+2012,28,$566,Streets & Transportation,Sidewalk Menu,ON W RACE AVE FROM N CICERO AVE (4800 W) TO N KILPATRICK AVE (4700 W),Pedestrian,46.4,21.73,21.03,5.57,5.26,14.92,8.19,74.88,4.71,black
+2019,13,$4999.52,Streets & Transportation,Concrete Alley (2019),5924 W 64TH PL,Car,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2022,13,$4755.4,Streets & Transportation,Concrete Alley (2022),5516 S AUSTIN AVE,Car,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2022,22,$660,Streets & Transportation,Miscellaneous CDOT Projects (2022),4401 S LEAMINGTON AVE,Car,30.71,32.85,26.02,7.91,2.5,58.47,85.69,5.54,0.41,hispanic
+2023,23,$39071.39,Streets & Transportation,Street Resurfacing (2023),ON S HAMLIN AVE FROM W 62ND ST (6200 S) TO W 62ND PL (6230 S),Car,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2021,36,$9072.43,Streets & Transportation,Sidewalk (2021),2174 N MOBILE AVE,Pedestrian,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2021,12,$51315.07,Streets & Transportation,Alley Resurfacing (2021),S SAWYER AVE & W 26TH ST&W 27TH ST & S SPAULDING AVE,Car,30.14,31.55,26.76,8.28,3.27,44.05,68.69,12.96,9.25,hispanic
+2015,33,$1597,Streets & Transportation,Sidewalk Menu,4325 N FRANCISCO AVE,Pedestrian,19.94,24.22,29.62,14.15,12.08,71.64,47.93,4.41,9.26,white
+2014,2,$31343,Streets & Transportation,Sidewalk Menu,ON W JACKSON BLVD FROM S LAFLIN ST (1500 W) TO S THROOP ST (1300 W),Pedestrian,16.73,11.76,27.36,16.57,27.58,80.23,9.71,7.06,6.96,white
+2020,26,$11384.71,Streets & Transportation,Sidewalk (2020),2154-2156 N KEYSTONE AVE,Pedestrian,26.98,24.24,27.84,12.06,8.88,49.68,60.68,11.7,1.66,hispanic
+2023,39,$13867,Streets & Transportation,Street Resurfacing (2023),ON W HOLBROOK ST FROM N MILWAUKEE AVE (6200 W) TO N MCLEOD AVE (6300 W),Car,17.7,19.27,28.5,16.32,18.22,66.88,23.4,2.66,19,white
+2014,23,$5228,Streets & Transportation,Street Resurfacing Menu,ON W 63RD PL FROM SSHVILLE AVE (6600 W) TO STCHEZ AVE (6500 W),Car,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2022,20,$71893.81,Streets & Transportation,Street Resurfacing (2022),ON S ADA ST FROM W 48TH ST (4800 S) TO W 49TH ST (4900 S),Car,53.01,24.54,16.21,4.43,1.81,14.59,13.8,77.69,1.72,black
+2015,21,$0,Streets & Transportation,Street Speed Hump Replacement,ON S UNION AVE FROM W 93RD ST (9300 S) TO W 95TH ST (9500 S),Pedestrian,37.97,23.43,25.98,8.59,4.02,1.18,1.15,96.84,0.24,black
+2015,20,$118911,Streets & Transportation,Street Resurfacing Menu (1-5),ON S KIMBARK AVE FROM E 63RD ST (6300 S) TO E 65TH ST (6500 S),Car,53.01,24.54,16.21,4.43,1.81,14.59,13.8,77.69,1.72,black
+2016,23,$2395,Streets & Transportation,Sidewalk Menu,5422 SSHVILLE AVE,Pedestrian,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2023,10,$17534.15,Streets & Transportation,Sidewalk (2023),10121 S EWING AVE,Pedestrian,34.32,25.26,27.32,9.13,3.97,66.54,59.49,25.22,0.23,white
+2023,35,$5600,Beautification,Street Light Pole Painting (2023),ON N SAWYER AVE FROM W DIVERSEY AVE (2800 N) TO N AVONDALE AVE (3200 N),NA,25.68,25.63,28.81,11.76,8.11,65.3,65.61,5.04,5.74,hispanic
+2022,11,$8892.48,Streets & Transportation,Curb & Gutter (2022),4328 S UNION AVE,Car,27.46,24,26.41,12.5,9.63,47.3,22.98,6.97,35.6,white
+2021,10,$52518.72,Streets & Transportation,Street Resurfacing (2021),ON S GREEN BAY AVE FROM E 134TH ST (13400 S) TO E 135TH ST (13500 S),Car,34.32,25.26,27.32,9.13,3.97,66.54,59.49,25.22,0.23,white
+2022,3,$500,Lighting,Street Light Upgrade (2022),15 E 37TH ST,NA,33.11,16.03,23.03,13.22,14.61,23.16,4.82,63.03,9.81,black
+2013,2,$1500,Beautification,Street Light Pole Painting,ON W ADAMS ST FROM S FRANKLIN ST (300 W) TO S WELLS ST (200 W),NA,16.73,11.76,27.36,16.57,27.58,80.23,9.71,7.06,6.96,white
+2017,6,$168549.36,Streets & Transportation,Street Resurfacing (1-5) (2017),ON E 72ND ST FROM S PEORIA ST (900 W) TO S RACINE AVE (1200 W),Car,45.01,23.37,23.7,5.03,2.89,1.19,1.82,96.38,0.07,black
+2015,26,$2113,Streets & Transportation,Sidewalk Menu,ON W HIRSCH ST FROM N ST LOUIS AVE (3500 W) TO N CENTRAL PARK AVE (3600 W),Pedestrian,26.98,24.24,27.84,12.06,8.88,49.68,60.68,11.7,1.66,hispanic
+2014,11,$500,Lighting,Floodlight Menu,439 W 44TH PL,NA,27.46,24,26.41,12.5,9.63,47.3,22.98,6.97,35.6,white
+2014,32,$32340,Streets & Transportation,Street Resurfacing Menu,ON N RAVENSWOOD AVE FROM W FLETCHER ST (3130 N) TO W BELMONT AVE (3200 N),Car,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white
+2014,39,$5979,Streets & Transportation,Street Resurfacing Menu,ON N HIAWATHA AVE FROM N LE MAI AVE (6390 N) TO N LEROY AVE (6400 N),Car,17.7,19.27,28.5,16.32,18.22,66.88,23.4,2.66,19,white
+2018,42,$119222.42,Streets & Transportation,Street Resurfacing (2018),ON N COLUMBUS DR FROM E NORTH WATER ST (433 N) TO E ILLINOIS ST (500 N),Car,12.23,8.49,25.32,18.39,35.57,73.34,5.98,4.62,18.51,white
+2022,31,$59161.82,Streets & Transportation,Street Resurfacing (2022),ON W SCHUBERT AVE FROM N LAVERGNE AVE (5000 W) TO N LECLAIRE AVE (5100 W),Car,26.42,25.25,30.96,11.43,5.94,53.55,76.84,3.18,1.92,hispanic
+2019,49,$700,Streets & Transportation,Alley Speed Hump (2019),1532 W JUNEWAY TER,Pedestrian,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2021,7,$22966.56,Streets & Transportation,Sidewalk (2021),2402-2410 E 77TH ST,Pedestrian,46.26,22.96,21.68,7.3,1.8,6.01,5.07,91.3,0.11,black
+2022,25,$17634.33,Streets & Transportation,Sidewalk (2022),2111 S TAN CT,Pedestrian,27.08,20.27,25.88,12.03,14.74,52.65,48.07,8.27,15.29,white
+2020,33,$92944.1,Streets & Transportation,Curb & Gutter (2020),ON N SAWYER AVE FROM W WAVELAND AVE (3700 N) TO N ELSTON AVE (3610 N),Car,19.94,24.22,29.62,14.15,12.08,71.64,47.93,4.41,9.26,white
+2023,14,$25813.88,Streets & Transportation,Alley Resurfacing (2023),S SACRAMENTO AVE & W 58TH ST&W 59TH ST & S WHIPPLE ST; 5800 S SACRAMENTO AVE,Car,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2013,17,$1400,Streets & Transportation,Alley Speed Hump Menu,S HARVARD AVE & S PRINCETON AVE & W 80TH ST & W 81ST ST,Pedestrian,41.31,30.79,20.74,5.09,2.07,9.5,19.79,75.48,0.29,black
+2016,13,$2458,Streets & Transportation,Miscellaneous CDOT,5930 S NEENAH AVE,Car,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2019,10,$6458.62,Streets & Transportation,Sidewalk (2019),9940 S AVENUE J,Pedestrian,34.32,25.26,27.32,9.13,3.97,66.54,59.49,25.22,0.23,white
+2020,39,$62548.33,Streets & Transportation,Street Resurfacing (2020),ON N CHRISTIANA AVE FROM W CATALPA AVE (5500 N) TO W BALMORAL AVE (5400 N),Car,17.7,19.27,28.5,16.32,18.22,66.88,23.4,2.66,19,white
+2022,49,$5206.16,Streets & Transportation,Sidewalk (2022),1957 W LUNT AVE,Pedestrian,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2023,18,$0,Streets & Transportation,Street Speed Hump Replacement (2023),ON S KARLOV AVE FROM W 80TH ST (8000 S) TO W 80TH PL (8030 S),Pedestrian,19.31,22.82,35.66,15.31,6.9,31.36,33.12,47.8,0.61,black
+2013,1,$8581,Streets & Transportation,Alley Apron Menu,ON W WABANSIA AVE FROM 2645 W TO N ROCKWELL ST (2600 W),Car,17.54,15.25,28.21,17.65,21.34,78.92,34.38,5.54,4.02,white
+2020,25,$3666.2,Streets & Transportation,Sidewalk (2020),1438 W 18TH ST,Pedestrian,27.08,20.27,25.88,12.03,14.74,52.65,48.07,8.27,15.29,white
+2015,47,$600,Streets & Transportation,"In-Road ""State Law Stop For Pedestrians"" Signs",W MONTROSE AVE & N MAPLEWOOD AVE,Pedestrian,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2018,22,$140000,Schools & Libraries,Little Village Academy - Athletic Field and Play lot,2620 S LAWNDALE AVE,NA,30.71,32.85,26.02,7.91,2.5,58.47,85.69,5.54,0.41,hispanic
+2014,42,$74786,Streets & Transportation,Street Resurfacing Menu,ON N STATE ST FROM W OHIO ST (600 N) TO W ERIE ST (660 N),Car,12.23,8.49,25.32,18.39,35.57,73.34,5.98,4.62,18.51,white
+2020,27,$54088.41,Streets & Transportation,Street Resurfacing (2020),ON S SEELEY AVE FROM W JACKSON BLVD (300 S) TO W VAN BUREN ST (400 S),Car,32.28,14.93,21.22,13.39,18.19,36.97,14.4,47.37,5.17,black
+2021,12,$9342.77,Streets & Transportation,Sidewalk (2021),3414 S BELL AVE; 3426-3428 S BELL AVE,Pedestrian,30.14,31.55,26.76,8.28,3.27,44.05,68.69,12.96,9.25,hispanic
+2016,30,$30260,Streets & Transportation,Alley Resurfacing Menu,N KILPATRICK AVE & W ROSCOE ST&N KEATING AVE & W CORNELIA AVE,Car,20.36,28.69,30.68,12.32,7.95,68.82,66.64,2,3.14,white
+2013,36,$0,Streets & Transportation,Resurfacing Street Speed,ON NTCHEZ AVE FROM W DIVERSEY AVE (2800 N) TO W GEORGE ST (2900 N),Car,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2019,12,$13693.92,Streets & Transportation,Street Resurfacing (2019),ON S LEAVITT ST FROM W 35TH ST (3500 S) TO S ARCHER AVE (3600 S),Car,30.14,31.55,26.76,8.28,3.27,44.05,68.69,12.96,9.25,hispanic
+2014,41,$74847,Streets & Transportation,Street Resurfacing Menu,ON N OZARK AVE FROM W LUNT AVE (7000 N) TO W TOUHY AVE (7200 N),Car,17.36,17.73,30.52,16.4,17.99,86.31,14.1,1.16,5.21,white
+2020,26,$15839.1,Streets & Transportation,Sidewalk (2020),2701 W DIVISION ST,Pedestrian,26.98,24.24,27.84,12.06,8.88,49.68,60.68,11.7,1.66,hispanic
+2016,13,$410600,Lighting,Street Light Piggy Back,ON W 61ST ST FROM S PARKSIDE AVE (5630 W) TO S CENTRAL AVE (5600 W); ON W 60TH ST FROM S PARKSIDE,NA,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2021,48,$39665.68,Streets & Transportation,Alley Resurfacing (2021),W CARMEN AVE & N SHERIDAN RD&N MARINE DR & W WINONA ST; 916 W CARMEN AVE,Car,27.55,24.5,27.89,10.81,9.25,66.05,14.5,14.91,12.94,white
+2014,47,$8105,Streets & Transportation,Alley Apron Menu,ON N GLENWOOD AVE FROM 5140 N TO W WINONA ST (5130 N),Car,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2021,10,$4700,Streets & Transportation,Street Speed Hump (2021),ON S CARONDOLET AVE FROM E 132ND ST (13200 S) TO E 133RD ST (13300 S),Pedestrian,34.32,25.26,27.32,9.13,3.97,66.54,59.49,25.22,0.23,white
+2021,29,$2350,Streets & Transportation,Street Speed Hump (2021),ON S MASON AVE FROM W RAILROAD AVE (900 S) TO W ARTHINGTON ST (1000 S),Pedestrian,31.14,23.4,26.19,10.36,8.9,37.78,23.98,48.36,1.48,black
+2015,43,$36034,Streets & Transportation,Alley Resurfacing Menu,W BELDEN AVE & N GENEVA TER&W KEMPER PL & N ORCHARD ST,Car,13.54,10.77,27.47,18.03,30.2,83.93,5.6,5.01,6.96,white
+2016,32,$8404,Streets & Transportation,Sidewalk Menu,2001 W WELLINGTON AVE,Pedestrian,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white
+2017,29,$700,Streets & Transportation,Alley Speed Hump Menu (2017),1325 N MASSASOIT AVE,Pedestrian,31.14,23.4,26.19,10.36,8.9,37.78,23.98,48.36,1.48,black
+2019,47,$11335.27,Streets & Transportation,Street Resurfacing (2019),ON W ROSCOE ST FROM N WESTERN AVE (2400 W) TO N CAMPBELL AVE (2500 W),Car,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2018,9,$63720.27,Streets & Transportation,Street Resurfacing (2018),ON S PERRY AVE FROM W 99TH ST (9900 S) TO W 100TH ST (10000 S),Car,38.72,24.75,24.84,7.99,3.7,5.61,4.96,92.55,0.15,black
+2022,9,$6710.71,Streets & Transportation,Sidewalk (2022),10744 S EBERHART AVE,Pedestrian,38.72,24.75,24.84,7.99,3.7,5.61,4.96,92.55,0.15,black
+2013,22,$54606,Streets & Transportation,Street Resurfacing Menu,ON S KNOX AVE FROM W 42ND ST (4200 S) TO W 43RD ST,Car,30.71,32.85,26.02,7.91,2.5,58.47,85.69,5.54,0.41,hispanic
+2019,3,$11750,Streets & Transportation,Street Speed Hump (2019),ON S LAFAYETTE AVE FROM W 57TH ST (5700 S) TO W 57TH PL (5740 S),Pedestrian,33.11,16.03,23.03,13.22,14.61,23.16,4.82,63.03,9.81,black
+2015,45,$0,Streets & Transportation,Street Speed Hump Replacement,ON W WAVELAND AVE FROM N LOWELL AVE (4330 W) TO N MILWAUKEE AVE (4400 W),Pedestrian,16.16,20.11,32.72,16.95,14.06,77.63,26.87,1.62,7.96,white
+2017,17,$26727.01,Streets & Transportation,Street Resurfacing (2017),ON E 80TH ST FROM S WINCHESTER AVE (1930 W) TO S DAMEN AVE (2000 W),Car,41.31,30.79,20.74,5.09,2.07,9.5,19.79,75.48,0.29,black
+2013,8,$0,Streets & Transportation,Resurfacing Street Speed,ON S BLACKSTONE AVE FROM E 88 ST (8800 S) TO E 89 ST (8900 S),Car,38.52,25.69,24.18,8.08,3.53,1.62,1.21,96.77,0.24,black
+2022,49,$73550.55,Streets & Transportation,Street Resurfacing (2022),ON N WINCHESTER AVE FROM N ROGERS AVE (7330 N) TO W FARGO AVE (7400 N),Car,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2019,23,$10885.01,Streets & Transportation,Alley Apron (2019),5343 S RIDGEWAY AVE,Car,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2022,13,$56196.94,Streets & Transportation,Street Resurfacing (2022),ON S KOMENSKY AVE FROM W 69TH ST (6900 S) TO W 70TH ST (7000 S),Car,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2017,19,$40988.07,Streets & Transportation,Street Resurfacing (2017),ON N HOYNE AVE FROM W 106TH ST (10600 S) TO W 107TH ST (10700 S),Car,13.31,18.49,31.9,18.22,18.09,73.18,10.68,19.71,1.42,white
+2014,39,$57151,Streets & Transportation,Street Resurfacing Menu,ON N KINGSDALE AVE FROM N KERCHEVAL AVE (5800 N) TO N CALDWELL AVE (5820 N),Car,17.7,19.27,28.5,16.32,18.22,66.88,23.4,2.66,19,white
+2016,40,$10982,Streets & Transportation,Miscellaneous CDOT,5924 N LINCOLN AVE,Car,20.79,22.92,26.56,15.06,14.67,67.28,21.87,6.39,16.86,white
+2015,48,$1200,Streets & Transportation,"In-Road ""State Law Stop For Pedestrians"" Signs",N CLARK ST & W HOLLYWOOD AVE,Pedestrian,27.55,24.5,27.89,10.81,9.25,66.05,14.5,14.91,12.94,white
+2017,36,$88140.09,Streets & Transportation,Street Resurfacing (2017),ON W WRIGHTWOOD AVE FROM N OAK PARK AVE (6800 W) TO N NORMANDY AVE (6700 W),Car,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2021,40,$9400,Streets & Transportation,Street Speed Hump (2021),ON N FRANCISCO AVE FROM W ARGYLE ST (5000 N) TO W FOSTER AVE (5200 N),Pedestrian,20.79,22.92,26.56,15.06,14.67,67.28,21.87,6.39,16.86,white
+2017,50,$9848.37,Streets & Transportation,Street Resurfacing (2017),ON W ROSEMONT AVE FROM N CALIFORNIA AVE (2800 W) TO N MOZART ST (2830 W),Car,22.01,25.95,28.31,13.19,10.54,56.45,17,12.83,21.91,white
+2018,9,$102787,Streets & Transportation,Street Resurfacing (1-5) (2018),ON S LOWE AVE FROM W 101ST ST (10100 S) TO W 103RD ST (10300 S),Car,38.72,24.75,24.84,7.99,3.7,5.61,4.96,92.55,0.15,black
+2014,34,$2532,Streets & Transportation,Sidewalk Menu,ON S STEWART AVE FROM W 120TH ST (12000 S) TO W 122ND ST (12200 S),Pedestrian,33.38,24,27.52,11.02,4.07,2.88,3.5,93.01,0.19,black
+2019,13,$2016.92,Streets & Transportation,Sidewalk (2019),3901 W 68TH ST,Pedestrian,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2020,23,$80770.6,Streets & Transportation,Street Resurfacing (2020),ON S NEVA AVE FROM W 52ND ST (5200 S) TO W 53RD ST (5300 S),Car,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2012,16,$3633,Streets & Transportation,Sidewalk Menu,ON S WHIPPLE ST FROM W 60 ST (6000 S) TO W 61 ST (6100 S),Pedestrian,44.72,29.07,20.18,4.36,1.67,17.16,41.78,55.68,0.32,black
+2023,13,$4159.12,Streets & Transportation,Sidewalk (2023),6642 S KOMENSKY AVE,Pedestrian,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2012,10,$6615,Streets & Transportation,Sidewalk Menu,ON S GREEN BAY AVE FROM E 112 ST (11200 S) TO E 113 ST (11300 S),Pedestrian,34.32,25.26,27.32,9.13,3.97,66.54,59.49,25.22,0.23,white
+2019,21,$1500,Streets & Transportation,Miscellaneous CDOT Projects (2019),9001 S GENOA AVE; 9420 S PERRY AVE,Car,37.97,23.43,25.98,8.59,4.02,1.18,1.15,96.84,0.24,black
+2015,46,$156000,Lighting,Street Light Residential Staggered Piggy Back Menu,ON N MAGNOLIA AVE FROM W MONTROSE AVE (4400 N) TO W WILSON AVE (4600 N) N Magnolia Ave from W Montrose Av to W Wilson Ave,NA,27.39,18.54,27.77,14.4,11.9,67.71,12.88,18.39,7.65,white
+2016,23,$2393,Streets & Transportation,Curb & Gutter Menu,5358 S NEW ENGLAND AVE,Car,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2019,32,$0,Streets & Transportation,Alley Speed Hump Replacement (2019),W WELLINGTON AVE & N WOLCOTT AVE&N DAMEN AVE & W OAKDALE AVE,Pedestrian,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white
+2012,2,$18500,Beautification,Street Light Pole Painting,ON MICHIGAN FROM E ROOSEVELT RD (1200 S) TO E HARRISON ST (600 S),NA,16.73,11.76,27.36,16.57,27.58,80.23,9.71,7.06,6.96,white
+2018,21,$4024.24,Streets & Transportation,Sidewalk Menu (2018),8055 S SANGAMON ST,Pedestrian,37.97,23.43,25.98,8.59,4.02,1.18,1.15,96.84,0.24,black
+2019,48,$81500,Streets & Transportation,Pedestrian Refuge Island (2019),N RIDGE AVE & W HOLLYWOOD AVE,Pedestrian,27.55,24.5,27.89,10.81,9.25,66.05,14.5,14.91,12.94,white
+2017,34,$8478.43,Streets & Transportation,Street Cul-de-Sac Menu (2017),S THROOP ST & W 105TH PL,Car,33.38,24,27.52,11.02,4.07,2.88,3.5,93.01,0.19,black
+2023,38,$51091.85,Streets & Transportation,Street Resurfacing (2023),ON W BYRON ST FROM N MARMORA AVE (5900 W) TO N AUSTIN AVE (6000 W),Car,19.54,20.31,33.82,16.5,9.84,82.86,24.7,1.55,4.72,white
+2020,32,$4700,Streets & Transportation,Street Speed Hump (2020),ON N CLAREMONT AVE FROM W ROSCOE ST (3400 N) TO W CORNELIA AVE (3500 N),Pedestrian,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white
+2014,4,$614,Streets & Transportation,Bus Pad,E 37TH ST & S COTTAGE GROVE AVE,Car,34.69,17.76,23.36,11.39,12.8,25.02,4.3,60.88,10.35,black
+2022,32,$5042.89,Streets & Transportation,Alley Resurfacing (2022),W WABANSIA AVE & N HERMITAGE AVE&N WOOD ST & W NORTH AVE,Car,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white
+2023,30,$120946.42,Streets & Transportation,Sidewalk (2023),ON N MARMORA AVE FROM W GEORGE ST (2900 N) TO W WELLINGTON AVE (3000 N);,Pedestrian,20.36,28.69,30.68,12.32,7.95,68.82,66.64,2,3.14,white
+2020,47,$3736.06,Streets & Transportation,Sidewalk (2020),N DAMEN AVE & W CULLOM AVE,Pedestrian,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2021,43,$27213.83,Streets & Transportation,Street Resurfacing (2021),1-20 E BANKS ST; ON E BANKS ST FROM N ASTOR ST (40 E) TO N STATE PKWY (1 E),Car,13.54,10.77,27.47,18.03,30.2,83.93,5.6,5.01,6.96,white
+2013,14,$1640,Streets & Transportation,Sidewalk Menu,ON STCHEZ AVE FROM W 51 ST (5100 S) TO W 52 ST (5200 S),Pedestrian,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2022,20,$11422.95,Streets & Transportation,Street Resurfacing (2022),ON S RHODES AVE FROM E 60TH ST (6000 S) TO E 61ST ST (6100 S),Car,53.01,24.54,16.21,4.43,1.81,14.59,13.8,77.69,1.72,black
+2017,23,$638.98,Streets & Transportation,Bollard Menu (2017),5700 S CENTRAL PARK AVE,Car,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2022,39,$17322.99,Streets & Transportation,Curb & Gutter (2022),5100 N CENTRAL PARK AVE,Car,17.7,19.27,28.5,16.32,18.22,66.88,23.4,2.66,19,white
+2012,50,$41176,Streets & Transportation,Street Resurfacing Menu,ON W CHASE AVE FROM N ALBANY AV (3100 W) TO Dead End (3130 W),Car,22.01,25.95,28.31,13.19,10.54,56.45,17,12.83,21.91,white
+2012,34,$10700,Streets & Transportation,Bollard Menu,ON S JUSTINE ST FROM 122 S TO W 122 ST (12200 S),Car,33.38,24,27.52,11.02,4.07,2.88,3.5,93.01,0.19,black
+2017,4,$6545,Miscellaneous,Miscellaneous Other Projects (2018),S DR MARTIN LUTHER KING JR DR & E 37TH ST,NA,34.69,17.76,23.36,11.39,12.8,25.02,4.3,60.88,10.35,black
+2016,39,$5171,Streets & Transportation,Alley Resurfacing Menu,W ROSEDALE AVE & N LINDER AVE&W ARDMORE AVE & N INDIAN RD,Car,17.7,19.27,28.5,16.32,18.22,66.88,23.4,2.66,19,white
+2012,42,$59990,Streets & Transportation,Sidewalk Menu,ON N MILWAUKEE AVE FROM W LAKE ST (200 N) TO W FULTON ST (300 N),Pedestrian,12.23,8.49,25.32,18.39,35.57,73.34,5.98,4.62,18.51,white
+2014,11,$700,Lighting,Street Light Upgrade,3800 S NORMAL AVE,NA,27.46,24,26.41,12.5,9.63,47.3,22.98,6.97,35.6,white
+2015,32,$150000,Parks & Recreation,Chicago Park District,2200 N OAKLEY AVE Holstein Park Field House -,NA,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white
+2020,44,$61301.56,Streets & Transportation,Street Resurfacing (2020),ON W WELLINGTON AVE FROM N BROADWAY (599 W) TO N CLARK ST (730 W),Car,13.74,15.14,28.47,18.86,23.79,86.15,6.85,3.03,7.02,white
+2014,28,$1850,Streets & Transportation,Street Speed Hump Menu,ON S KEELER AVE FROM W JACKSON BLVD (300 S) TO W GLADYS AVE (330 S),Pedestrian,46.4,21.73,21.03,5.57,5.26,14.92,8.19,74.88,4.71,black
+2023,13,$6838.81,Streets & Transportation,Curb & Gutter (2023),5750 S KENNETH AVE; 5710 S KENNETH AVE; 5706 S KENNETH AVE,Car,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2015,37,$58912,Streets & Transportation,Street Resurfacing Menu,ON W POTOMAC AVE FROM N KILDARE AVE (4300 W) TO N KOSTNER AVE (4400 W),Car,40.7,27.9,23.41,5.49,2.5,8.04,26,71.26,0.37,black
+2018,38,$23465.19,Streets & Transportation,Curb & Gutter (2018),5639 W MONTROSE AVE,Car,19.54,20.31,33.82,16.5,9.84,82.86,24.7,1.55,4.72,white
+2023,3,$15678.37,Streets & Transportation,Miscellaneous CDOT Projects (2023),3950 S MICHIGAN AVE,Car,33.11,16.03,23.03,13.22,14.61,23.16,4.82,63.03,9.81,black
+2023,13,$3826.71,Streets & Transportation,Sidewalk (2023),5914 SSHVILLE AVE,Pedestrian,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2016,49,$17000,Schools & Libraries,Miscellaneous Other,6907 N CLARK ST Rogers Park Library - Automatic Doors,NA,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2017,12,$74379.17,Streets & Transportation,Street Resurfacing (1-5) (2017),ON S ROCKWELL ST FROM W 39TH PL (3930 S) TO W 40TH PL (4050 S),Car,30.14,31.55,26.76,8.28,3.27,44.05,68.69,12.96,9.25,hispanic
+2021,35,$350,Streets & Transportation,"In-Road ""State Law Stop For Pedestrians"" Sign",W DRUMMOND PL & N KIMBALL AVE,Pedestrian,25.68,25.63,28.81,11.76,8.11,65.3,65.61,5.04,5.74,hispanic
+2023,22,$21256.01,Streets & Transportation,Alley Apron (2023),2414 S KEDVALE AVE,Car,30.71,32.85,26.02,7.91,2.5,58.47,85.69,5.54,0.41,hispanic
+2020,25,$50109.87,Streets & Transportation,Street Resurfacing (2020),ON W CULLERTON ST FROM S LOOMIS ST (1400 W) TO S BLUE ISLAND AVE (1500 W),Car,27.08,20.27,25.88,12.03,14.74,52.65,48.07,8.27,15.29,white
+2017,11,$31189.15,Streets & Transportation,Alley Resurfacing Menu (2017),S EMERALD AVE & W 32ND ST&S HALSTED ST & W 33RD ST,Car,27.46,24,26.41,12.5,9.63,47.3,22.98,6.97,35.6,white
+2012,30,$350,Lighting,Street Light Upgrade,5511 W DIVERSEY AVE,NA,20.36,28.69,30.68,12.32,7.95,68.82,66.64,2,3.14,white
+2012,14,$7400,Streets & Transportation,Street Speed Hump Menu,ON S TRUMBULL AVE FROM W 51 ST (5100 S) TO W 53 ST (5300 S),Pedestrian,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2023,10,$4880,Streets & Transportation,Street Speed Hump (2023),ON S AVENUE E FROM E 108TH ST (10800 S) TO E 110TH ST (11000 S),Pedestrian,34.32,25.26,27.32,9.13,3.97,66.54,59.49,25.22,0.23,white
+2021,34,$44202.95,Streets & Transportation,Sidewalk (2021),9954 S PEORIA ST,Pedestrian,33.38,24,27.52,11.02,4.07,2.88,3.5,93.01,0.19,black
+2013,14,$8961,Streets & Transportation,Sidewalk Menu,ON S TRUMBULL AVE FROM W 55 ST (5500 S) TO W 56 ST (5600 S),Pedestrian,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2021,7,$175000,Streets & Transportation,Concrete Alley (2021),E 83RD ST & E 83RD PL&S CLYDE AVE & S SOUTH CHICAGO AVE,Car,46.26,22.96,21.68,7.3,1.8,6.01,5.07,91.3,0.11,black
+2015,33,$10000,Schools & Libraries,Chicago Public Schools,3221 N SACRAMENTO AVE Line Elementary School - security camera -,NA,19.94,24.22,29.62,14.15,12.08,71.64,47.93,4.41,9.26,white
+2023,13,$5693.48,Streets & Transportation,Sidewalk (2023),5537 S PARKSIDE AVE,Pedestrian,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2022,3,$163877.43,Streets & Transportation,Street Resurfacing (2022),ON S CALUMET AVE FROM E 18TH ST (1800 S) TO E CERMAK RD (2200 S),Car,33.11,16.03,23.03,13.22,14.61,23.16,4.82,63.03,9.81,black
+2023,32,$12634,Streets & Transportation,Alley Apron (2023),1916 N OAKLEY AVE,Car,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white
+2019,21,$3619.52,Streets & Transportation,Sidewalk (2019),9304 S LAFLIN ST,Pedestrian,37.97,23.43,25.98,8.59,4.02,1.18,1.15,96.84,0.24,black
+2021,31,$12000,Lighting,Street Light Upgrade (2021),SCHOOL ST; 5000 W FLETCHER ST; 4858 W MELROSE ST; 3535 N LAVERGNE AVE; 3303 N LAMON AVE; 3305 N LAVERGNE AVE; 4812 W NEWPORT AVE; 2557 N LOCKWOOD AVE;,NA,26.42,25.25,30.96,11.43,5.94,53.55,76.84,3.18,1.92,hispanic
+2021,14,$40636.18,Streets & Transportation,Alley Resurfacing (2021),2650 W 51ST ST; W 51ST ST & S WASHTENAW AVE&S TALMAN AVE & W 50TH ST,Car,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2023,28,$0,Streets & Transportation,Street Speed Hump Replacement (2023),ON W ERIE ST FROM N KENTON AVE (4600 W) TO N KILPATRICK AVE (4700 W),Pedestrian,46.4,21.73,21.03,5.57,5.26,14.92,8.19,74.88,4.71,black
+2017,33,$10000,Beautification,Wilson Mural,2755 W WILSON AVE:2700 W WILSON AVE,NA,19.94,24.22,29.62,14.15,12.08,71.64,47.93,4.41,9.26,white
+2021,10,$12254.54,Streets & Transportation,Sidewalk (2021),10927 S AVENUE L,Pedestrian,34.32,25.26,27.32,9.13,3.97,66.54,59.49,25.22,0.23,white
+2014,5,$144000,Lighting,Street Light Residential Staggered Piggy Back Menu,ON S CRANDON AVE FROM E 71ST ST (7100 S) TO E 73RD ST (7300 S),NA,40.5,18.29,23.67,8.64,8.91,24.77,4.28,62.83,7.82,black
+2023,9,$35283.72,Streets & Transportation,Alley Resurfacing (2023),E 108TH ST & S STATE ST&S WABASH AVE & E 109TH ST,Car,38.72,24.75,24.84,7.99,3.7,5.61,4.96,92.55,0.15,black
+2016,28,$700,Streets & Transportation,Alley Speed Hump Menu,S PULASKI RD & W WILCOX ST&S SPRINGFIELD AVE & W ADAMS ST,Pedestrian,46.4,21.73,21.03,5.57,5.26,14.92,8.19,74.88,4.71,black
+2013,36,$77224,Streets & Transportation,Street Resurfacing Menu,ON N OCONTO AVE FROM W ROSCOE ST (3400 N) TO W CORNELIA AVE (3500 N),Car,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2017,23,$24028.05,Streets & Transportation,Sidewalk (2017),ON STOMA AVE FROM W 53RD ST (5300 S) TO W 54TH ST (5400 S),Pedestrian,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2018,49,$6234.27,Streets & Transportation,Sidewalk Menu (2018),6432-6438 N LAKEWOOD AVE,Pedestrian,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2012,30,$180901,Streets & Transportation,Street Resurfacing Menu,ON W SCHUBERT AVE FROM N CENTRAL AV (5600 W) TO N AUSTIN AV (6000 W),Car,20.36,28.69,30.68,12.32,7.95,68.82,66.64,2,3.14,white
+2017,6,$53764.8,Streets & Transportation,Sidewalk (2017),ON S WALLACE ST FROM W 76TH ST (7600 S) TO W 78TH ST (7800 S),Pedestrian,45.01,23.37,23.7,5.03,2.89,1.19,1.82,96.38,0.07,black
+2012,24,$128000,Lighting,Street Light Residential Staggered Piggy Back Menu,ON CULLERTON FROM S KEELER AV (4200 W) TO S KOSTNER AV (4400 W),NA,45.5,27.1,20.35,5.37,1.68,13.02,22,74.93,0.28,black
+2013,20,$340,Streets & Transportation,Sidewalk Menu,ON S STEWART AVE FROM 6202 S TO W 62ND ST (6200 S),Pedestrian,53.01,24.54,16.21,4.43,1.81,14.59,13.8,77.69,1.72,black
+2020,25,$33711.23,Streets & Transportation,Sidewalk (2020),2021 S MORGAN ST,Pedestrian,27.08,20.27,25.88,12.03,14.74,52.65,48.07,8.27,15.29,white
+2019,31,$12735.89,Streets & Transportation,Sidewalk (2019),4538 W FULLERTON AVE,Pedestrian,26.42,25.25,30.96,11.43,5.94,53.55,76.84,3.18,1.92,hispanic
+2016,8,$15028,Streets & Transportation,Sidewalk Menu,ON S PAXTON AVE FROM E 84TH ST (8400 S) TO S SOUTH CHICAGO AVE (8480 S),Pedestrian,38.52,25.69,24.18,8.08,3.53,1.62,1.21,96.77,0.24,black
+2018,5,$2100,Miscellaneous,Miscellaneous Other Projects (2018),S HARPER AVE:2200-2216 E 71ST ST:6617 S DREXEL AVE:6746 S DORCHESTER AVE:6616 S GREENWOOD AVE,NA,40.5,18.29,23.67,8.64,8.91,24.77,4.28,62.83,7.82,black
+2017,19,$29029.24,Streets & Transportation,Street Resurfacing (1-5) (2017),ON E 115TH ST FROM S ROCKWELL ST (2600 W) TO S MAPLEWOOD AVE (2530 W),Car,13.31,18.49,31.9,18.22,18.09,73.18,10.68,19.71,1.42,white
+2016,43,$1490,Streets & Transportation,Sidewalk Menu,ON N HUDSON AVE FROM W MENOMONEE ST (1800 N) TO W WISCONSIN ST (1900 N),Pedestrian,13.54,10.77,27.47,18.03,30.2,83.93,5.6,5.01,6.96,white
+2022,41,$82066.1,Streets & Transportation,Street Resurfacing (2022),ON N NICKERSON AVE FROM N NINA AVE (5900 N) TO N EAST CIRCLE AVE (5800 N),Car,17.36,17.73,30.52,16.4,17.99,86.31,14.1,1.16,5.21,white
+2022,30,$40796.25,Streets & Transportation,Street Resurfacing (2022),ON W SCHOOL ST FROM N MARMORA AVE (5900 W) TO N AUSTIN AVE (6000 W),Car,20.36,28.69,30.68,12.32,7.95,68.82,66.64,2,3.14,white
+2019,37,$45349.4,Streets & Transportation,Street Resurfacing (2019),ON W HADDON AVE FROM N CICERO AVE (4800 W) TO N LAMON AVE (4900 W),Car,40.7,27.9,23.41,5.49,2.5,8.04,26,71.26,0.37,black
+2018,47,$2548.39,Streets & Transportation,Curb & Gutter Menu (2018),3650 N CLAREMONT AVE,Car,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2012,49,$48966,Streets & Transportation,Street Resurfacing Menu,ON W NORTH SHORE AVE FROM N GLENWOOD AVE (1400 W) TO N SHERIDAN RD (1200 W),Car,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2019,29,$38251.01,Streets & Transportation,Street Resurfacing (2019),ON W BLOOMINGDALE AVE FROM N NEWLAND AVE (6930 W) TO N SAYRE AVE (7000 W),Car,31.14,23.4,26.19,10.36,8.9,37.78,23.98,48.36,1.48,black
+2013,4,$10924,Streets & Transportation,Alley Resurfacing Menu,S DREXEL BLVD & S COTTAGE GROVE AVE&E 40TH ST & S ELLIS AVE,Car,34.69,17.76,23.36,11.39,12.8,25.02,4.3,60.88,10.35,black
+2015,33,$17706,Streets & Transportation,Sidewalk Menu,ON N KEDZIE AVE FROM W DIVERSEY AVE (2800 N) TO W GEORGE ST (2900 N),Pedestrian,19.94,24.22,29.62,14.15,12.08,71.64,47.93,4.41,9.26,white
+2014,19,$14190,Streets & Transportation,Street Resurfacing Menu,ON W 96TH ST FROM S LEAVITT ST (2200 W) TO S HAMILTON AVE (2131 W),Car,13.31,18.49,31.9,18.22,18.09,73.18,10.68,19.71,1.42,white
+2018,21,$6248.04,Streets & Transportation,Sidewalk Menu (2018),8935 S WINCHESTER AVE,Pedestrian,37.97,23.43,25.98,8.59,4.02,1.18,1.15,96.84,0.24,black
+2022,9,$6944.16,Streets & Transportation,Sidewalk (2022),9931 S PRINCETON AVE,Pedestrian,38.72,24.75,24.84,7.99,3.7,5.61,4.96,92.55,0.15,black
+2018,40,$1850,Streets & Transportation,Street Speed Hump Menu (2018),6034 N MAPLEWOOD AVE,Pedestrian,20.79,22.92,26.56,15.06,14.67,67.28,21.87,6.39,16.86,white
+2013,16,$996,Streets & Transportation,Street Speed Hump Menu,ON S ADA ST FROM W 61ST ST (6100 S) TO W 62ND ST (6200 S),Pedestrian,44.72,29.07,20.18,4.36,1.67,17.16,41.78,55.68,0.32,black
+2017,40,$53396.08,Streets & Transportation,Alley Apron (2017),2617 W RASCHER AVE,Car,20.79,22.92,26.56,15.06,14.67,67.28,21.87,6.39,16.86,white
+2019,26,$700,Streets & Transportation,Alley Speed Hump (2019),1409 N KOSTNER AVE,Pedestrian,26.98,24.24,27.84,12.06,8.88,49.68,60.68,11.7,1.66,hispanic
+2023,49,$2777.07,Streets & Transportation,Sidewalk (2023),1513 W SHERWIN AVE,Pedestrian,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2012,23,$6108,Streets & Transportation,Curb & Gutter Menu,ON S AVERS AVE FROM W 52 ST (5200 S) TO W 53 ST (5300 S),Car,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2014,15,$0,Streets & Transportation,Resurfacing Street Speed,ON S TALMAN AVE FROM W 63RD ST (6300 S) TO W 64TH ST (6400 S),Car,36.61,34.26,22,4.99,2.13,45.96,73.88,19.26,1.98,hispanic
+2015,46,$6500,Streets & Transportation,Pavement Markings Menu,N LAKE SHORE DR & W ADDISON ST,Car,27.39,18.54,27.77,14.4,11.9,67.71,12.88,18.39,7.65,white
+2022,18,$19740.1,Streets & Transportation,Sidewalk (2022),8238 S LAWNDALE AVE,Pedestrian,19.31,22.82,35.66,15.31,6.9,31.36,33.12,47.8,0.61,black
+2019,23,$5743.65,Streets & Transportation,Curb & Gutter (2019),5739-5743 S MENARD AVE,Car,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2020,6,$4315.77,Streets & Transportation,Sidewalk (2020),7348 S PRAIRIE AVE,Pedestrian,45.01,23.37,23.7,5.03,2.89,1.19,1.82,96.38,0.07,black
+2023,35,$9760,Streets & Transportation,Street Speed Hump (2023),ON W PALMER ST FROM N PULASKI RD (4000 W) TO N KOSTNER AVE (4400 W),Pedestrian,25.68,25.63,28.81,11.76,8.11,65.3,65.61,5.04,5.74,hispanic
+2022,49,$20362.31,Streets & Transportation,Alley Resurfacing (2022),N LAKEWOOD AVE & W ALBION AVE&W NORTH SHORE AVE & N GLENWOOD AVE; 6600 N,Car,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2020,9,$18140.73,Streets & Transportation,Street Resurfacing (2020),ON S FOREST AVE FROM E 99TH ST (9900 S) TO E 99TH PL (9950 S),Car,38.72,24.75,24.84,7.99,3.7,5.61,4.96,92.55,0.15,black
+2022,16,$20325.52,Streets & Transportation,Street Resurfacing (2022),ON S ELIZABETH ST FROM W GARFIELD BLVD (5500 S) TO W 58TH ST (5800 S),Car,44.72,29.07,20.18,4.36,1.67,17.16,41.78,55.68,0.32,black
+2019,38,$64340.83,Streets & Transportation,Street Resurfacing (2019),ON W SUNNYSIDE AVE FROM N LINDER AVE (5500 W) TO N CENTRAL AVE (5600 W),Car,19.54,20.31,33.82,16.5,9.84,82.86,24.7,1.55,4.72,white
+2015,42,$63530,Streets & Transportation,Street Resurfacing Menu,ON E LAKE ST FROM N MICHIGAN AVE (100 E) TO N STETSON AVE (154 E),Car,12.23,8.49,25.32,18.39,35.57,73.34,5.98,4.62,18.51,white
+2017,26,$10646.92,Streets & Transportation,Sidewalk Menu (2017),3500 W MCLEAN AVE,Pedestrian,26.98,24.24,27.84,12.06,8.88,49.68,60.68,11.7,1.66,hispanic
+2017,5,$4923.56,Streets & Transportation,Street Resurfacing (2017),ON E HAYES DR FROM S RICHARDS DR (1845 E) TO S CORNELL DR (1632 E),Car,40.5,18.29,23.67,8.64,8.91,24.77,4.28,62.83,7.82,black
+2022,10,$0,Streets & Transportation,Street Speed Hump Replacement (2022),ON S AVENUE J FROM E 99TH ST (9900 S) TO E 100TH ST (10000 S),Pedestrian,34.32,25.26,27.32,9.13,3.97,66.54,59.49,25.22,0.23,white
+2019,28,$500,Streets & Transportation,Miscellaneous CDOT Projects (2019),5066 W ADAMS ST,Car,46.4,21.73,21.03,5.57,5.26,14.92,8.19,74.88,4.71,black
+2019,9,$47896.3,Streets & Transportation,Sidewalk (2019),11100 S LANGLEY AVE,Pedestrian,38.72,24.75,24.84,7.99,3.7,5.61,4.96,92.55,0.15,black
+2014,36,$1400,Streets & Transportation,Alley Speed Hump Menu,N NEWLAND AVE & W SCHUBERT AVE&N NEW ENGLAND AVE & W DIVERSEY AVE,Pedestrian,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2020,49,$27007.38,Streets & Transportation,Alley Apron (2020),2050 W JARVIS AVE,Car,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2022,33,$4700,Streets & Transportation,Street Speed Hump (2022),ON N RICHMOND ST FROM W SUNNYSIDE AVE (4500 N) TO W WILSON AVE (4600 N); 4500 N,Pedestrian,19.94,24.22,29.62,14.15,12.08,71.64,47.93,4.41,9.26,white
+2020,28,$7050,Streets & Transportation,Street Speed Hump (2020),ON S FRANCISCO AVE FROM W HARRISON ST (600 S) TO W POLK ST (800 S),Pedestrian,46.4,21.73,21.03,5.57,5.26,14.92,8.19,74.88,4.71,black
+2019,1,$32387.34,Streets & Transportation,Sidewalk (2019),3101 W ARMITAGE AVE,Pedestrian,17.54,15.25,28.21,17.65,21.34,78.92,34.38,5.54,4.02,white
+2019,36,$600,Streets & Transportation,"In-Road ""State Law Stop For Pedestrians"" Signs",NRRAGANSETT AVE & W BARRY AVE,Pedestrian,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2016,45,$17477,Streets & Transportation,Sidewalk Menu,3701-3721 N KOSTNER AVE,Pedestrian,16.16,20.11,32.72,16.95,14.06,77.63,26.87,1.62,7.96,white
+2021,8,$1400,Streets & Transportation,Alley Speed Hump (2021),S CREGIER AVE & E 75TH ST&E 76TH ST & S RIDGELAND AVE; 7514 S CREGIER AVE,Pedestrian,38.52,25.69,24.18,8.08,3.53,1.62,1.21,96.77,0.24,black
+2023,40,$2247.77,Streets & Transportation,Sidewalk (2023),2245 W BERWYN AVE,Pedestrian,20.79,22.92,26.56,15.06,14.67,67.28,21.87,6.39,16.86,white
+2022,34,$115960,Streets & Transportation,Curb & Gutter (2022),ON S PRINCETON AVE FROM W 118TH ST (11800 S) TO W 119TH ST (11900 S),Car,33.38,24,27.52,11.02,4.07,2.88,3.5,93.01,0.19,black
+2012,7,$3700,Streets & Transportation,Street Speed Hump Menu,ON S BURNHAM AVE FROM E 78 ST (7800 S) TO E 79 ST (7900 S),Pedestrian,46.26,22.96,21.68,7.3,1.8,6.01,5.07,91.3,0.11,black
+2013,2,$3700,Streets & Transportation,Traffic Equipment,ON S WESTERN AVE FROM W VAN BUREN ST (400 S) TO W CONGRESS PKWY (500 S),Car,16.73,11.76,27.36,16.57,27.58,80.23,9.71,7.06,6.96,white
+2014,38,$33641,Streets & Transportation,Street Resurfacing Menu,ON N PARKSIDE AVE FROM W BERTEAU AVE (4200 N) TO W CULLOM AVE (4300 N),Car,19.54,20.31,33.82,16.5,9.84,82.86,24.7,1.55,4.72,white
+2022,26,$53244.44,Streets & Transportation,Alley Resurfacing (2022),W EVERGREEN AVE & N ST LOUIS AVE&N HOMAN AVE & W POTOMAC AVE,Car,26.98,24.24,27.84,12.06,8.88,49.68,60.68,11.7,1.66,hispanic
+2021,48,$2048.48,Streets & Transportation,Sidewalk (2021),6250 N GLENWOOD AVE,Pedestrian,27.55,24.5,27.89,10.81,9.25,66.05,14.5,14.91,12.94,white
+2018,30,$1400,Streets & Transportation,Alley Speed Hump (2018),W BELMONT AVE & N LONG AVE&W MELROSE ST & N LINDER AVE,Pedestrian,20.36,28.69,30.68,12.32,7.95,68.82,66.64,2,3.14,white
+2023,13,$2849.31,Streets & Transportation,Sidewalk (2023),5914 STOMA AVE; 5925 STOMA AVE; 5955 STOMA AVE,Pedestrian,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2021,36,$21871.34,Streets & Transportation,Alley Resurfacing (2021),N MERRIMAC AVE & W PALMER ST&W GRAND AVE & N MOBILE AVE; 2208 N MERRIMAC AVE,Car,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2013,4,$26433,Streets & Transportation,Sidewalk Menu,ON E 46TH ST FROM S EVANS AVE (720 E) TO S COTTAGE GROVE AVE (800 E),Pedestrian,34.69,17.76,23.36,11.39,12.8,25.02,4.3,60.88,10.35,black
+2015,38,$9247,Streets & Transportation,Alley Resurfacing Menu (1-1),W FOREST PRESERVE AVE & N PITTSBURGH AVE&W CORNELIA AVE & N PLAINFIELD AVE,Car,19.54,20.31,33.82,16.5,9.84,82.86,24.7,1.55,4.72,white
+2023,23,$427.54,Streets & Transportation,Sidewalk (2023),5317 S KOSTNER AVE,Pedestrian,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2019,35,$39961.11,Streets & Transportation,Alley Resurfacing (2019),N KILDARE AVE & W PALMER ST&W SHAKESPEARE AVE & N KOSTNER AVE,Car,25.68,25.63,28.81,11.76,8.11,65.3,65.61,5.04,5.74,hispanic
+2020,35,$0,Streets & Transportation,Alley Speed Hump Replacement (2020),W BELDEN AVE & N MONTICELLO AVE&N LAWNDALE AVE & W FULLERTON AVE,Pedestrian,25.68,25.63,28.81,11.76,8.11,65.3,65.61,5.04,5.74,hispanic
+2014,45,$0,Streets & Transportation,Resurfacing Street Speed,ON N MARMORA AVE FROM W STRONG ST (4900 N) TO W GUNNISON ST (4830 N),Car,16.16,20.11,32.72,16.95,14.06,77.63,26.87,1.62,7.96,white
+2020,34,$7554.29,Streets & Transportation,Sidewalk (2020),11921 S STEWART AVE,Pedestrian,33.38,24,27.52,11.02,4.07,2.88,3.5,93.01,0.19,black
+2014,45,$0,Streets & Transportation,Resurfacing Street Speed,ON W DAKIN ST FROM N LOCKWOOD AVE (5300 W) TO N LARAMIE AVE (5200 W),Car,16.16,20.11,32.72,16.95,14.06,77.63,26.87,1.62,7.96,white
+2017,22,$0,Streets & Transportation,Alley Speed Hump Replacement (2017),2701 S CENTRAL PARK AVE,Pedestrian,30.71,32.85,26.02,7.91,2.5,58.47,85.69,5.54,0.41,hispanic
+2022,36,$9329.79,Streets & Transportation,Sidewalk (2022),6301 W FULLERTON AVE,Pedestrian,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2021,34,$11750,Streets & Transportation,Street Speed Hump (2021),ON W 105TH PL FROM 347 W TO S WENTWORTH AVE (200 W),Pedestrian,33.38,24,27.52,11.02,4.07,2.88,3.5,93.01,0.19,black
+2022,30,$47511.52,Streets & Transportation,Sidewalk (2022),ON N MOODY AVE FROM W DIVERSEY AVE (2800 N) TO W GEORGE ST (2900 N),Pedestrian,20.36,28.69,30.68,12.32,7.95,68.82,66.64,2,3.14,white
+2020,21,$246371.26,Streets & Transportation,Curb & Gutter (2020),ON S LOOMIS BLVD FROM W 85TH ST (8500 S) TO W 87TH ST (8700 S),Car,37.97,23.43,25.98,8.59,4.02,1.18,1.15,96.84,0.24,black
+2012,20,$16190,Streets & Transportation,Street Resurfacing Menu,ON E 65TH ST FROM DR. MARTIN LUTHER KING JR. DR (400 E) TO S VERNON AV (432 E),Car,53.01,24.54,16.21,4.43,1.81,14.59,13.8,77.69,1.72,black
+2023,49,$47470.48,Streets & Transportation,Alley Resurfacing (2023),N ASHLAND AVE & W PRATT BLVD&W NORTH SHORE AVE & N BOSWORTH AVE; 6701 N,Car,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2019,25,$7428.87,Streets & Transportation,Sidewalk (2019),1645 W 21ST PL,Pedestrian,27.08,20.27,25.88,12.03,14.74,52.65,48.07,8.27,15.29,white
+2019,35,$1600,Beautification,Street Light Pole Painting (2019),ON N GRESHAM AVE FROM N MILWAUKEE AVE (2930 N) TO W BARRY AVE (3100 N),NA,25.68,25.63,28.81,11.76,8.11,65.3,65.61,5.04,5.74,hispanic
+2014,1,$2450,Streets & Transportation,In-Road 'State Law Stop For Pedestrians' Signs Menu,N PAULINA ST & W AUGUSTA BLVD,Pedestrian,17.54,15.25,28.21,17.65,21.34,78.92,34.38,5.54,4.02,white
+2012,30,$350,Lighting,Street Light Upgrade,5503 W DIVERSEY AVE,NA,20.36,28.69,30.68,12.32,7.95,68.82,66.64,2,3.14,white
+2012,16,$32408,Streets & Transportation,Alley Resurfacing Menu,S BISHOP ST & S LAFLIN ST & W GARFIELD BLVD & W 56TH ST,Car,44.72,29.07,20.18,4.36,1.67,17.16,41.78,55.68,0.32,black
+2017,14,$13848.29,Streets & Transportation,Sidewalk (2017),ON S LUNA AVE FROM W 52ND ST (5200 S) TO W 54TH ST (5400 S),Pedestrian,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2022,12,$54205.65,Streets & Transportation,Street Resurfacing (2022),ON W 39TH PL FROM S CAMPBELL AVE (2500 W) TO S ROCKWELL ST (2600 W),Car,30.14,31.55,26.76,8.28,3.27,44.05,68.69,12.96,9.25,hispanic
+2021,33,$0,Streets & Transportation,Street Speed Hump Replacement (2021),ON N FRANCISCO AVE FROM W BYRON ST (3900 N) TO W IRVING PARK RD (4000 N),Pedestrian,19.94,24.22,29.62,14.15,12.08,71.64,47.93,4.41,9.26,white
+2016,35,$0,Streets & Transportation,Alley Speed Hump,N KEDVALE AVE & W BELDEN AVE&N KEELER AVE & W PALMER ST,Pedestrian,25.68,25.63,28.81,11.76,8.11,65.3,65.61,5.04,5.74,hispanic
+2014,38,$3700,Streets & Transportation,Street Speed Hump Menu,ON N MASON AVE FROM W BERTEAU AVE (4200 N) TO W CULLOM AVE (4300 N),Pedestrian,19.54,20.31,33.82,16.5,9.84,82.86,24.7,1.55,4.72,white
+2018,36,$1850,Streets & Transportation,Street Speed Hump Menu (2018),6826 W WELLINGTON AVE,Pedestrian,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2023,5,$245478.75,Streets & Transportation,Street Resurfacing (2023),ON S UNIVERSITY AVE FROM E 52ND ST (5200 S) TO E 55TH ST (5500 S),Car,40.5,18.29,23.67,8.64,8.91,24.77,4.28,62.83,7.82,black
+2016,23,$10707,Streets & Transportation,Curb & Gutter Menu,ON S RUTHERFORD AVE FROM W 56TH ST (5600 S) TO W 57TH ST (5700 S),Car,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2014,39,$22841,Streets & Transportation,Street Resurfacing Menu,ON W CULLOM AVE FROM N PULASKI RD (4000 W) TO N KEYSTONE AVE (4100 W),Car,17.7,19.27,28.5,16.32,18.22,66.88,23.4,2.66,19,white
+2019,38,$7823.21,Streets & Transportation,Sidewalk (2019),7607 W ADDISON ST,Pedestrian,19.54,20.31,33.82,16.5,9.84,82.86,24.7,1.55,4.72,white
+2020,8,$500,Lighting,Street Light Upgrade (2020),1254 E 97TH PL,NA,38.52,25.69,24.18,8.08,3.53,1.62,1.21,96.77,0.24,black
+2014,1,$1900,Streets & Transportation,In-Road 'State Law Stop For Pedestrians' Signs Menu,N DAMEN AVE & W LE MOYNE ST,Pedestrian,17.54,15.25,28.21,17.65,21.34,78.92,34.38,5.54,4.02,white
+2017,4,$18272.17,Streets & Transportation,Alley Resurfacing (2017),E 47TH ST & S INGLESIDE AVE&E 48TH ST & S ELLIS AVE,Car,34.69,17.76,23.36,11.39,12.8,25.02,4.3,60.88,10.35,black
+2017,27,$0,Streets & Transportation,Alley Speed Hump Replacement (2017),800 N MONTICELLO AVE,Pedestrian,32.28,14.93,21.22,13.39,18.19,36.97,14.4,47.37,5.17,black
+2020,43,$153716.62,Streets & Transportation,Street Resurfacing (2020),ON N HOWE ST FROM W WILLOW ST (1800 N) TO W ARMITAGE AVE (2000 N),Car,13.54,10.77,27.47,18.03,30.2,83.93,5.6,5.01,6.96,white
+2022,49,$85802.77,Streets & Transportation,Street Resurfacing (2022),ON W ESTES AVE FROM N SHERIDAN RD (1300 W) TO N GLENWOOD AVE (1400 W),Car,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2019,26,$40025.69,Streets & Transportation,Alley Resurfacing (2019),N CALIFORNIA AVE & W CRYSTAL ST&N WASHTENAW AVE & W DIVISION ST; 1201-1225 N,Car,26.98,24.24,27.84,12.06,8.88,49.68,60.68,11.7,1.66,hispanic
+2022,24,$1440.49,Streets & Transportation,Sidewalk (2022),3610 W LEXINGTON ST,Pedestrian,45.5,27.1,20.35,5.37,1.68,13.02,22,74.93,0.28,black
+2022,17,$33038.89,Streets & Transportation,Alley Resurfacing (2022),S GREEN ST & W 76TH ST&W 77TH ST & S PEORIA ST,Car,41.31,30.79,20.74,5.09,2.07,9.5,19.79,75.48,0.29,black
+2022,26,$79492.54,Streets & Transportation,Alley Resurfacing (2022),W ARMITAGE AVE & N ST LOUIS AVE&N DRAKE AVE & W CORTLAND ST,Car,26.98,24.24,27.84,12.06,8.88,49.68,60.68,11.7,1.66,hispanic
+2016,43,$350,Streets & Transportation,In-Road 'State Law Stop For Pedestrians' Signs Menu,W FULLERTON AVE & N SEMINARY AVE,Pedestrian,13.54,10.77,27.47,18.03,30.2,83.93,5.6,5.01,6.96,white
+2023,47,$125000,Bike Infrastructure,Bike Boulevard (2023),ON N LEAVITT ST FROM W ADDISON ST (3600 N) TO W AINSLIE ST (4900 N),NA,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2013,14,$8094,Streets & Transportation,Sidewalk Menu,ON W 53RD ST FROM S TRUMBULL AV (3432 W) TO S ST LOUIS AV (3500 W),Pedestrian,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2017,33,$0,Streets & Transportation,Alley Speed Hump Replacement (2017),W HENDERSON ST & N CALIFORNIA AVE&N ELSTON AVE & W ROSCOE ST,Pedestrian,19.94,24.22,29.62,14.15,12.08,71.64,47.93,4.41,9.26,white
+2019,25,$85529.83,Streets & Transportation,Street Resurfacing (2019),ON W 14TH PL FROM S MORGAN ST (1000 W) TO S RACINE AVE (1200 W),Car,27.08,20.27,25.88,12.03,14.74,52.65,48.07,8.27,15.29,white
+2020,48,$59275.37,Streets & Transportation,Street Resurfacing (2020),ON W ROSEMONT AVE FROM N GLENWOOD AVE (1400 W) TO N GREENVIEW AVE (1500 W),Car,27.55,24.5,27.89,10.81,9.25,66.05,14.5,14.91,12.94,white
+2018,38,$25852,Streets & Transportation,Street Resurfacing (2018),ON W GRACE ST FROM N ODELL AVE (7330 W) TO N OKETO AVE (7400 W),Car,19.54,20.31,33.82,16.5,9.84,82.86,24.7,1.55,4.72,white
+2019,39,$53798.24,Streets & Transportation,Street Resurfacing (2019),ON N ST LOUIS AVE FROM W HOLLYWOOD AVE (5700 N) TO W ARDMORE AVE (5800 N),Car,17.7,19.27,28.5,16.32,18.22,66.88,23.4,2.66,19,white
+2017,28,$500,Lighting,Street Light Upgrade Menu (2017),5122 W VAN BUREN ST,NA,46.4,21.73,21.03,5.57,5.26,14.92,8.19,74.88,4.71,black
+2013,2,$1800,Beautification,Street Light Pole Painting,ON E HARRISON ST FROM S MICHIGAN AVE (100 E) TO S STATE ST (1 E),NA,16.73,11.76,27.36,16.57,27.58,80.23,9.71,7.06,6.96,white
+2016,12,$4978,Streets & Transportation,Sidewalk Menu,3621 S HONORE ST,Pedestrian,30.14,31.55,26.76,8.28,3.27,44.05,68.69,12.96,9.25,hispanic
+2023,3,$3714.25,Streets & Transportation,Sidewalk (2023),4805 S WABASH AVE,Pedestrian,33.11,16.03,23.03,13.22,14.61,23.16,4.82,63.03,9.81,black
+2018,39,$69992.6,Streets & Transportation,Street Resurfacing (2018),ON W HOLBROOK ST FROM W PETERSON AVE (6354 W) TO N MCLEOD AVE (6300 W),Car,17.7,19.27,28.5,16.32,18.22,66.88,23.4,2.66,19,white
+2023,44,$78143.74,Lighting,LED Traffic Signal Upgrades & Pedestrian Countdown,1000 W BELMONT AVE; W BELMONT AVE & N SHEFFIELD AVE,NA,13.74,15.14,28.47,18.86,23.79,86.15,6.85,3.03,7.02,white
+2023,32,$28395.23,Streets & Transportation,Alley Resurfacing (2023),W BLOOMINGDALE AVE & N HONORE ST&N WOLCOTT AVE & W CORTLAND ST,Car,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white
+2022,32,$50000,Lighting,Street Light Residential Staggered Piggy Back (2022),ON N PAULINA ST FROM W CORTLAND ST (1900 N) TO W ARMITAGE AVE (2000 N); ON W,NA,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white
+2021,23,$1339.06,Streets & Transportation,Sidewalk (2021),7011 W 64TH PL,Pedestrian,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2014,14,$1850,Streets & Transportation,Street Speed Hump Menu,ON W 52ND ST FROM S LOTUS AVE (5430 W) TO S LONG AVE (5400 W),Pedestrian,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2020,35,$4700,Streets & Transportation,Street Speed Hump (2020),ON W LELAND AVE FROM N LAWNDALE AVE (3700 W) TO N HAMLIN AVE (3800 W),Pedestrian,25.68,25.63,28.81,11.76,8.11,65.3,65.61,5.04,5.74,hispanic
+2019,32,$1400,Streets & Transportation,Alley Speed Hump (2019),N CAMPBELL AVE & W ALTGELD ST&N MAPLEWOOD AVE & W FULLERTON AVE,Pedestrian,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white
+2020,17,$0,Streets & Transportation,Street Speed Hump Replacement (2020),ON S EMERALD AVE FROM W 76TH ST (7600 S) TO W 79TH ST (7900 S),Pedestrian,41.31,30.79,20.74,5.09,2.07,9.5,19.79,75.48,0.29,black
+2018,1,$0,Streets & Transportation,Alley Speed Hump Replacement (2018),W ARMITAGE AVE & N BINGHAM ST&W FRANCIS PL & N MILWAUKEE AVE,Pedestrian,17.54,15.25,28.21,17.65,21.34,78.92,34.38,5.54,4.02,white
+2016,20,$600,Streets & Transportation,In-Road 'State Law Stop For Pedestrians' Signs Menu,S LOOMIS BLVD & W 52ND ST,Pedestrian,53.01,24.54,16.21,4.43,1.81,14.59,13.8,77.69,1.72,black
+2017,11,$13608,Streets & Transportation,Left-Turn Arrow Menu (2017),S HALSTED ST & W 26TH ST,Car,27.46,24,26.41,12.5,9.63,47.3,22.98,6.97,35.6,white
+2017,21,$500,Lighting,Street Light Upgrade Menu (2017),9021 S ELIZABETH ST,NA,37.97,23.43,25.98,8.59,4.02,1.18,1.15,96.84,0.24,black
+2021,33,$2350,Streets & Transportation,Street Speed Hump (2021),ON W AGATITE AVE FROM 2701 W TO N MANOR AVE (2800 W),Pedestrian,19.94,24.22,29.62,14.15,12.08,71.64,47.93,4.41,9.26,white
+2013,49,$7245,Streets & Transportation,Alley Resurfacing Menu,W DEVON AVE & N NEWGARD AVE&W ARTHUR AVE & N GREENVIEW AVE,Car,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2023,13,$6208.06,Streets & Transportation,Sidewalk (2023),5631 S NEW ENGLAND AVE,Pedestrian,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2014,27,$0,Streets & Transportation,Resurfacing Street Speed,ON N AVERS AVE FROM W AUGUSTA BLVD (1000 N) TO W THOMAS ST (1100 N),Car,32.28,14.93,21.22,13.39,18.19,36.97,14.4,47.37,5.17,black
+2016,48,$105041,Streets & Transportation,Street Resurfacing Menu,ON N MAGNOLIA AVE FROM W BALMORAL AVE (5400 N) TO W FOSTER AVE (5200 N),Car,27.55,24.5,27.89,10.81,9.25,66.05,14.5,14.91,12.94,white
+2022,22,$47040.3,Streets & Transportation,Alley Resurfacing (2022),W 27TH ST & S SAWYER AVE&S SPAULDING AVE & W 28TH ST; 2700-2758 S SAWYER AVE,Car,30.71,32.85,26.02,7.91,2.5,58.47,85.69,5.54,0.41,hispanic
+2018,2,$51647.45,Streets & Transportation,Street Resurfacing (1-5) (2018),ON N HUDSON AVE FROM W BLACKHAWK ST (1500 N) TO W NORTH AVE (1600 N),Car,16.73,11.76,27.36,16.57,27.58,80.23,9.71,7.06,6.96,white
+2013,22,$3309,Streets & Transportation,Curb & Gutter Menu,ON S SPRINGFIELD AVE FROM W 32ND ST (3200 S) TO W 33RD ST (3300 S),Car,30.71,32.85,26.02,7.91,2.5,58.47,85.69,5.54,0.41,hispanic
+2015,21,$8167,Streets & Transportation,Sidewalk Menu,ON W 86TH ST FROM S GREEN ST (830 W) TO S PEORIA ST (900 W),Pedestrian,37.97,23.43,25.98,8.59,4.02,1.18,1.15,96.84,0.24,black
+2015,31,$46327,Streets & Transportation,Street Resurfacing Menu,ON W MELROSE ST FROM N LARAMIE AVE (5200 W) TO N LOCKWOOD AVE (5300 W),Car,26.42,25.25,30.96,11.43,5.94,53.55,76.84,3.18,1.92,hispanic
+2019,14,$8305.74,Streets & Transportation,Sidewalk (2019),5100-5106 S MONITOR AVE,Pedestrian,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2016,4,$47983,Streets & Transportation,Street Resurfacing Menu,ON S FEDERAL ST FROM W HARRISON ST (600 S) TO W POLK ST (800 S),Car,34.69,17.76,23.36,11.39,12.8,25.02,4.3,60.88,10.35,black
+2017,30,$0,Streets & Transportation,Alley Speed Hump Replacement (2017),W ROSCOE ST & N KEELER AVE&W HENDERSON ST & N KILDARE AVE,Pedestrian,20.36,28.69,30.68,12.32,7.95,68.82,66.64,2,3.14,white
+2017,29,$28000,Streets & Transportation,Traffic Signal LED Upgrade Menu (2017),W MADISON ST & N LOTUS AVE,Car,31.14,23.4,26.19,10.36,8.9,37.78,23.98,48.36,1.48,black
+2021,44,$23672.92,Streets & Transportation,Curb & Gutter (2021),ON N LAKEWOOD AVE FROM W WAVELAND AVE (3700 N) TO W GRACE ST (3800 N); 3719 N,Car,13.74,15.14,28.47,18.86,23.79,86.15,6.85,3.03,7.02,white
+2014,19,$26090,Streets & Transportation,Street Resurfacing Menu,ON N BELL AVE FROM W 94TH ST (9400 S) TO W 95TH ST (9500 S),Car,13.31,18.49,31.9,18.22,18.09,73.18,10.68,19.71,1.42,white
+2021,32,$45961.35,Streets & Transportation,Curb & Gutter (2021),3042 N WOLCOTT AVE,Car,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white
+2021,17,$16243.83,Streets & Transportation,Sidewalk (2021),7920 S WINCHESTER AVE,Pedestrian,41.31,30.79,20.74,5.09,2.07,9.5,19.79,75.48,0.29,black
+2023,9,$26699.87,Streets & Transportation,Sidewalk (2023),12157 S YALE AVE,Pedestrian,38.72,24.75,24.84,7.99,3.7,5.61,4.96,92.55,0.15,black
+2017,16,$21600.83,Streets & Transportation,Street Resurfacing (2017),ON W 68TH ST FROM S DAMEN AVE (2000 W) TO S WINCHESTER AVE (1930 W),Car,44.72,29.07,20.18,4.36,1.67,17.16,41.78,55.68,0.32,black
+2019,7,$86900.14,Streets & Transportation,Street Resurfacing (2019),ON E 75TH ST FROM 2780 E TO S SOUTH SHORE DR (2750 E),Car,46.26,22.96,21.68,7.3,1.8,6.01,5.07,91.3,0.11,black
+2017,37,$46647.02,Streets & Transportation,Street Resurfacing (1-5) (2017),ON N LUNA AVE FROM W LE MOYNE ST (1500 N) TO W NORTH AVE (1600 N),Car,40.7,27.9,23.41,5.49,2.5,8.04,26,71.26,0.37,black
+2014,15,$27787,Streets & Transportation,Alley Resurfacing Menu,W 66TH ST & S WESTERN AVE&W MARQUETTE RD & S CLAREMONT AVE,Car,36.61,34.26,22,4.99,2.13,45.96,73.88,19.26,1.98,hispanic
+2014,36,$56034,Streets & Transportation,Street Resurfacing Menu,ON N NEWCASTLE AVE FROM W ADDISON ST (3600 N) TO W WAVELAND AVE (3700 N),Car,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2021,36,$3117.09,Streets & Transportation,Sidewalk (2021),3025 N NEENAH AVE,Pedestrian,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2023,25,$32530.18,Streets & Transportation,Arterial Street Bump Outs (2023),S RACINE AVE & W CULLERTON ST,Car,27.08,20.27,25.88,12.03,14.74,52.65,48.07,8.27,15.29,white
+2021,6,$2800,Streets & Transportation,Alley Speed Hump (2021),S CALUMET AVE & E 69TH ST&E 70TH ST & S DR MARTIN LUTHER KING JR DR,Pedestrian,45.01,23.37,23.7,5.03,2.89,1.19,1.82,96.38,0.07,black
+2022,1,$62875.45,Streets & Transportation,Street Resurfacing (2022),ON N WOLCOTT AVE FROM W ELLEN ST (1300 N) TO N WICKER PARK AVE (1370 N),Car,17.54,15.25,28.21,17.65,21.34,78.92,34.38,5.54,4.02,white
+2015,40,$148000,Streets & Transportation,Concrete Alley Menu,N HERMITAGE AVE & W HIGHLAND AVE&N RAVENSWOOD AVE & W THOME AVE,Car,20.79,22.92,26.56,15.06,14.67,67.28,21.87,6.39,16.86,white
+2019,46,$2530.45,Streets & Transportation,Sidewalk (2019),4712 N MAGNOLIA AVE,Pedestrian,27.39,18.54,27.77,14.4,11.9,67.71,12.88,18.39,7.65,white
+2016,1,$350,Streets & Transportation,In-Road 'State Law Stop For Pedestrians' Signs Menu,N HOYNE AVE & W DIVISION ST,Pedestrian,17.54,15.25,28.21,17.65,21.34,78.92,34.38,5.54,4.02,white
+2019,14,$700,Streets & Transportation,Alley Speed Hump (2019),5208 S CALIFORNIA AVE,Pedestrian,24.37,29.86,31.33,9.84,4.6,51.85,81.58,1.84,2.78,hispanic
+2017,43,$340000,Lighting,Street Light Residential Staggered Piggy Back (2017),ON N ORCHARD ST FROM W WILLOW ST (1800 N) TO W ARMITAGE AVE (2000 N),NA,13.54,10.77,27.47,18.03,30.2,83.93,5.6,5.01,6.96,white
+2021,13,$5802.08,Streets & Transportation,Sidewalk (2021),5743 STCHEZ AVE,Pedestrian,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2020,11,$39052.1,Streets & Transportation,Alley Resurfacing (2020),W 29TH ST & S PRINCETON AVE&S WELLS ST & W 30TH ST,Car,27.46,24,26.41,12.5,9.63,47.3,22.98,6.97,35.6,white
+2013,49,$0,Streets & Transportation,Resurfacing Street Speed,ON W MORSE AVE FROM N WOLCOTT AV (1900 W) TO N RIDGE BV (2035 W),Car,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2023,35,$9740.9,Streets & Transportation,Sidewalk (2023),ON N DRAKE AVE FROM 2115 N TO W DICKENS AVE (2100 N),Pedestrian,25.68,25.63,28.81,11.76,8.11,65.3,65.61,5.04,5.74,hispanic
+2018,12,$23319.9,Streets & Transportation,Sidewalk Menu (2018),2910 W 36TH ST,Pedestrian,30.14,31.55,26.76,8.28,3.27,44.05,68.69,12.96,9.25,hispanic
+2019,33,$44683.46,Streets & Transportation,Alley Resurfacing (2019),N ALBANY AVE & W GRACE ST&W WAVELAND AVE & N WHIPPLE ST,Car,19.94,24.22,29.62,14.15,12.08,71.64,47.93,4.41,9.26,white
+2015,5,$350,Streets & Transportation,"In-Road ""State Law Stop For Pedestrians"" Signs",E 55TH ST & S UNIVERSITY AVE,Pedestrian,40.5,18.29,23.67,8.64,8.91,24.77,4.28,62.83,7.82,black
+2019,23,$9493.84,Streets & Transportation,Sidewalk (2019),5300 S MERRIMAC AVE,Pedestrian,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2015,44,$3788,Streets & Transportation,Sidewalk Menu,ON N HALSTED ST FROM W ALDINE AVE (3300 N) TO W BUCKINGHAM PL (3330 N),Pedestrian,13.74,15.14,28.47,18.86,23.79,86.15,6.85,3.03,7.02,white
+2015,30,$12294,Streets & Transportation,Alley Apron Menu,2745 N MOODY AVE,Car,20.36,28.69,30.68,12.32,7.95,68.82,66.64,2,3.14,white
+2021,22,$32677.52,Streets & Transportation,Alley Resurfacing (2021),S LAWNDALE AVE & W 24TH ST&W 25TH ST & S RIDGEWAY AVE,Car,30.71,32.85,26.02,7.91,2.5,58.47,85.69,5.54,0.41,hispanic
+2023,41,$500,Lighting,Street Light Upgrade (2023),7104 N OZARK AVE,NA,17.36,17.73,30.52,16.4,17.99,86.31,14.1,1.16,5.21,white
+2022,13,$2225.48,Streets & Transportation,Bollard (2022),3944-3945 W 64TH PL,Car,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2020,38,$11801.3,Streets & Transportation,Alley Apron (2020),3551 N ORANGE AVE,Car,19.54,20.31,33.82,16.5,9.84,82.86,24.7,1.55,4.72,white
+2013,47,$63939,Streets & Transportation,Street Bump Outs Menu,ON W BERTEAU AVE FROM N CLARK ST (1400 W) TO N GREENVIEW AVE (1500 W),Car,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2012,26,$950,Streets & Transportation,In-Road 'State Law Stop For Pedestrians' Signs Menu,W ARMITAGE AVE & N LAWNDALE AVE,Pedestrian,26.98,24.24,27.84,12.06,8.88,49.68,60.68,11.7,1.66,hispanic
+2022,26,$950,Lighting,Floodlight (2022),1656 N AVERS AVE,NA,26.98,24.24,27.84,12.06,8.88,49.68,60.68,11.7,1.66,hispanic
+2020,21,$36816.86,Streets & Transportation,Alley Resurfacing (2020),8215 S THROOP ST; S ELIZABETH ST & W 82ND ST&W 83RD ST & S THROOP ST,Car,37.97,23.43,25.98,8.59,4.02,1.18,1.15,96.84,0.24,black
+2022,29,$10971,Security Cameras,1 LPR/Existing Camera - N Harlem and W Belmont,N HARLEM AVE & W BELMONT AVE,NA,31.14,23.4,26.19,10.36,8.9,37.78,23.98,48.36,1.48,black
+2013,30,$53933,Streets & Transportation,Curb & Gutter Menu,ON W BARRY AVE FROM N AUSTIN AVE (6000 W) TO N MEADE AVE (6100 W),Car,20.36,28.69,30.68,12.32,7.95,68.82,66.64,2,3.14,white
+2021,44,$25384.71,Streets & Transportation,Alley Resurfacing (2021),W ROSCOE ST & N ELAINE PL&N HALSTED ST & W CORNELIA AVE,Car,13.74,15.14,28.47,18.86,23.79,86.15,6.85,3.03,7.02,white
+2019,31,$14100,Streets & Transportation,Street Speed Hump (2019),ON N KENNETH AVE FROM W BELMONT AVE (3200 N) TO W DIVERSEY AVE (2800 N),Pedestrian,26.42,25.25,30.96,11.43,5.94,53.55,76.84,3.18,1.92,hispanic
+2015,28,$2950,Beautification,Traffic Signal Pole Painting Menu,ON S SACRAMENTO AVE FROM W POLK ST (800 S) TO W ROOSEVELT RD (1200 S) Sacramento-Polk to Roosevelt,NA,46.4,21.73,21.03,5.57,5.26,14.92,8.19,74.88,4.71,black
+2018,8,$55478.66,Streets & Transportation,Street Resurfacing Menu (2018),ON S CLYDE AVE FROM E 90TH ST (9000 S) TO E 91ST ST (9100 S),Car,38.52,25.69,24.18,8.08,3.53,1.62,1.21,96.77,0.24,black
+2016,32,$41107,Streets & Transportation,Alley Resurfacing Menu,W DIVERSEY AVE & N WESTERN AVE&W SCHUBERT AVE & N ARTESIAN AVE,Car,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white
+2016,37,$178000,Lighting,Street Light Residential Staggered Piggy Back Menu,ON N LOCKWOOD AVE FROM W CHICAGO AVE (800 N) TO W OHIO ST (600 N),NA,40.7,27.9,23.41,5.49,2.5,8.04,26,71.26,0.37,black
+2020,36,$24776,Security Cameras,1 POD Camera: Fullerton & Narragansett,W FULLERTON AVE & NRRAGANSETT AVE,NA,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2022,30,$7921.1,Streets & Transportation,Sidewalk (2022),2555 N MCVICKER AVE,Pedestrian,20.36,28.69,30.68,12.32,7.95,68.82,66.64,2,3.14,white
+2018,13,$3642.14,Streets & Transportation,Sidewalk (2018),6116 S KOLMAR AVE,Pedestrian,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2021,18,$121241.38,Streets & Transportation,Street Resurfacing (1-5) (2021),ON W 77TH PL FROM S KENTON AVE (4600 W) TO S KOSTNER AVE (4400 W),Car,19.31,22.82,35.66,15.31,6.9,31.36,33.12,47.8,0.61,black
+2013,26,$295000,Streets & Transportation,Concrete Alley Menu,N HAMLIN AVE & N AVERS AVE & W NORTH AVE & W LE MOYNE ST,Car,26.98,24.24,27.84,12.06,8.88,49.68,60.68,11.7,1.66,hispanic
+2012,13,$204750,Lighting,Street Light Residential Staggered Piggy Back Menu,ON MENARD FROM W 60 ST (6000 S) TO W 63 ST (6300 S),NA,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2021,36,$42151.94,Streets & Transportation,Alley Resurfacing (2021),N MOBILE AVE & W DICKENS AVE&W PALMER ST & N MULLIGAN AVE,Car,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2017,1,$3700,Streets & Transportation,Street Speed Hump (2017),ON W SUPERIOR ST FROM N DAMEN AVE (2000 W) TO N WOLCOTT AVE (1900 W),Pedestrian,17.54,15.25,28.21,17.65,21.34,78.92,34.38,5.54,4.02,white
+2012,43,$12955,Streets & Transportation,Sidewalk Menu,ON W DIVERSEY AVE FROM N SHEFFIELD AVE (1000 W) TO N MILDRED AVE (900 W),Pedestrian,13.54,10.77,27.47,18.03,30.2,83.93,5.6,5.01,6.96,white
+2012,45,$5991,Streets & Transportation,Sidewalk Menu,ON N MULLIGAN AVE FROM W BALMORAL AVE (5400 N) TO W CATALPA AVE (5500 N),Pedestrian,16.16,20.11,32.72,16.95,14.06,77.63,26.87,1.62,7.96,white
+2021,39,$54725.97,Streets & Transportation,Street Resurfacing (2021),ON N KNOX AVE FROM N HIAWATHA AVE (6100 N) TO N IONIA AVE (6200 N),Car,17.7,19.27,28.5,16.32,18.22,66.88,23.4,2.66,19,white
+2017,46,$3430.32,Streets & Transportation,Sidewalk (2017),800 W HUTCHINSON ST,Pedestrian,27.39,18.54,27.77,14.4,11.9,67.71,12.88,18.39,7.65,white
+2023,31,$6367.05,Streets & Transportation,Arterial Street Bump Outs (2023),N LARAMIE AVE & W CORNELIA AVE,Car,26.42,25.25,30.96,11.43,5.94,53.55,76.84,3.18,1.92,hispanic
+2019,29,$0,Streets & Transportation,Alley Speed Hump Replacement (2019),W VAN BUREN ST & S CICERO AVE&W GLADYS AVE & S LAVERGNE AVE,Pedestrian,31.14,23.4,26.19,10.36,8.9,37.78,23.98,48.36,1.48,black
+2013,42,$110619,Streets & Transportation,Street Resurfacing Menu,ON W ERIE ST FROM N ORLEANS ST (332 W) TO N KINGSBURY ST (530 W),Car,12.23,8.49,25.32,18.39,35.57,73.34,5.98,4.62,18.51,white
+2022,36,$7573.83,Streets & Transportation,Street Traffic Circle (2022),2400 N NEWLAND AVE; W ALTGELD ST & N NEWLAND AVE,Car,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2022,28,$7272.69,Streets & Transportation,Collector Street - Miscellaneous Concrete (2022),ON S ALBANY AVE FROM W HARRISON ST (600 S) TO W ROOSEVELT RD (1200 S),Car,46.4,21.73,21.03,5.57,5.26,14.92,8.19,74.88,4.71,black
+2022,28,$2350,Streets & Transportation,Street Speed Hump (2022),ON N KILDARE AVE FROM W WASHINGTON BLVD (100 N) TO W WEST END AVE (200 N),Pedestrian,46.4,21.73,21.03,5.57,5.26,14.92,8.19,74.88,4.71,black
+2022,48,$2377.7,Streets & Transportation,Curb & Gutter (2022),5300 N WAYNE AVE,Car,27.55,24.5,27.89,10.81,9.25,66.05,14.5,14.91,12.94,white
+2023,46,$0,Streets & Transportation,Street Speed Hump Replacement (2023),ON N MAGNOLIA AVE FROM W SUNNYSIDE AVE (4500 N) TO W WILSON AVE (4600 N),Pedestrian,27.39,18.54,27.77,14.4,11.9,67.71,12.88,18.39,7.65,white
+2014,17,$60395,Streets & Transportation,Curb & Gutter Menu,ON S OAKLEY AVE FROM W 70TH ST (7000 S) TO W 71ST ST (7100 S),Car,41.31,30.79,20.74,5.09,2.07,9.5,19.79,75.48,0.29,black
+2017,15,$1850,Streets & Transportation,Street Speed Hump (2017),ON W 48TH ST FROM S WOLCOTT AVE (1900 W) TO S HONORE ST (1830 W),Pedestrian,36.61,34.26,22,4.99,2.13,45.96,73.88,19.26,1.98,hispanic
+2013,8,$31573,Streets & Transportation,Sidewalk Menu,ON S CHAPPEL AVE FROM E 80 ST (8000 S) TO E 81 ST (8100 S),Pedestrian,38.52,25.69,24.18,8.08,3.53,1.62,1.21,96.77,0.24,black
+2019,1,$2797.96,Streets & Transportation,Sidewalk (2019),2727 W HADDON AVE,Pedestrian,17.54,15.25,28.21,17.65,21.34,78.92,34.38,5.54,4.02,white
+2019,21,$27722.71,Streets & Transportation,Sidewalk (2019),9106-9110 S LAFLIN ST,Pedestrian,37.97,23.43,25.98,8.59,4.02,1.18,1.15,96.84,0.24,black
+2021,15,$0,Streets & Transportation,Alley Speed Hump Replacement (2021),W 42ND ST & S FAIRFIELD AVE&S CALIFORNIA AVE & W POPE JOHN PAUL II DR,Pedestrian,36.61,34.26,22,4.99,2.13,45.96,73.88,19.26,1.98,hispanic
+2022,23,$1527.75,Streets & Transportation,Sidewalk (2022),3741 W 57TH ST,Pedestrian,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2020,3,$300,Streets & Transportation,Miscellaneous CDOT Projects (2020),4250 S WABASH AVE,Car,33.11,16.03,23.03,13.22,14.61,23.16,4.82,63.03,9.81,black
+2018,33,$0,Streets & Transportation,Alley Speed Hump Replacement (2017),W BYRON ST & N FRANCISCO AVE:W IRVING PARK RD & N RICHMOND ST,Pedestrian,19.94,24.22,29.62,14.15,12.08,71.64,47.93,4.41,9.26,white
+2020,15,$27618.94,Streets & Transportation,Alley Apron (2020),ON W 66TH ST FROM S HERMITAGE AVE (1730 W) TO S PAULINA ST (1700 W),Car,36.61,34.26,22,4.99,2.13,45.96,73.88,19.26,1.98,hispanic
+2023,41,$11178.06,Streets & Transportation,Miscellaneous CDOT Projects (2023),W HIGGINS AVE & N OCTAVIA AVE,Car,17.36,17.73,30.52,16.4,17.99,86.31,14.1,1.16,5.21,white
+2016,24,$6073,Streets & Transportation,Alley Apron Menu,1916 S MILLARD AVE,Car,45.5,27.1,20.35,5.37,1.68,13.02,22,74.93,0.28,black
+2017,27,$69618.91,Streets & Transportation,Alley Resurfacing (2017),700 N ST LOUIS AVE:N ST LOUIS AVE & W CHICAGO AVE&N DRAKE AVE & W HURON ST,Car,32.28,14.93,21.22,13.39,18.19,36.97,14.4,47.37,5.17,black
+2020,45,$35629.46,Streets & Transportation,Alley Resurfacing (1-1) (2020),5600 W GUNNISON ST; 4848 N CENTRAL AVE; N CENTRAL AVE & W GUNNISON ST&W,Car,16.16,20.11,32.72,16.95,14.06,77.63,26.87,1.62,7.96,white
+2021,25,$7050,Streets & Transportation,Street Speed Hump (2021),ON W 17TH ST FROM S RACINE AVE (1200 W) TO S CARPENTER ST (1100 W),Pedestrian,27.08,20.27,25.88,12.03,14.74,52.65,48.07,8.27,15.29,white
+2023,49,$11644.18,Streets & Transportation,Sidewalk (2023),1243-1247 W COLUMBIA AVE,Pedestrian,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2020,25,$61825.38,Streets & Transportation,Street Resurfacing (2020),ON W CULLERTON ST FROM S PAULINA ST (1700 W) TO S WOOD ST (1800 W),Car,27.08,20.27,25.88,12.03,14.74,52.65,48.07,8.27,15.29,white
+2016,45,$2395,Streets & Transportation,Sidewalk Menu,5622 W GROVER ST,Pedestrian,16.16,20.11,32.72,16.95,14.06,77.63,26.87,1.62,7.96,white
+2021,33,$500,Lighting,Street Light Upgrade (2021),3652 N ALBANY AVE,NA,19.94,24.22,29.62,14.15,12.08,71.64,47.93,4.41,9.26,white
+2023,1,$95717.96,Streets & Transportation,Street Resurfacing (2023),ON N WICKER PARK AVE FROM W EVERGREEN AVE (1400 N) TO N DAMEN AVE (1550 N),Car,17.54,15.25,28.21,17.65,21.34,78.92,34.38,5.54,4.02,white
+2023,48,$14306.93,Streets & Transportation,Alley Resurfacing (2023),N MARINE DR & W MARGATE TER&W AINSLIE ST & N MCCUTCHEON TER,Car,27.55,24.5,27.89,10.81,9.25,66.05,14.5,14.91,12.94,white
+2022,42,$0,Streets & Transportation,Street Speed Hump Replacement (2022),ON N PARK DR FROM E SOUTH WATER ST (220 N) TO E BENTON PL (170 N),Pedestrian,12.23,8.49,25.32,18.39,35.57,73.34,5.98,4.62,18.51,white
+2014,41,$41405,Streets & Transportation,Street Resurfacing Menu,ON W PETERSON AVE FROM N HARLEM AVE (7200 W) TO N WEST CIRCLE AVE (7044 W),Car,17.36,17.73,30.52,16.4,17.99,86.31,14.1,1.16,5.21,white
+2014,19,$42241,Streets & Transportation,Street Resurfacing Menu,ON S TRUMBULL AVE FROM W 103RD ST (10300 S) TO W,Car,13.31,18.49,31.9,18.22,18.09,73.18,10.68,19.71,1.42,white
+2014,45,$20552,Streets & Transportation,Sidewalk Menu,ON W STRONG ST FROM N LAMON AVE (4900 W) TO N LAVERGNE AVE (5000 W),Pedestrian,16.16,20.11,32.72,16.95,14.06,77.63,26.87,1.62,7.96,white
+2020,48,$1652.07,Streets & Transportation,Sidewalk (2020),1414-1416 W THOME AVE; W THOME AVE & N GLENWOOD AVE&N GREENVIEW AVE & W,Pedestrian,27.55,24.5,27.89,10.81,9.25,66.05,14.5,14.91,12.94,white
+2021,29,$4700,Streets & Transportation,Street Speed Hump (2021),ON W OHIO ST FROM N WALLER AVE (5700 W) TO N MENARD AVE (5800 W),Pedestrian,31.14,23.4,26.19,10.36,8.9,37.78,23.98,48.36,1.48,black
+2018,23,$27011,Security Cameras,POD CAMERA - 53rd & Harlem,S HARLEM AVE & W 53RD ST,NA,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2019,40,$212500,Streets & Transportation,Street Resurfacing (2019),ON N CLARK ST FROM W FOSTER AVE (5200 N) TO W BRYN MAWR AVE (5600 N),Car,20.79,22.92,26.56,15.06,14.67,67.28,21.87,6.39,16.86,white
+2015,23,$6839,Streets & Transportation,Sidewalk Menu,ON SRRAGANSETT AVE FROM W 53RD ST (5300 S) TO W 54TH ST (5400 S),Pedestrian,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2015,25,$32974,Streets & Transportation,Street Resurfacing Menu,ON S ABERDEEN ST FROM W POLK ST (800 S) TO W CONGRESS PKWY (600 S),Car,27.08,20.27,25.88,12.03,14.74,52.65,48.07,8.27,15.29,white
+2019,37,$12056.52,Streets & Transportation,Street Resurfacing (2019),ON N LOCKWOOD AVE FROM W LAKE ST (360 N) TO W KINZIE ST (400 N),Car,40.7,27.9,23.41,5.49,2.5,8.04,26,71.26,0.37,black
+2023,35,$1400,Beautification,Street Light Pole Painting (2023),ON N ST LOUIS AVE FROM W BARRY AVE (3100 N) TO W BELMONT AVE (3200 N),NA,25.68,25.63,28.81,11.76,8.11,65.3,65.61,5.04,5.74,hispanic
+2012,35,$550,Streets & Transportation,In-Road 'State Law Stop For Pedestrians' Signs Menu,N MILWAUKEE AVE & N DAWSON AVE,Pedestrian,25.68,25.63,28.81,11.76,8.11,65.3,65.61,5.04,5.74,hispanic
+2014,6,$600,Streets & Transportation,In-Road 'State Law Stop For Pedestrians' Signs Menu,E 75TH ST & S LANGLEY AVE,Pedestrian,45.01,23.37,23.7,5.03,2.89,1.19,1.82,96.38,0.07,black
+2018,26,$50731.53,Streets & Transportation,Street Resurfacing (2018),ON N FAIRFIELD AVE FROM W LE MOYNE ST (1500 N) TO W NORTH AVE (1600 N),Car,26.98,24.24,27.84,12.06,8.88,49.68,60.68,11.7,1.66,hispanic
+2014,34,$30990,Streets & Transportation,Sidewalk Menu,ON W 98TH ST FROM S LOWE AVE (630 W) TO S UNION AVE (700 W),Pedestrian,33.38,24,27.52,11.02,4.07,2.88,3.5,93.01,0.19,black
+2019,49,$2800,Streets & Transportation,Alley Speed Hump (2019),N WOLCOTT AVE & W FARGO AVE&W BIRCHWOOD AVE & N WINCHESTER AVE,Pedestrian,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2015,46,$90000,Streets & Transportation,Left-Turn Arrow Menu,N BROADWAY & N CLARENDON AVE,Car,27.39,18.54,27.77,14.4,11.9,67.71,12.88,18.39,7.65,white
+2013,25,$22500,Security Cameras,High Definition Camera,2159 W. 19th Street,NA,27.08,20.27,25.88,12.03,14.74,52.65,48.07,8.27,15.29,white
+2017,27,$54022,Security Cameras,High Definition Camera (2017),ON S HAMILTON AVE FROM W JACKSON BLVD (300 S) TO W ADAMS ST (200 S):200 S HOYNE AVE,NA,32.28,14.93,21.22,13.39,18.19,36.97,14.4,47.37,5.17,black
+2016,33,$0,Streets & Transportation,Alley Speed Hump,N WASHTENAW AVE & W GEORGE ST&N TALMAN AVE & W DIVERSEY AVE,Pedestrian,19.94,24.22,29.62,14.15,12.08,71.64,47.93,4.41,9.26,white
+2023,41,$74668.96,Streets & Transportation,Street Resurfacing (2023),ON N SAYRE AVE FROM W GREGORY ST (5530 N) TO W HIGGINS AVE (5442 N),Car,17.36,17.73,30.52,16.4,17.99,86.31,14.1,1.16,5.21,white
+2015,43,$14602,Streets & Transportation,Sidewalk Menu,ON N LARRABEE ST FROM W MENOMONEE ST (1800 N) TO W WISCONSIN ST (1900 N),Pedestrian,13.54,10.77,27.47,18.03,30.2,83.93,5.6,5.01,6.96,white
+2018,7,$42554.16,Streets & Transportation,Street Resurfacing (2018),ON S CRANDON AVE FROM E 78TH ST (7800 S) TO E 79TH ST (7900 S),Car,46.26,22.96,21.68,7.3,1.8,6.01,5.07,91.3,0.11,black
+2020,15,$13289.66,Streets & Transportation,Alley Apron (2020),ON W 61ST ST FROM S WOOD ST (1800 W) TO S HERMITAGE AVE (1730 W),Car,36.61,34.26,22,4.99,2.13,45.96,73.88,19.26,1.98,hispanic
+2021,3,$259.76,Lighting,Street Light Upgrade (2021),421 E 41ST ST,NA,33.11,16.03,23.03,13.22,14.61,23.16,4.82,63.03,9.81,black
+2019,28,$25000,Parks & Recreation,Fencing for Mason Playground,4100 W WEST END AVE,NA,46.4,21.73,21.03,5.57,5.26,14.92,8.19,74.88,4.71,black
+2018,47,$21400.76,Streets & Transportation,Street Resurfacing (2018),ON N CAMPBELL AVE FROM W CULLOM AVE (4300 N) TO W PENSACOLA AVE (4330 N),Car,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2013,4,$31352,Streets & Transportation,Sidewalk Menu,ON S ST LAWRENCE AVE FROM E BOWEN AV (4135 S) TO E 42 ST (4200 S),Pedestrian,34.69,17.76,23.36,11.39,12.8,25.02,4.3,60.88,10.35,black
+2018,13,$2005.53,Streets & Transportation,Sidewalk Menu (2018),3817 W 66TH ST,Pedestrian,16.64,25.68,34.07,15.91,7.7,61.67,66.53,2.43,0.42,hispanic
+2013,25,$9000,Lighting,Street Light Arterial,(1830 S),NA,27.08,20.27,25.88,12.03,14.74,52.65,48.07,8.27,15.29,white
+2021,46,$19587.76,Streets & Transportation,Sidewalk (2021),4600 N MAGNOLIA AVE,Pedestrian,27.39,18.54,27.77,14.4,11.9,67.71,12.88,18.39,7.65,white
+2020,3,$150,Streets & Transportation,Miscellaneous CDOT Projects (2020),5402 S INDIANA AVE,Car,33.11,16.03,23.03,13.22,14.61,23.16,4.82,63.03,9.81,black
+2012,23,$20403,Streets & Transportation,Sidewalk Menu,ON S MELVINA AVE FROM W 53 ST (5300 S) TO W 54 ST (5400 S),Pedestrian,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2014,30,$53494,Streets & Transportation,Street Resurfacing Menu,ON N AVERS AVE FROM W SCHOOL ST (3300 N) TO W ROSCOE ST (3400 N),Car,20.36,28.69,30.68,12.32,7.95,68.82,66.64,2,3.14,white
+2017,47,$600,Streets & Transportation,"In-Road ""State Law Stop For Pedestrians"" Signs (2017)",W MONTROSE AVE & N BELL AVE,Pedestrian,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2018,11,$37685.96,Streets & Transportation,Pedestrian Refuge Island Menu (2018),S HALSTED ST & W 28TH ST,Pedestrian,27.46,24,26.41,12.5,9.63,47.3,22.98,6.97,35.6,white
+2013,17,$8731,Streets & Transportation,Alley Apron Menu,ON W 77TH ST FROM W TO S MAY ST (1132 W),Car,41.31,30.79,20.74,5.09,2.07,9.5,19.79,75.48,0.29,black
+2017,30,$2800,Streets & Transportation,Alley Speed Hump (2017),W WARWICK AVE & N KILPATRICK AVE&W WAVELAND AVE & N CICERO AVE,Pedestrian,20.36,28.69,30.68,12.32,7.95,68.82,66.64,2,3.14,white
+2015,18,$51538,Streets & Transportation,Street Resurfacing Menu,ON W 86TH ST FROM S LAWNDALE AVE (3700 W) TO S HAMLIN AVE (3800 W),Car,19.31,22.82,35.66,15.31,6.9,31.36,33.12,47.8,0.61,black
+2013,17,$600,Beautification,Street Light Pole Painting,ON W 72ND PL FROM S LOOMIS BV (1400 W) TO S ADA ST (1316 W),NA,41.31,30.79,20.74,5.09,2.07,9.5,19.79,75.48,0.29,black
+2022,10,$4700,Streets & Transportation,Street Speed Hump (2022),ON S AVENUE M FROM E 113TH ST (11300 S) TO E 114TH ST (11400 S),Pedestrian,34.32,25.26,27.32,9.13,3.97,66.54,59.49,25.22,0.23,white
+2014,17,$55615,Streets & Transportation,Sidewalk Menu,ON W 74TH ST FROM S PARNELL AVE (540 W) TO S NORMAL AVE (500 W),Pedestrian,41.31,30.79,20.74,5.09,2.07,9.5,19.79,75.48,0.29,black
+2018,5,$89423.92,Streets & Transportation,Street Resurfacing (2018),ON S HARPER AVE FROM E 56TH ST (5600 S) TO E 57TH ST (5700 S),Car,40.5,18.29,23.67,8.64,8.91,24.77,4.28,62.83,7.82,black
+2019,38,$-14253.07,Streets & Transportation,Street Resurfacing (2019),ON N ORIOLE AVE FROM W CORNELIA AVE (3499 N) TO W ADDISON ST (3600 N),Car,19.54,20.31,33.82,16.5,9.84,82.86,24.7,1.55,4.72,white
+2013,23,$2043,Streets & Transportation,Curb & Gutter Menu,ON W 58TH ST FROM S MAJOR AV (5700 W) TO S MASSASOIT AV (5731 W),Car,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2017,46,$905.36,Streets & Transportation,Sidewalk Menu (2017),4170 N MARINE DR,Pedestrian,27.39,18.54,27.77,14.4,11.9,67.71,12.88,18.39,7.65,white
+2014,41,$126797,Streets & Transportation,Street Resurfacing Menu,ON N HIAWATHA AVE FROM N LEHIGH AVE (6700 N) TO N LIGHTFOOT AVE (6800 N),Car,17.36,17.73,30.52,16.4,17.99,86.31,14.1,1.16,5.21,white
+2018,4,$6644,Streets & Transportation,Left-Turn Arrow Menu (2018),E HYDE PARK BLVD & S LAKE PARK AVE,Car,34.69,17.76,23.36,11.39,12.8,25.02,4.3,60.88,10.35,black
+2018,23,$4402.62,Streets & Transportation,Curb & Gutter Menu (2018),5320 S SAYRE AVE,Car,18.88,25.87,32.15,15.59,7.51,62.46,68.36,2.28,1.61,hispanic
+2023,49,$12077.65,Streets & Transportation,Sidewalk (2023),1844 W CHASE AVE,Pedestrian,32.8,25.99,26.21,9.1,5.9,56.92,20.15,28.42,5.9,white
+2022,3,$2103.35,Streets & Transportation,Sidewalk (2022),1841 S CALUMET AVE,Pedestrian,33.11,16.03,23.03,13.22,14.61,23.16,4.82,63.03,9.81,black
+2022,47,$0,Streets & Transportation,Street Speed Hump Replacement (2022),ON N HERMITAGE AVE FROM W GRACE ST (3800 N) TO W WAVELAND AVE (3700 N),Pedestrian,10.93,16.32,29.62,18.22,24.92,85.33,12.23,2.65,5.58,white
+2014,32,$2881,Streets & Transportation,Sidewalk Menu,ON N HOYNE AVE FROM W BARRY AVE (3100 N) TO W WELLINGTON AVE (3000 N),Pedestrian,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white
+2022,28,$1400,Streets & Transportation,Alley Speed Hump (2022),W TAYLOR ST & S LOOMIS ST&S LAFLIN ST & W FILLMORE ST,Pedestrian,46.4,21.73,21.03,5.57,5.26,14.92,8.19,74.88,4.71,black
+2019,32,$86243.58,Streets & Transportation,Street Resurfacing (2019),ON W BARRY AVE FROM N SOUTHPORT AVE (1399 W) TO N ASHLAND AVE (1600 W),Car,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white
+2018,28,$165000,Lighting,Street Light Residential Staggered Piggy Back (2018),ON W MAYPOLE AVE FROM N KENTON AVE (4600 W) TO N CICERO AVE (4800 W),NA,46.4,21.73,21.03,5.57,5.26,14.92,8.19,74.88,4.71,black
+2017,36,$0,Streets & Transportation,Street Speed Hump Replacement (2017),ON N MEADE AVE FROM W FULLERTON AVE (2400 N) TO W GRAND AVE (2230 N),Pedestrian,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2016,16,$3700,Streets & Transportation,Street Speed Hump Menu,ON S GREEN ST FROM W 60TH ST (6000 S) TO W 61ST ST (6100 S),Pedestrian,44.72,29.07,20.18,4.36,1.67,17.16,41.78,55.68,0.32,black
+2022,36,$4661.71,Streets & Transportation,Curb & Gutter (2022),6226 W EDDY ST,Car,20.57,27.98,31.27,13.76,6.43,55.91,68.97,3.5,4.11,hispanic
+2012,32,$54783,Streets & Transportation,Street Resurfacing Menu,ON W FLETCHER ST FROM N HOYNE AV (2100 W) TO N LEAVITT ST (2200 W),Car,9.23,9.96,25.5,18.8,36.51,85.84,17.77,2.84,5.47,white

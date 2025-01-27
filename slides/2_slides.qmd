@@ -27,7 +27,6 @@ editor_options:
 library(tidyverse)
 ```
 
-
 # So what?
 
 ## Why learn Markdown?
@@ -318,7 +317,6 @@ You can dynamically fill values (strings, numbers) in your Markdown prose using 
 ```{r}
 #| echo: true
 #| label: fruit
-
 fruit_prices <- tibble(
   fruit = c("apple", "pear", "orange"),
   price = c(2.05, 1.37, 3.09)
@@ -328,9 +326,13 @@ max_price <- fruit_prices |>
   summarize(max_price = max(price)) |>
   pull(max_price)
 
+max_price
+
 max_fruit <- fruit_prices |>
   filter(price == max_price) |>
   pull(fruit)
+
+max_fruit
 ```
 
 ### Usage
