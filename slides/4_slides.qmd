@@ -1,0 +1,520 @@
+---
+title: "Collecting Tidy Text"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  echo: true
+  warning: false
+  message: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    toc: true
+    toc-depth: 2
+    slide-level: 4
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+## Review
+
+<https://PollEv.com/fredner>
+
+## "The whole game" of data science
+
+```{mermaid}
+%%| echo: false
+flowchart LR
+    subgraph Get_Data [Get Data]
+        direction LR
+        A[Import]
+        G[Create]
+    end
+    A --> B[Tidy]
+    G --> B[Tidy]
+    B --> C[Transform]
+    subgraph Understand
+        direction LR
+        C --> D[Visualize]
+        D --> E[Model]
+        E --> C
+    end
+    Understand --> F[Communicate]
+    subgraph "The Whole Game"
+        direction LR
+        Get_Data
+        B
+        Understand
+        F
+    end
+```
+
+### DSST289 emphases
+
+```{mermaid}
+%%| echo: false
+flowchart LR
+    subgraph Get_Data [Get Data]
+        direction LR
+        A[Import]
+        G[Create]
+    end
+    A --> B[Tidy]
+    G --> B[Tidy]
+    B --> C[Transform]
+    subgraph Understand
+        direction LR
+        C --> D[Visualize]
+        D --> E[Model]
+        E --> C
+    end
+    Understand --> F[Communicate]
+    subgraph "The Whole Game"
+        direction LR
+        Get_Data
+        B
+        Understand
+        F
+    end
+    style A fill:#E69F00,stroke:#000,stroke-width:2
+    style C fill:#E69F00,stroke:#000,stroke-width:2
+    style D fill:#E69F00,stroke:#000,stroke-width:2
+    style F fill:#E69F00,stroke:#000,stroke-width:2
+```
+
+### DSST389 emphases
+
+```{mermaid}
+%%| echo: false
+flowchart LR
+    subgraph Get_Data [Get Data]
+        direction LR
+        A[Import]
+        G[Create]
+    end
+    A --> B[Tidy]
+    G --> B[Tidy]
+    B --> C[Transform]
+    subgraph Understand
+        direction LR
+        C --> D[Visualize]
+        D --> E[Model]
+        E --> C
+    end
+    Understand --> F[Communicate]
+    subgraph "The Whole Game"
+        direction LR
+        Get_Data
+        B
+        Understand
+        F
+    end
+    style G fill:#56B4E9,stroke:#000,stroke-width:2
+    style B fill:#56B4E9,stroke:#000,stroke-width:2
+    style E fill:#56B4E9,stroke:#000,stroke-width:2
+    style F fill:#56B4E9,stroke:#000,stroke-width:2
+```
+
+### Today's emphasis
+
+```{mermaid}
+%%| echo: false
+flowchart LR
+    subgraph Get_Data [Get Data]
+        direction LR
+        A[Import]
+        G[Create]
+    end
+    A --> B[Tidy]
+    G --> B[Tidy]
+    B --> C[Transform]
+    subgraph Understand
+        direction LR
+        C --> D[Visualize]
+        D --> E[Model]
+        E --> C
+    end
+    Understand --> F[Communicate]
+    subgraph "The Whole Game"
+        direction LR
+        Get_Data
+        B
+        Understand
+        F
+    end
+    style G fill:#56B4E9,stroke:#000,stroke-width:2
+```
+
+## Data creation & data collection
+
+- Sometimes data will be **given**
+  - e.g., [The U.S. Census](https://data.census.gov/)
+- Other times, data must be **created**
+  - Creation involves both manual and automatic work
+
+### Tidyness
+
+- Either:
+  - Collect data in a tidy format
+  - Or collect data in a format that can be easily tidied
+
+#### Collect in a format that can easily be tidied
+
+```{r}
+#| echo: false
+
+library(tidyverse)
+
+flower <- c(
+  "Black-Eyed Susan", "Virginia Bluebell", "Eastern Red Columbine"
+)
+height_day_1 <- c(10, 8, 6)
+height_day_2 <- c(11, 10, 9)
+height_day_3 <- c(12, 12, 12)
+
+flowers <- tibble(
+  flower,
+  height_day_1,
+  height_day_2,
+  height_day_3
+)
+
+flowers
+```
+
+With a `pivot_longer()`:
+
+```{r}
+#| echo: false
+
+
+flowers |>
+  pivot_longer(
+    cols = -flower, # i.e., every column NOT flower
+    names_to = "day",
+    names_prefix = "height_day_",
+    names_transform = as.integer,
+    values_to = "height"
+  )
+```
+
+### Tables
+
+- Don't be afraid to have multiple tables
+  - If you give them matching keys, they can always be joined
+- Avoid data duplication
+  - [DRY principle: "Don't repeat yourself."](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)
+
+### Explicitness
+
+- Choices made in data collection should be explicit and (ideally) reproducible
+  - For automatic data collection, this can be code
+  - For manual data collection, this can be a description of your methodology
+
+### Data dictionaries
+
+| Column | Description                                                          | Units | Notes                                                                                   |
+|-------------|----------------------------------------------------------------------|-------|-----------------------------------------------------------------------------------------|
+| `flower`      | Common English name for measured flower.        |    |                           |
+| `day`         | Day of observation starting at 1.        |    | Days since beginning of experiment.                   |
+| `height`      | Vertical height of flower from soil to peak. | cm    | Max height may represent bloom, bud, or leaf tip. |
+
+#### Measurement protocols: example
+
+> Height is measured from the soil surface to the topmost point of the flower, which could be the tip of a leaf, bloom, or bud, depending on the plant’s growth stage. Researchers use a ruler to measure. Measurements are taken at 24 hour intervals.
+
+### Bad example: color for meaning
+
+:::{.callout-warning}
+Using color to convey meaning is bad because it is **not** explicit.
+:::
+
+<table>
+  <thead>
+    <tr>
+      <th>flower</th>
+      <th>height_day_1</th>
+      <th>height_day_2</th>
+      <th>height_day_3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="background-color: #d9fdd3;">
+      <td>Black-Eyed Susan</td>
+      <td>10</td>
+      <td>11</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <td>Virginia Bluebell</td>
+      <td>8</td>
+      <td>10</td>
+      <td>12</td>
+    </tr>
+    <tr style="background-color: #d9fdd3;">
+      <td>Eastern Red Columbine</td>
+      <td>6</td>
+      <td>9</td>
+      <td>12</td>
+    </tr>
+  </tbody>
+</table>
+
+### Good example: data validation
+
+Instructions for [Excel](https://support.microsoft.com/en-us/office/apply-data-validation-to-cells-29fecbcc-d1b9-42c1-9d76-eff3ce5f7249) and [Google Sheets](https://support.google.com/docs/answer/186103?hl=en&co=GENIE.Platform%3DDesktop).
+
+![Example of data validation in Excel.](images/validation-1.png)
+
+### Data feminism's big questions[@dignazioDataFeminism2020]
+
+- How do standard practices in data science reinforce existing and intersecting inequalities of race, gender, class, etc.?
+  - ["Garbage in, garbage out" (GIGO)](https://en.wikipedia.org/wiki/Garbage_in,_garbage_out)
+- How could data cause harm simply by existing?
+- Can data produced under unjust conditions nevertheless promote social justice?
+
+#### Example: Student tardiness data
+
+Imagine that the university provided professors with data like this, where an app on your phone would use your geolocation and your course schedule to determine whether you arrived to class on time.
+
+<table>
+  <thead>
+    <tr>
+      <th>student_id</th>
+      <th>mean_arrival_time</th>
+      <th>arrival_category</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="background-color: #d9fdd3;">
+      <td>1</td>
+      <td>-11</td>
+      <td>early</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>-5</td>
+      <td>on time</td>
+    </tr>
+    <tr style="background-color: #ffcccc;">
+      <td>3</td>
+      <td>9</td>
+      <td>late</td>
+    </tr>
+    <tr style="background-color: #d9fdd3;">
+      <td>4</td>
+      <td>-15</td>
+      <td>early</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>0</td>
+      <td>on time</td>
+    </tr>
+  </tbody>
+</table>
+
+#### Effects of such data collection?
+
+- Data without information: professors already know who comes late
+- Confirmation bias: students who arrive late become "late students"
+- Reinforces cultural biases (e.g., "good" students are punctual; "bad" students are not)
+- Stereotype threat
+- Privacy: collection of sensitive location data for little benefit
+
+## Automatic data collection
+
+Processes that automatically output structured data from observations.
+
+- Examples:
+  - Website interaction data
+    - <https://clickclickclick.click/>
+  - Amazon warehouse workers' [scanners](https://www.vice.com/en/article/internal-documents-show-amazons-dystopian-system-for-tracking-workers-every-minute-of-their-shifts) ("time-off-task")
+  - [Automated Weather Observing Systems](https://www.ncei.noaa.gov/products/land-based-station/automated-surface-weather-observing-systems)
+
+## From text to data automatically
+
+- Extracting structured data from unstructured text is a longstanding problem
+- Many applications: OCR, transcription, language models, etc.
+- Data from texts have many properties that are amenable to general data science principles
+
+### Counting words manually
+
+On a piece of paper, create a table in a tidy data structure that counts the words in the following sentence:
+
+**The cat sat on the mat.**
+
+### Compare your results
+
+### "Literal" approach
+
+| Word     | Count |
+|----------|-------|
+| The      | 1     |
+| cat      | 1     |
+| sat      | 1     |
+| on       | 1     |
+| the      | 1     |
+| mat.     | 1     |
+
+**Naive Algorithm**: A "word" is a string surrounded by whitespace.
+
+### "Intuitive" approach
+
+| Word  | Count |
+|-------|-------|
+| the   | 2     |
+| cat   | 1     |
+| sat   | 1     |
+| on    | 1     |
+| mat   | 1     |
+
+**"Algorithm"**: Many prior social and educational experiences that *imply* what I expect you to do when I say, "Count the words in this sentence."
+
+### Some assumptions for either
+
+- The word is the atomic unit of the text.
+- The text exists in a digital form.
+- The text is relatively free of errors (e.g., typos).
+
+### The naive way
+
+Using [the `stringr` package](https://stringr.tidyverse.org/) from the `tidyverse`:
+
+```{r}
+"The cat sat on the mat." |>
+  str_split(pattern = " ")
+```
+
+`[[1]]` refers to a [list](https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Lists) containing multiple vectors.
+
+`[1]` refers to the first element of the [vector](https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Vectors-and-assignment) containing the words in the sentence.
+
+### Counting these words
+
+```{r}
+"The cat sat on the mat." |>
+  str_split(pattern = " ") |>
+  tibble(word = _) |>
+  unnest(word) |>
+  count(word, name = "count")
+```
+
+### Aside: the `_` placeholder
+
+The `_` placeholder allows you to choose where the data being piped from the left side goes.
+
+```r
+x |> f(1, y = _)
+```
+
+is equivalent to:
+
+```r
+f(1, y = x)
+```
+
+[More info.](https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/#-vs)
+
+
+### Problems with the naive way
+
+- It doesn't account for punctuation
+  - e.g., `"mat."` should be `"mat"`
+- It doesn't account for capitalization
+  - e.g., `"The"` and `"the"` should both count as the same word
+
+### Tokenizers
+
+Tokenizers are software packages that handle the process of splitting up a text into **tokens** (words). For example, here is how ChatGPT's tokenizer, `tiktoken`, [handles](https://platform.openai.com/tokenizer) a Langston Hughes poem:
+
+![`tiktoken` visualization of "Harlem."](images/tiktoken.png)
+
+### Distinction: types vs. tokens
+
+A *type* is the form of a word, whereas a *token* is an instance of a *type*.
+
+"The cat sat on the mat" has **5** types and **6** tokens.
+
+There are two tokens---`"The"` and `"the"`---of the type `"the"`.
+
+### `tidytext`
+
+To start, we are going to use [the `tidytext` library](https://github.com/juliasilge/tidytext) to tokenize texts in R.
+
+[Documentation here.](https://cran.r-project.org/web/packages/tidytext/tidytext.pdf)
+
+#### `tidytext` input
+
+Here is the beginning of a poem as a vector of lines:
+
+```{r}
+dickinson <- c(
+  "Because I could not stop for Death -",
+  "He kindly stopped for me -",
+  "The Carriage held but just Ourselves -",
+  "and Immortality"
+)
+
+dickinson
+```
+
+Which we convert into a `tibble`:
+
+```{r}
+poem_df <- tibble(line = 1:4, text = dickinson)
+
+poem_df
+```
+
+#### `unnest_tokens()` tokenizes
+
+```{r}
+library(tidytext)
+
+poem_df |> 
+  unnest_tokens(output = word, input = text) |> 
+  slice_head(n = 8)
+```
+
+Compared to the input:
+
+```{r}
+dickinson |> first()
+```
+
+#### Stop words
+
+[Stop words](https://en.wikipedia.org/wiki/Stop_word) are words that analysts typically filter out of texts for two reasons:
+
+1. They are likely to be highly frequent.
+2. They are unlikely to be highly meaningful.
+
+Good examples in English include: *the*, *a*, *is*, etc.
+
+#### `tidytext` stop words
+
+`tidytext` includes a list of stop words from several lexicons that can be accessed like so:
+
+```{r}
+data(stop_words)
+
+stop_words |> 
+  slice_sample(n = 5)
+```
+
+## Practice
+
+## Works cited

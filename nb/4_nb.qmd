@@ -1,0 +1,332 @@
+---
+title: "Collecting Tidy Texts"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+execute:
+  echo: false
+format:
+  html:
+    anchor-sections: true
+    code-tools: false
+    code-link: true
+    embed-resources: true
+    link-external-icon: true
+    link-external-newwindow: true
+    number-sections: true
+    smooth-scroll: true
+    toc: true
+editor:
+  markdown:
+    wrap: 72
+---
+
+## Environment
+
+Run the following in a code chunk or your console to clean up your environment:
+
+```r
+if (interactive()) {
+  rstudioapi::restartSession(clean = TRUE)
+}
+```
+
+Today, we need to install some new libraries and their dependencies:
+
+```{r}
+if (!requireNamespace("tidytext", quietly = TRUE)) {
+  install.packages("tidytext")
+}
+
+if (!requireNamespace("gutenbergr", quietly = TRUE)) {
+  install.packages("gutenbergr")
+}
+
+if (!requireNamespace("janeaustenr", quietly = TRUE)) {
+  install.packages("janeaustenr")
+}
+```
+
+Then, import needed libraries:
+
+```{r}
+#| label: libraries
+
+library(tidyverse)
+library(ggrepel)
+library(tidytext)
+library(gutenbergr)
+library(janeaustenr)
+theme_set(theme_minimal())
+```
+
+## Data
+
+We're going to start with the novels of [Jane Austen](https://en.wikipedia.org/wiki/Jane_Austen), author of *Pride and Prejudice* (1813). These are part of [the `janeaustenr`package](https://github.com/juliasilge/janeaustenr).
+
+I'm going to set up the books for you in the cell below:
+
+```{r}
+books <- austen_books() |>
+  group_by(book) |>
+  mutate(
+    linenumber = row_number(),
+    chapter = cumsum(str_detect(
+      text,
+      regex("^chapter [\\divxlc]", ignore_case = TRUE)
+    ))
+  ) |>
+  ungroup()
+```
+
+Don't worry if some of these functions (e.g., `cumsum()`, `regex()`) don't look familiar. We will cover them when you need to use them.
+
+## Analysis
+
+First, take a look at `books`:
+
+```{r}
+books
+```
+
+Currently, the values in the `text` column contain multiple words. But we know that tidy texts have one word per row.
+
+### Tokenization
+
+Tokenize the values in `text` into a new column called `word`. Save the results of your output into `tidy_books`, and print 5 random rows from `tidy_books`.
+
+```{r}
+#| label: q-unnest
+
+tidy_books <- books |>
+  unnest_tokens(output = word, input = text)
+
+tidy_books |>
+  slice_sample(n = 5)
+```
+
+### Key words in context
+
+Now, match the words in your sample to their original contexts in `books` so you can see the context in which each token originally appeared.
+
+```{r}
+#| label: q-kwic
+
+sample <- tidy_books |>
+  slice_sample(n = 5)
+
+sample |>
+  left_join(books, join_by(book, linenumber, chapter))
+```
+
+Then, choose a word and identify all of the times that it appears in Austen's [corpus](https://en.wikipedia.org/wiki/Text_corpus). (In this context, a corpus is a collection of texts.) I've chosen the word `"breakfast"` for my example, but you may choose whatever you like.
+
+```{r}
+#| label: q-filter
+
+tidy_books |>
+  filter(word == "breakfast") |>
+  left_join(books, join_by(book, linenumber, chapter))
+```
+
+### Collocates
+
+Collocates are words that appear near a given word. (Think "co-locate.") Find all of the words that appear on the same line as your target word, and count the total number of times they appear near your word.
+
+```{r}
+#| label: q-collocates-1
+
+my_word <- "breakfast"
+
+tidy_books |>
+  semi_join(
+    tidy_books |> filter(word == my_word),
+    join_by(book, chapter, linenumber)
+  ) |>
+  filter(word != my_word) |>
+  count(word, sort = TRUE)
+```
+
+In the case of `"breakfast"`, this isn't terribly interesting yet. One reason is that the results are full of **stop words**.
+
+### Stop words
+
+Using `stop_words` from `tidytext`, remove all of the stop words from `tidy_books`. Then, calculate and print the total number of stop words that were **removed** from `tidy_books` once you have removed them.
+
+:::{.callout-tip}
+While you can use `count()` to get the total number of lines from a data frame, `tally()` is generally preferred in this case. That's because `count()` assumes that you will be grouping, whereas `tally()` assumes that the grouping has already been done. See [the docs](https://dplyr.tidyverse.org/reference/count.html).
+:::
+
+Finally, overwrite `tidy_books` once you have done this correctly, and print the first 5 rows.
+
+```{r}
+#| label: q-remove-stop
+
+data(stop_words)
+
+before <- tidy_books |>
+  tally() |>
+  pull()
+
+tidy_books <- tidy_books |>
+  anti_join(stop_words, join_by(word))
+
+tidy_books |> 
+  slice_head(n = 5)
+
+after <- tidy_books |>
+  tally() |>
+  pull()
+
+n_stop <- before - after
+```
+
+The total number of stop words removed was `{r} n_stop`, after which we are left with `{r} after`. In other words, `{r} round((n_stop / before) * 100)`% of Austen's works are stop words.
+
+### Collocation without stop words
+
+Using the updated `tidy_books`, re-run your collocation analysis from above.
+
+```{r}
+#| label: q-collocates-2
+
+my_word <- "breakfast"
+
+tidy_books |>
+  semi_join(
+    tidy_books |> filter(word == my_word),
+    join_by(book, chapter, linenumber)
+  ) |>
+  filter(word != my_word) |>
+  count(word, sort = TRUE)
+```
+
+### Frequent words
+
+What are the most frequently used words across all of Austen's novels?
+
+```{r}
+#| label: q-mfw
+
+tidy_books |>
+  count(word, sort = TRUE)
+```
+
+What are the three most frequent words in each novel?
+
+```{r}
+#| label: q-mfw-novel
+
+tidy_books |>
+  group_by(book) |>
+  count(word, sort = TRUE) |>
+  slice_head(n = 3)
+```
+
+What do you notice about the most frequent words within each novel as compared to the list of most frequent words overall?
+
+### Shared words
+
+If we are interested in Austen's works *in general*, it is not too interesting to observe that the names of characters who only appear in one book tend to appear frequently in that book.
+
+Filter `tidy_books` again such that the only words in the dataset are words that appear in *every* Austen book. Once you have this right, overwrite `tidy_books` again with the reduced data set.
+
+```{r}
+#| label: q-words-in-all
+
+n_books <- tidy_books |>
+  distinct(book) |>
+  count() |>
+  pull()
+
+total_words <- tidy_books |> 
+  distinct(word) |> 
+  tally()
+
+tidy_books <- tidy_books |>
+  distinct(book, word) |>
+  count(word) |>
+  filter(n == n_books) |>
+  inner_join(tidy_books, join_by(word))
+
+total_shared_words <- tidy_books |>
+  distinct(word) |>
+  tally()
+```
+
+Austen uses `{r} total_shared_words` unique non-stop words in every book, as compared to `{r} total_words` non-stop words that appear at least once in any book.
+
+## Visualization
+
+Now that we have a shared set of terms, let's visualize those based on their use across the novels.
+
+Create a stacked bar chart showing the most frequent terms across all of the novels, with the sections of the bar chart colored based on the novel. Put the terms on the y axis, and the frequency on the x axis.
+
+```{r}
+#| label: q-bar-chart
+
+word_counts <- tidy_books |> 
+  count(book, word) 
+
+top_20_words <- word_counts |>
+  count(word, wt = n, sort = TRUE) |>
+  slice_head(n = 20) |>
+  rename(total_count = n)
+
+top_20_words |> 
+  left_join(word_counts, by = "word") |> 
+  mutate(word = fct_reorder(word, total_count)) |> 
+  ggplot(aes(x = n, y = word, fill = book)) +
+  geom_col() +
+  scale_fill_brewer(palette = "Dark2")
+```
+
+This suggests not only the different rates at which these words are used, but also their differences across works.
+
+We can visualize this relative over- or underrepresentation of specific words with a heatmap.
+
+1. As in the previous question, identify the top 20 most frequent *shared* words across all novels.
+2. Filter to keep only those words, count per novel, and visualize.
+3. Use the geom below for your plot:
+
+```r
+geom_tile(color = "gray")
+```
+
+The `color` argument is a fixed aesthetic that you can set to any value you like.
+
+4. Because the names of the books overlap with one another on the x-axis, you can use the line below to angle them:
+
+```r
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+#| label: q-heatmap
+
+top_20_shared_words <- tidy_books |>
+  count(word, sort = TRUE) |>
+  slice_head(n = 20) |>
+  pull(word)
+
+tidy_books |>
+  filter(word %in% top_20_shared_words) |>
+  count(book, word) |>
+  ggplot(aes(
+    x = book, 
+    y = word, 
+    fill = n
+  )) +
+  geom_tile(color = "gray") +
+  scale_fill_viridis_c() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+There is one word in one book that stands out. If you have read the book or seen [the 2020 film](https://en.wikipedia.org/wiki/Emma_(2020_film)), try to imagine why that might be the case.
+
+## Extra challenge
+
+Try using the `gutenbergr` package (installed above) to analyze one or more books of your choosing from [Project Gutenberg](https://www.gutenberg.org/) in the same way.
+
+Find the documentation for `gutenbergr` [here](https://docs.ropensci.org/gutenbergr/).

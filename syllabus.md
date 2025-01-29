@@ -132,9 +132,7 @@ I expect you to...
 
 ### Code Interview
 
-Unlike DSST289, you are not required to upload your completed notebooks as we go. Instead, you will be asked to complete a code interview near the end of the semester.
-
-During your interview, I will ask you to explain your approach and solutions to a few randomly selected problems from the notebooks that we complete throughout the semester.
+Near the end of the semester, you will complete a code interview. I will ask you to explain your approach and solutions to a few randomly selected problems from the notebooks assigned throughout the semester.
 
 If you do not complete the notebooks, you cannot succeed on the code interview.
 
@@ -190,9 +188,7 @@ I ask you to do these things in this order when you can't figure something out:
 
 ## Schedule
 
-- The schedule below outlines major topics to be covered in the course.
-- I reserve the right to change the schedule.
-  - If I change the schedule, I will inform you as far in advance as possible.
+The schedule outlines major topics to be covered in the course. I reserve the right to change the schedule as the semester progresses. If I do change the schedule, I will inform you as far in advance as possible.
 
 Meeting  Date      Topic
 -------- --------- ---------------------------------------------
@@ -200,7 +196,7 @@ Meeting  Date      Topic
 2        01-15     Quarto and Markdown
          01-22     **NO CLASS**
 3        01-27     `tidyverse` review
-4        01-29     Text processing and Zipf
+4        01-29     Data collection and text processing
 5        02-03     Sampling and corpora
 6        02-05     Sentiment analysis
 7        02-10     n-grams and correlation
