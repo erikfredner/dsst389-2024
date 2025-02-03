@@ -1,0 +1,443 @@
+---
+title: "Corpora and Sampling"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  echo: true
+  warning: false
+  message: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    toc: true
+    toc-depth: 2
+    slide-level: 4
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+## Review
+
+### Poll Everywhere
+
+1. Go to this URL:
+
+<https://pollev.com/fredner>
+
+2. Please log in to Poll Everywhere using your `@richmond.edu` email address.
+
+### Notebook 3 review
+
+#### Data
+
+```{r}
+library(tidyverse)
+theme_set(theme_minimal())
+
+funds <- read_csv("../data/chicago_spending.csv")
+
+funds |> slice_sample(n = 5)
+```
+
+#### Parse number
+
+```{r}
+funds |>
+  select(cost) |>
+  slice_sample(n = 5) |>
+  pull()
+
+funds <- funds |>
+  mutate(cost = parse_number(cost)) |>
+  select(year, ward, cost, category)
+
+funds |> slice_sample(n = 5)
+```
+
+#### Any blank values?
+
+```{r}
+funds |>
+  filter(if_any(everything(), is.na))
+```
+
+#### Total expenditures
+
+```{r}
+funds |>
+  group_by(category) |>
+  summarize(total_cost = sum(cost)) |>
+  mutate(prop_cost = total_cost / sum(total_cost)) |>
+  arrange(desc(total_cost))
+```
+
+#### Expenditures stacked
+
+```{r}
+#| output-location: slide
+
+funds |>
+  group_by(year, category) |>
+  summarize(total_cost = sum(cost)) |>
+  ggplot(aes(x = as_factor(year), y = total_cost, fill = category)) +
+  geom_col(position = "stack") +
+  scale_fill_brewer(palette = "Set3")
+```
+
+#### A note about qualitative color palettes
+
+```r
+scale_fill_brewer(palette = "Set3")
+```
+
+This is a *qualitative* color palette, which is designed for categorical data and does not imply any inherent order or magnitude, unlike continuous continuous scales like `viridis`.
+
+#### Expenditures stacked with continuous color palette (`viridis`)
+
+:::{.callout-warning}
+This color palette improperly implies a scale of values from low (dark) to high (light). Here, the factor order (and thus the color) is determined **alphabetically**, which is not meaningful.
+:::
+
+```{r}
+#| output-location: slide
+#| echo: false
+
+funds |>
+  group_by(year, category) |>
+  summarize(total_cost = sum(cost)) |>
+  ggplot(aes(x = as_factor(year), y = total_cost, fill = category)) +
+  geom_col(position = "stack") +
+  scale_fill_viridis_d()
+```
+
+#### Recommended color palettes
+
+- For continuous variables (e.g., grade is between 0 and 100), the [`viridis` scale](https://ggplot2.tidyverse.org/reference/scale_viridis.html) is recommended
+- For categorical variables (e.g., major is Biology, English, Philosophy, etc.), the colorblind-safe [`brewer` scales](https://ggplot2.tidyverse.org/reference/scale_brewer.html) are recommended (e.g., `"Dark2"`)
+  - If you don't like `"Dark2"`, try `"Set2"` or `"Pastel2"`
+- (I used `"Set3"` in the previous figure because `"Dark2"` only supports up to seven colors.)
+  
+#### `brewer` qualitative scales
+  
+```{r}
+#| echo: false
+
+library(ggplot2)
+library(patchwork)
+
+# Convert cyl and gear to factors
+mtcars$cyl <- factor(mtcars$cyl)
+mtcars$gear <- factor(mtcars$gear)
+
+# Plot 1: Dark2
+p_dark2 <- ggplot(mtcars, aes(x = cyl, fill = gear)) +
+  geom_bar() +
+  scale_fill_brewer(palette = "Dark2") +
+  labs(title = "Dark2")
+
+# Plot 2: Set2
+p_set2 <- ggplot(mtcars, aes(x = cyl, fill = gear)) +
+  geom_bar() +
+  scale_fill_brewer(palette = "Set2") +
+  labs(title = "Set2")
+
+# Plot 3: Pastel2
+p_pastel2 <- ggplot(mtcars, aes(x = cyl, fill = gear)) +
+  geom_bar() +
+  scale_fill_brewer(palette = "Pastel2") +
+  labs(title = "Pastel2")
+
+# Combine all three plots in a 1x3 grid
+p_dark2 | p_set2 | p_pastel2
+```
+
+#### Proportional expenditures area
+
+```{r}
+#| output-location: slide
+
+
+funds |>
+  group_by(year, category) |>
+  summarize(total_cost = sum(cost)) |>
+  ungroup() |>
+  group_by(year) |>
+  mutate(prop_cost = total_cost / sum(total_cost)) |>
+  ggplot(aes(x = year, y = prop_cost, fill = category)) +
+  geom_area(position = "stack") +
+  scale_fill_brewer(palette = "Set3")
+```
+
+#### Proportional expenditures area simplified grouping
+
+```{r}
+#| output-location: slide
+
+funds |>
+  group_by(year, category) |>
+  # .groups = "drop_last" drops `category` grouping, but keeps `year`:
+  summarize(total_cost = sum(cost), .groups = "drop_last") |>
+  mutate(prop_cost = total_cost / sum(total_cost)) |>
+  ggplot(aes(x = year, y = prop_cost, fill = category)) +
+  geom_area(position = "stack") +
+  scale_fill_brewer(palette = "Set3")
+```
+
+#### Spending by ward
+
+```{r}
+funds |>
+  group_by(ward) |>
+  summarize(total_spend = sum(cost)) |>
+  ungroup() |>
+  filter(!is.na(total_spend)) |>
+  summarize(
+    mean_total_spend = mean(total_spend),
+    sd_total_spend = sd(total_spend),
+    cv_total_spend = sd_total_spend / mean_total_spend
+  )
+```
+
+- `sd` abbreviates [standard deviation](https://en.wikipedia.org/wiki/Standard_deviation)
+- `cv` abbreviates [coefficient of variation](https://en.wikipedia.org/wiki/Coefficient_of_variation)
+
+#### Spending outliers
+
+```{r}
+ward_spending <- funds |>
+  group_by(category, ward) |>
+  summarize(total_spend = sum(cost), .groups = "drop")
+
+ward_outliers <- ward_spending |>
+  group_by(category) |>
+  mutate(
+    Q1 = quantile(total_spend, 0.25),
+    Q3 = quantile(total_spend, 0.75),
+    IQR = Q3 - Q1,
+    upper_bound = Q3 + 1.5 * IQR
+  ) |>
+  filter(total_spend >= upper_bound) |>
+  ungroup()
+
+ward_outliers |>
+  mutate(spend_over_upper = total_spend - upper_bound) |>
+  arrange(desc(spend_over_upper)) |>
+  slice_head(n = 1)
+```
+
+The Parks in Ward 1 include [*Cloud Gate*](https://en.wikipedia.org/wiki/Cloud_Gate).
+
+#### Spending equity
+
+We assume an equal split across all wards, and see how each ward’s actual spending deviates from that ideal.
+
+```{r}
+#| output-location: slide
+
+total_spending <- funds |>
+  summarize(total_cost = sum(cost)) |>
+  pull(total_cost)
+
+ward_spending <- funds |>
+  group_by(ward) |>
+  summarize(ward_total = sum(cost), ) |>
+  ungroup()
+
+n_wards <- funds |>
+  summarize(max_ward = max(ward)) |>
+  pull(max_ward)
+
+expected_spending <- total_spending / n_wards
+
+ward_spending <- ward_spending |>
+  mutate(
+    expected_spend = expected_spending,
+    deviation = ward_total - expected_spend
+  ) |>
+  arrange(desc(deviation))
+
+ward_spending |>
+  ggplot(aes(x = fct_reorder(factor(ward), deviation), y = deviation)) +
+  geom_col() +
+  labs(
+    title = "Deviation of Wards' Spending from Expected",
+    subtitle = "Positive values indicate overspending, negative values indicate underspending",
+    x = "Ward",
+    y = "Spending Deviation (Actual - Expected)"
+  ) +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+#### Questions?
+
+## Corpora and sampling
+
+### Analyzing textual data
+
+- If you want to study one text, just read it!
+- Quantitative text analysis becomes interesting when you have:
+  - a large enough amount of text that it would be difficult to read and recall all of the relevant details
+  - a large enough amount of text that it would be impossible to read and recall all of the relevant details
+- Neither of these mean that you need to have an exceptionally large amount of text.
+  - e.g., Human readers identifying parts of speech
+
+### Corpora
+
+- The set of documents being studied is often called the **corpus** (plural: corpora)
+- What's "in" and what's "out" of the corpus?
+
+#### Example: Taylor Swift corpora
+
+- Corpora containing lyrics to...
+  - "Cruel Summer" (one song, but with multiple versions)
+  - *Red (Taylor's Version)* (one album)
+  - all of the *Taylor's Version* albums (four albums)
+  - all of Swift's recorded songs (Studio only? Live? YouTube?)
+  - Swift's songs, compared with other pop songs (???)
+
+### Problems with corpus construction
+
+1. Completeness
+2. Reproducibility
+3. Representativeness
+
+### Corpora as an example of a general problem
+
+These issues with corpus construction are a specific example of a general problem in data science, which pertains to the representativeness of the *sample* we have in relation to the *population* we want to measure.
+
+#### Bigger is not necessarily better
+
+- [The *Literary Digest* poll of 1936](https://doi.org/10.1017/S014555320001035X) famously predicted that Alf Landon would defeat Franklin D. Roosevelt in the US presidential election
+  - *Literary Digest* polled over 10 million people, but they oversampled Landon supporters (sample bias)
+- George Gallup (later of Gallup polling) conducted biweekly polls of just 2,000 people and accurately predicted a Roosevelt victory
+  - Quality of the sample beats quantity
+
+#### Selection bias
+
+- *Literary Digest* subscribers were different from the population of US voters in a non-random way
+- The same is true for contemporary rating systems, like Yelp and Google reviews (self-selection bias)
+
+### Important distributions
+
+Once we have some samples, we will take some sample statistics. Here are two important ideal types for these distributions.
+
+#### Uniform distribution
+
+This assumes that every number between two values is equally likely to be chosen. [**Bingo**](https://en.wikipedia.org/wiki/Bingo_(American_version)) is a good real-world example.
+
+```{r}
+set.seed(1)
+
+bingo_calls <- tibble(
+  call_order = 1:75,
+  ball = sample(1:75, size = 75, replace = FALSE)
+)
+
+bingo_calls |> slice_head(n = 5)
+```
+
+#### Bingo and uniformity
+
+Let's see when Ball 1 would be called over 100,000 games of bingo:
+
+```{r}
+#| echo: false
+
+set.seed(1)
+n_games <- 100000
+n_balls <- 75
+
+bingo_sim <- tibble(game = 1:n_games) %>%
+  mutate(call_order_ball1 = map_int(game, ~ {
+    call_sequence <- sample(1:n_balls, size = n_balls, replace = FALSE)
+    which(call_sequence == 1)
+  }))
+```
+
+```{r}
+bingo_sim |> slice_sample(n = 5)
+```
+
+```{r}
+#| output-location: slide
+
+bingo_sim |>
+  ggplot(aes(x = call_order_ball1)) +
+  geom_histogram(binwidth = 1, color = "white", fill = "#009E73") +
+  scale_x_continuous(
+    breaks = 1:n_balls,
+    guide = guide_axis(check.overlap = TRUE)
+  )
+```
+
+#### Normality
+
+Unlike the uniform distribution, the [normal (or Gaussian) distribution](https://en.wikipedia.org/wiki/Normal_distribution) is unequal. **Human height** is a good real-world example.
+
+```{r}
+set.seed(1)
+
+n <- 1000
+mean_height <- 165 # in centimeters
+sd_height <- 7 # in centimeters
+
+women_heights <- tibble(
+  student_id = 1:n,
+  height = rnorm(n, mean = mean_height, sd = sd_height)
+) |>
+  mutate(
+    total_inches = height / 2.54,
+    feet = floor(total_inches / 12),
+    inches = total_inches - feet * 12
+  ) |>
+  select(-total_inches)
+
+women_heights |> slice_sample(n = 5)
+```
+
+#### The bell curve
+
+```{r}
+#| echo: false
+
+women_heights |>
+  ggplot(aes(x = height)) +
+  geom_histogram(
+    aes(y = ..density..),
+    binwidth = 1,
+    fill = "white",
+    color = "black"
+  ) +
+  geom_density(fill = "#009E73", alpha = 0.2) +
+  stat_function(
+    fun = dnorm, args = list(mean = mean_height, sd = sd_height),
+    color = "#56B4E9", size = 1
+  ) +
+  labs(
+    title = "Simulated heights of female American college students",
+    subtitle = "Assuming a normal distribution (mean = 165 cm, sd = 7 cm)",
+    x = "Height (cm)",
+    y = "Density"
+  )
+```
+
+#### A challenge with word distributions in texts
+
+- Word distributions are not uniform because not all words are equally likely.
+- Not all word distributions are normal because many words are "bursty."
+  - The word "Dracula" shows up a lot in [*Dracula*](https://en.wikipedia.org/wiki/Dracula).
+  - But that large number of uses does not mean that we should expect to see a few instances of "Dracula" in many novels from 1897.
+
+### Practice

@@ -196,7 +196,7 @@ Meeting  Date      Topic
 2        01-15     Quarto and Markdown
          01-22     **NO CLASS**
 3        01-27     `tidyverse` review
-4        01-29     Data collection and text processing
+4        01-29     Tidy texts
 5        02-03     Sampling and corpora
 6        02-05     Sentiment analysis
 7        02-10     n-grams and correlation

@@ -4,7 +4,8 @@ subtitle: "DSST389: Advanced Data Science"
 author: "Erik Fredner"
 institute: "University of Richmond"
 date: today
-echo: true
+execute:
+  echo: true
 format:
   html:
     anchor-sections: true
@@ -97,12 +98,6 @@ Tokenize the values in `text` into a new column called `word`. Save the results 
 
 ```{r}
 #| label: q-unnest
-
-tidy_books <- books |>
-  unnest_tokens(output = word, input = text)
-
-tidy_books |>
-  slice_sample(n = 5)
 ```
 
 ### Key words in context
@@ -111,22 +106,12 @@ Now, match the words in your sample to their original contexts in `books` so you
 
 ```{r}
 #| label: q-kwic
-
-sample <- tidy_books |>
-  slice_sample(n = 5)
-
-sample |>
-  left_join(books, join_by(book, linenumber, chapter))
 ```
 
 Then, choose a word and identify all of the times that it appears in Austen's [corpus](https://en.wikipedia.org/wiki/Text_corpus). (In this context, a corpus is a collection of texts.) I've chosen the word `"breakfast"` for my example, but you may choose whatever you like.
 
 ```{r}
 #| label: q-filter
-
-tidy_books |>
-  filter(word == "breakfast") |>
-  left_join(books, join_by(book, linenumber, chapter))
 ```
 
 ### Collocates
@@ -135,16 +120,6 @@ Collocates are words that appear near a given word. (Think "co-locate.") Find al
 
 ```{r}
 #| label: q-collocates-1
-
-my_word <- "breakfast"
-
-tidy_books |>
-  semi_join(
-    tidy_books |> filter(word == my_word),
-    join_by(book, chapter, linenumber)
-  ) |>
-  filter(word != my_word) |>
-  count(word, sort = TRUE)
 ```
 
 In the case of `"breakfast"`, this isn't terribly interesting yet. One reason is that the results are full of **stop words**.
@@ -161,24 +136,6 @@ Finally, overwrite `tidy_books` once you have done this correctly, and print the
 
 ```{r}
 #| label: q-remove-stop
-
-data(stop_words)
-
-before <- tidy_books |>
-  tally() |>
-  pull()
-
-tidy_books <- tidy_books |>
-  anti_join(stop_words, join_by(word))
-
-tidy_books |> 
-  slice_head(n = 5)
-
-after <- tidy_books |>
-  tally() |>
-  pull()
-
-n_stop <- before - after
 ```
 
 The total number of stop words removed was `{r} n_stop`, after which we are left with `{r} after`. In other words, `{r} round((n_stop / before) * 100)`% of Austen's works are stop words.
@@ -189,16 +146,6 @@ Using the updated `tidy_books`, re-run your collocation analysis from above.
 
 ```{r}
 #| label: q-collocates-2
-
-my_word <- "breakfast"
-
-tidy_books |>
-  semi_join(
-    tidy_books |> filter(word == my_word),
-    join_by(book, chapter, linenumber)
-  ) |>
-  filter(word != my_word) |>
-  count(word, sort = TRUE)
 ```
 
 ### Frequent words
@@ -207,20 +154,12 @@ What are the most frequently used words across all of Austen's novels?
 
 ```{r}
 #| label: q-mfw
-
-tidy_books |>
-  count(word, sort = TRUE)
 ```
 
 What are the three most frequent words in each novel?
 
 ```{r}
 #| label: q-mfw-novel
-
-tidy_books |>
-  group_by(book) |>
-  count(word, sort = TRUE) |>
-  slice_head(n = 3)
 ```
 
 What do you notice about the most frequent words within each novel as compared to the list of most frequent words overall?
@@ -233,25 +172,6 @@ Filter `tidy_books` again such that the only words in the dataset are words that
 
 ```{r}
 #| label: q-words-in-all
-
-n_books <- tidy_books |>
-  distinct(book) |>
-  count() |>
-  pull()
-
-total_words <- tidy_books |> 
-  distinct(word) |> 
-  tally()
-
-tidy_books <- tidy_books |>
-  distinct(book, word) |>
-  count(word) |>
-  filter(n == n_books) |>
-  inner_join(tidy_books, join_by(word))
-
-total_shared_words <- tidy_books |>
-  distinct(word) |>
-  tally()
 ```
 
 Austen uses `{r} total_shared_words` unique non-stop words in every book, as compared to `{r} total_words` non-stop words that appear at least once in any book.
@@ -264,21 +184,6 @@ Create a stacked bar chart showing the most frequent terms across all of the nov
 
 ```{r}
 #| label: q-bar-chart
-
-word_counts <- tidy_books |> 
-  count(book, word) 
-
-top_20_words <- word_counts |>
-  count(word, wt = n, sort = TRUE) |>
-  slice_head(n = 20) |>
-  rename(total_count = n)
-
-top_20_words |> 
-  left_join(word_counts, by = "word") |> 
-  mutate(word = fct_reorder(word, total_count)) |> 
-  ggplot(aes(x = n, y = word, fill = book)) +
-  geom_col() +
-  scale_fill_brewer(palette = "Dark2")
 ```
 
 This suggests not only the different rates at which these words are used, but also their differences across works.
@@ -303,23 +208,6 @@ theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ```{r}
 #| label: q-heatmap
-
-top_20_shared_words <- tidy_books |>
-  count(word, sort = TRUE) |>
-  slice_head(n = 20) |>
-  pull(word)
-
-tidy_books |>
-  filter(word %in% top_20_shared_words) |>
-  count(book, word) |>
-  ggplot(aes(
-    x = book, 
-    y = word, 
-    fill = n
-  )) +
-  geom_tile(color = "gray") +
-  scale_fill_viridis_c() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 There is one word in one book that stands out. If you have read the book or seen [the 2020 film](https://en.wikipedia.org/wiki/Emma_(2020_film)), try to imagine why that might be the case.

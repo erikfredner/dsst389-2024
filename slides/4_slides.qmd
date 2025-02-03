@@ -28,10 +28,6 @@ editor_options:
     wrap: 72
 ---
 
-## Review
-
-<https://PollEv.com/fredner>
-
 ## "The whole game" of data science
 
 ```{mermaid}
@@ -159,8 +155,10 @@ flowchart LR
 
 ## Data creation & data collection
 
-- Sometimes data will be **given**
-  - e.g., [The U.S. Census](https://data.census.gov/)
+- Sometimes data will be **given** to you
+  - Everything in 289
+  - Data that cannot be reproduced or recollected
+    - e.g., [The U.S. Census](https://data.census.gov/)
 - Other times, data must be **created**
   - Creation involves both manual and automatic work
 
@@ -352,7 +350,7 @@ Processes that automatically output structured data from observations.
 
 ### Counting words manually
 
-On a piece of paper, create a table in a tidy data structure that counts the words in the following sentence:
+On a piece of paper, create a table in a tidy data structure that counts the instances of the words in the following sentence:
 
 **The cat sat on the mat.**
 
@@ -449,6 +447,16 @@ A *type* is the form of a word, whereas a *token* is an instance of a *type*.
 "The cat sat on the mat" has **5** types and **6** tokens.
 
 There are two tokens---`"The"` and `"the"`---of the type `"the"`.
+
+### Example: Buffalo buffalo
+
+The longest grammatically correct sentence in English that only uses one type is:
+
+[**"Buffalo buffalo Buffalo buffalo buffalo buffalo Buffalo buffalo."**](https://en.wikipedia.org/wiki/Buffalo_buffalo_Buffalo_buffalo_buffalo_buffalo_Buffalo_buffalo)
+
+|type|tokens|
+|---|---|
+|buffalo|8|
 
 ### `tidytext`
 
