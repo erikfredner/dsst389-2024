@@ -1,0 +1,152 @@
+---
+title: "Group Project 1"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+echo: false
+format:
+  html:
+    anchor-sections: true
+    code-tools: false
+    code-link: true
+    embed-resources: true
+    link-external-icon: true
+    link-external-newwindow: true
+    number-sections: true
+    smooth-scroll: true
+    toc: true
+editor:
+  markdown:
+    wrap: 72
+---
+
+## Deadline
+
+Project 1 is due by the start of class on Monday, February 17.
+
+## Grocery shopping
+
+For this assignment, your goal is to *teach your peers something about grocery shopping* with data. This assignment, like the other group projects, is open-ended by design.
+
+Where the notebooks help you practice matching outputs using direct instructions, the projects more closely resemble "real-world" data science tasks, where you analyze existing data or gather new data, and make meaning from it for someone else.
+
+**I encourage you to bring your food interests and preferences to this analysis!** Build on something that you are either already knowledgable of or interested in.
+
+### Required elements
+
+While possible responses are open-ended, there are several required elements of the project.
+
+- [ ] What you teach your peers must be meaningful (i.e., It must answer the question, "So what?")
+- [ ] It must pertain to grocery shopping in some way (e.g., saving money, buying healthier foods, finding the best product given a constraint, choosing the best basket of goods for a certain purpose, etc.)
+- [ ] It must *not* directly reproduce the original purpose for which the data was created.
+- [ ] Your analysis must include at least two outputs (e.g., tables, figures, etc.)
+- [ ] Your analysis must include both code and prose explaining the motivations and outcomes of your analysis.
+- [ ] The submitted document should be a Quarto-rendered PDF, using at least some of the advanced features that we discussed earlier in the semester (e.g., figure captions, cross-references, in-line calculations, etc.)
+- [ ] The submitted document should include at least 400 words describing your your "so what?", your outputs, and the code used to generate them.
+
+## Contribution to learning goals
+
+This project directly addresses the following learning goals for this course:
+
+- Collect, manipulate, tidy, visualize, and explore data using basic and advanced techniques.
+- Understand key aspects of the [R programming language](https://www.r-project.org) and the [`tidyverse`](https://www.tidyverse.org).
+- Use the [RStudio](https://posit.co/products/open-source/rstudio/) integrated development environment.
+- Use [Quarto](https://quarto.org/) to create high-quality research documents and websites.
+- Use programming language documentation, cookbooks, and large language models to solve programming problems.
+
+The next projects will focus on the material we are learning about analyzing texts. (You need to learn more methods to have options for analysis.)
+
+## Data
+
+For this assignment, you will use data from [GroceryDB](https://github.com/Barabasi-Lab/GroceryDB). GroceryDB is the data underlying the website [TrueFood](https://www.truefood.tech), which is "designed to unveil the degree of processing of food products."
+
+### Recommended datasaet
+
+GroceryDB contains multiple tables. I recommend using the table `GroceryDB_foods.csv`, but you may use any table or tables from GroceryDB in combination with any other data that serves your research question.
+
+### So what?
+
+For TrueFood and GroceryDB, their "so what" is that ultra-processed foods are increasingly recognized as unhealthy. For example, the consumption of ultra-processed foods is associated with increased [all-cause mortality](https://pmc.ncbi.nlm.nih.gov/articles/PMC7399967/), among other things.
+
+The second part of their "so what" is that ultra-processed foods are consumed everywhere, but that they are especially prevalent in the [Standard American Diet](https://pubmed.ncbi.nlm.nih.gov/21139124/). Consuming fewer ultra-processed foods would likely improve American health outcomes, so TrueFood ranks foods based on what they call the [Food Processing Score (FPro)](https://www.medrxiv.org/content/10.1101/2022.04.23.22274217v5), which is used to quantify how processed a given food is relative to other foods in the same category. I recommend [reading their analysis](https://www.truefood.tech/intro) comparing two cakes to better understand their intentions and methodology.
+
+The database provides information about foods sold at Target, Walmart, and Whole Foods, three of the biggest grocers in the US.
+
+### Other data
+
+If you wish, you *may* combine data from GroceryDB with other data sources of your choosing.
+
+If you choose to do so, you must explain *where* you sourced that data from, and *why* it is suitable to answer your questions.
+
+### Example project
+
+NFL players eat a shockingly large number of [Uncrustables](https://www.nytimes.com/2024/12/05/learning/whats-going-on-in-this-graph-dec-11-2024.html?unlocked_article_code=1.vE4.6aTB.ZwEu5IwXeTGd&smid=url-share), which are sealed crustless sandwiches. Despite their popularity, Uncrustables have significant nutritional downsides for athletes: They are ultra-processed foods, high in sugar, etc.
+
+Using the data in GroceryDB, this project identifies which foods share as many of the nutritional benefits that have made Uncrustables popular as possible while minimizing their costs, such as high total sugar. We analyze trade-offs that exist among the top contenders, and recommend two best replacements for Uncrustables.
+
+## External resources
+
+As the purpose of this group project is to imitate data science work that one might do outside of school, it is an **open-resource** project. This means that you may use books, websites, and, yes, generative artificial intelligence (GenAI) tools in order to complete this work.
+
+However, your use of all external resources, including GenAI, is constrained by the rules set out in the syllabus, which include the following:
+
+### Prohibited Uses of GenAI
+
+- Submitting model output, in part or in whole, as if it were your original work. This includes code *or* writing.
+- Uploading any data used in this course (e.g., `.csv` files) directly to multimodal GenAI tools like ChatGPT.
+- Using models for assistance *without* citing your interaction with the model.
+- Using models to generate outputs that you cannot verify, explain, or understand.^[However, if a model does produce an output that you cannot verify, explain, or understand, you may use the model to improve your understanding of that output.]
+
+### Permitted Uses of GenAI
+
+I ask you to do these things in this order when you can't figure something out:
+
+1. Review the course notes and slides, if relevant.
+2. Talk to your classmates.
+3. Search for credible information online (e.g., StackOverflow).
+4. Talk to the [Custom GPT](https://chatgpt.com/g/g-6783c8a8603c8191862f677689207682-dsst389-gpt) for this class.
+5. If you use information from the Custom GPT, **cite** your interactions with it.
+
+[This page](https://help.openai.com/en/articles/7925741-chatgpt-shared-links-faq) explains how to share a link to a ChatGPT interaction.
+
+### Things to consider when using GenAI
+
+#### Style
+
+The [Custom GPT](https://chatgpt.com/g/g-6783c8a8603c8191862f677689207682-dsst389-gpt) for this course is designed to help you with programming problems while following the conventions of this class. However, **you** are ultimately responsible for ensuring that your code follows the class style requirements:
+
+- Use the base R pipe (`|>`), not the `magrittr` pipe (`|>`)
+- Use `<-` to assign outputs to objects. *Do not* use `=`.
+- Use `tidyverse` functions instead of base R whenever possible.
+  - e.g., `as_factor()` is `tidyverse`; `as.factor()` is `{base}`.
+- Style your code in accordance with the [`tidyverse` style guide](https://style.tidyverse.org/).
+- Code without comments and/or documentation is incomplete.
+
+#### Accuracy
+
+LLMs get things wrong. That can happen because the model makes a mistake, or the person prompting the model makes a mistake. Either way, the accuracy of your code is your responsibility.
+
+## Rubric
+
+| Criterion                   | Description                                                                                                   | Weight |
+|--------------------------------|-------------------------------------------------------------------------------------------------------------------|-----------|
+| Significance | Addresses a meaningful question about grocery shopping, explaining why it matters without replicating the data’s purpose. | 30%       |
+| Analysis & Data Integration| Uses effective data manipulation and appropriate datasets, explaining methods briefly.                              | 20%       |
+| Outputs                    | Offers at least two clear, meaningful tables or figures that advance the analysis.                                  | 20%       |
+| Code Quality & Style       | Employs clean, documented R code that follows tidyverse style.                                                      | 10%       |
+| Prose                      | Document is a professional-quality Quarto PDF. Presents motivations and findings in concise formal writing.                                                       | 20%       |
+
+## Groups
+
+```{r}
+#| warning: false
+
+library(tidyverse)
+library(knitr)
+
+df <- read_csv('../GITIGNORED/p1_groups.csv')
+
+df |> kable()
+```
+

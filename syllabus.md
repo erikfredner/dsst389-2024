@@ -198,13 +198,13 @@ Meeting  Date      Topic
 3        01-27     `tidyverse` review
 4        01-29     Tidy texts
 5        02-03     Sampling and corpora
-6        02-05     Sentiment analysis
-7        02-10     n-grams and correlation
+6        02-05     Relative frequencies
+7        02-10     Review
 8        02-12     **Group Project 1**
-9        02-17     tf-idf and KNN
-10       02-19     Gradient boosted trees and text classification
-11       02-24     Principal components analysis
-12       02-26     Authorship attribution
+9        02-17     Sentiment analysis
+10       02-19     tf-idf and KNN
+11       02-24     Gradient boosted trees and text classification
+12       02-26     Principal components analysis
 13       03-03     Topic modeling
 14       03-05     **Group Project 2**
          03-10     *Spring Break*
@@ -216,8 +216,8 @@ Meeting  Date      Topic
 19       03-31     Web Scraping
 20       04-02     Text and data cleaning
 21       04-07     LLMs
-22       04-09     **Code Interviews**
-23       04-14     **Group Project 3**
+22       04-09     **Group Project 3**
+23       04-14     **Code Interviews**
 24       04-16     Workshop
 25       04-21     Workshop
 26       04-23     **Final Project presentations**

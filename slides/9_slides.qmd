@@ -1,0 +1,370 @@
+---
+title: "Sentiment"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  echo: true
+  warning: false
+  message: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    toc: true
+    toc-depth: 2
+    slide-level: 4
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+## Quiz
+
+1. Go to this URL:
+
+<https://pollev.com/fredner>
+
+2. Please log in to Poll Everywhere using your `@richmond.edu` email address.
+
+## Project 1
+
+- *At least one* group member must have uploaded by the deadline.
+- You will receive an email **today at 2pm** with a link to your self and peer evaluations for Project 1.
+  - Please fill that out by Wednesday, Feb. 19.
+
+### Share conclusions
+
+Would any groups like to briefly describe their project?
+
+## Sentiment analysis
+
+Sentiment analysis attempts to determine how positive or negative the sentiment (mood) of a text is.
+
+### Intuitive examples
+
+- Positive: "Dinner was superb!"
+- Neutral: "Dinner was adequate."
+- Negative: "Dinner was gross."
+- But, we also intuit that "Dinner was catastrophic!" should be **more** negative than "Dinner was gross."
+
+### Intuitive "data"
+
+| Text                   | Sentiment Category | Sentiment Score |
+|------------------------|--------------------|-----------------|
+| Dinner was superb!  | Positive           | 5               |
+| Dinner was adequate.       | Neutral            | 1               |
+| Dinner was gross.        | Negative           | -2              |
+| Dinner was catastrophic!   | Negative           | -4              |
+
+### Sentiment lexicons with `tidytext`
+
+```{r}
+#| echo: false
+library(tidytext)
+library(textdata)
+library(tidyverse)
+theme_set(theme_minimal())
+set.seed(123)
+```
+
+```{r}
+afinn <- get_sentiments("afinn")
+
+afinn |>
+  slice_sample(n = 5)
+```
+
+`afinn` [source](https://www2.imm.dtu.dk/pubdb/pubs/6010-full.html)
+
+### Applying the `afinn` lexicon
+
+```{r}
+#| echo: false
+
+dinner <- c(
+  "Dinner was superb!",
+  "Dinner was adequate.",
+  "Dinner was gross.",
+  "Dinner was catastrophic!"
+)
+
+dinner <- tibble(
+  id = 1:4,
+  text = dinner
+)
+```
+
+```{r}
+dinner
+
+dinner |>
+  unnest_tokens(input = text, output = word) |>
+  inner_join(afinn, join_by(word))
+```
+
+### Emotional lexicons (`nrc`)
+
+```{r}
+nrc <- get_sentiments("nrc")
+
+nrc |>
+  slice_sample(n = 5)
+```
+
+Words can have multiple associations:
+
+```{r}
+nrc |>
+  filter(word == "death") |>
+  pull(sentiment)
+```
+
+`nrc` [source](https://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm)
+
+### Applying sentiment analysis to `tidy_books`
+
+```{r}
+#| echo: false
+
+library(janeaustenr)
+library(dplyr)
+library(stringr)
+
+tidy_books <- austen_books() |>
+  group_by(book) |>
+  mutate(
+    linenumber = row_number(),
+    chapter = cumsum(str_detect(
+      text,
+      regex("^chapter [\\divxlc]",
+        ignore_case = TRUE
+      )
+    ))
+  ) |>
+  ungroup() |>
+  unnest_tokens(word, text)
+```
+
+```{r}
+tidy_books |> slice_head(n = 3)
+
+tidy_books |>
+  inner_join(nrc, join_by(word)) |>
+  group_by(sentiment) |>
+  slice_sample(n = 1)
+```
+
+### Frequent sentiments
+
+```{r}
+tidy_books |>
+  inner_join(
+    nrc |> filter(sentiment == "surprise"),
+    join_by(word),
+    relationship = "many-to-many"
+  ) |>
+  count(word, sort = TRUE) |>
+  slice_head(n = 3)
+
+tidy_books |>
+  inner_join(nrc |> filter(sentiment == "fear"), join_by(word)) |>
+  count(word, sort = TRUE) |>
+  slice_head(n = 3)
+```
+
+### Positive vs. negative sentiment
+
+The `bing` lexicon classifies sentiments as positive or negative. Unclassed words are treated as neutral or unknown.
+
+```{r}
+bing <- get_sentiments("bing")
+
+bing |>
+  group_by(sentiment) |>
+  slice_sample(n = 3)
+```
+
+`bing` [source](https://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html)
+
+### Comparing sentiment by section
+
+Sentiment analysis becomes more powerful when we analyze larger *sections* of documents: paragraphs, stanzas, subsections, individual emails in a thread, etc.
+
+#### Creating sections
+
+We are going to compare books by percentile (i.e., each 1% of each book's words). To start, we need to identify each word's *position* in the book: 
+
+```{r}
+tidy_books <- tidy_books |>
+  group_by(book) |>
+  mutate(book_word = row_number()) |>
+  ungroup()
+
+tidy_books |>
+  group_by(book) |>
+  summarize(min = min(book_word), max = max(book_word))
+```
+
+### Creating sections
+
+Next, we are going to using [the `ntile()` function](https://dplyr.tidyverse.org/reference/ntile.html) to group words by percentile within each book:
+
+```{r}
+#| output-location: slide
+tidy_books <- tidy_books |>
+  group_by(book) |>
+  mutate(
+    book_word = row_number(),
+    percentile = ntile(book_word, 100)
+  ) |>
+  ungroup()
+
+tidy_books |>
+  filter(percentile == 95) |>
+  group_by(book, percentile) |>
+  summarize(
+    min = min(book_word),
+    max = max(book_word),
+    len = max - min
+  )
+```
+
+#### Aside: `ntile()`
+
+```{r}
+#| echo: false
+
+lotr_grades <- tribble(
+  ~name,      ~grade,
+  "Frodo",    70,
+  "Sam",      85,
+  "Gandalf",  95,
+  "Legolas",  80,
+  "Gimli",    75,
+  "Boromir",  88,
+  "Merry",    82,
+  "Pippin",   78,
+  "Aragorn",  90,
+  "Elrond",   92
+)
+```
+
+```{r}
+lotr_grades |>
+  mutate(grade_decile = ntile(grade, 10)) |>
+  arrange(desc(grade))
+
+lotr_grades |>
+  mutate(grade_quintile = ntile(grade, 5)) |>
+  arrange(grade)
+```
+
+#### Calculating section sentiment
+
+```{r}
+tidy_books |>
+  inner_join(bing, join_by(word)) |>
+  count(book, percentile, sentiment)
+```
+
+
+#### Preparing to calculate net sentiment
+
+```{r}
+tidy_books |>
+  inner_join(bing, join_by(word)) |>
+  count(book, percentile, sentiment) |>
+  pivot_wider(
+    names_from = sentiment,
+    values_from = n,
+    values_fill = 0
+  )
+```
+
+#### Calculating net sentiment
+
+```{r}
+#| code-line-numbers: "9"
+tidy_books |>
+  inner_join(bing, join_by(word)) |>
+  count(book, percentile, sentiment) |>
+  pivot_wider(
+    names_from = sentiment,
+    values_from = n,
+    values_fill = 0
+  ) |>
+  mutate(sentiment = positive - negative) |>
+  group_by(book) |>
+  slice_sample(n = 1)
+```
+
+#### Plotting net sentiment
+
+```{r}
+#| output-location: slide
+
+tidy_books |>
+  inner_join(bing, join_by(word)) |>
+  count(book, percentile, sentiment) |>
+  pivot_wider(
+    names_from = sentiment,
+    values_from = n,
+    values_fill = 0
+  ) |>
+  mutate(sentiment = positive - negative) |>
+  ggplot(aes(x = percentile, y = sentiment, fill = book)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(vars(book), ncol = 3) +
+  scale_fill_brewer(palette = "Dark2")
+```
+
+#### Filtering for sections (e.g., The End)
+
+```{r}
+#| output-location: slide
+#| code-line-numbers: "10"
+tidy_books |>
+  inner_join(bing, join_by(word)) |>
+  count(book, percentile, sentiment) |>
+  pivot_wider(
+    names_from = sentiment,
+    values_from = n,
+    values_fill = 0
+  ) |>
+  mutate(sentiment = positive - negative) |>
+  filter(percentile >= 90) |>
+  ggplot(aes(x = percentile, y = sentiment, fill = book)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(vars(book), ncol = 3) +
+  scale_fill_brewer(palette = "Dark2")
+```
+
+### Applications of sentiment analysis
+
+- Studying narrative structure
+  - Is the beginning, middle, or end of a novel most negative?
+- Classifying product reviews
+  - Was the reviewer satisfied?
+- Classifying corporate financial reports
+  - Is the corporation optimistic or pessimistic?
+
+### Limitations of sentiment analysis
+
+- Does not handle negation
+  - "Dinner was *not* a catastrophe!" still scores -4
+- Does not handle irony
+  - "I love being stressed" would get a neutral score (love: 3, stressed: -2) when it should be *at least as* negative as "I hate being stressed."
+- Because of these limitations and others, sentiment analysis is increasingly being done with large language models
+
+## Practice
