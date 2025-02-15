@@ -1,5 +1,5 @@
 ---
-title: "Sentiment"
+title: "Sentiment Analysis"
 subtitle: "DSST389: Advanced Data Science"
 author: "Erik Fredner"
 institute: "University of Richmond"
@@ -29,14 +29,6 @@ editor_options:
   chunk_output_type: console
 ---
 
-## Quiz
-
-1. Go to this URL:
-
-<https://pollev.com/fredner>
-
-2. Please log in to Poll Everywhere using your `@richmond.edu` email address.
-
 ## Project 1
 
 - *At least one* group member must have uploaded by the deadline.
@@ -49,14 +41,14 @@ Would any groups like to briefly describe their project?
 
 ## Sentiment analysis
 
-Sentiment analysis attempts to determine how positive or negative the sentiment (mood) of a text is.
+Sentiment analysis attempts to determine how positive or negative the sentiment (i.e., feeling, mood, tone) of a text is.
 
 ### Intuitive examples
 
 - Positive: "Dinner was superb!"
 - Neutral: "Dinner was adequate."
 - Negative: "Dinner was gross."
-- But, we also intuit that "Dinner was catastrophic!" should be **more** negative than "Dinner was gross."
+- But we intuit that "Dinner was catastrophic!" should be **more** negative than "Dinner was gross."
 
 ### Intuitive "data"
 
@@ -160,9 +152,60 @@ tidy_books <- austen_books() |>
 tidy_books |> slice_head(n = 3)
 
 tidy_books |>
-  inner_join(nrc, join_by(word)) |>
+  inner_join(nrc, join_by(word), relationship = "many-to-many") |>
   group_by(sentiment) |>
   slice_sample(n = 1)
+```
+
+#### Aside: `relationship = "many-to-many"`?
+
+Consider the following tables:
+
+```{r}
+#| echo: false
+
+lotr_activities <- tribble(
+  ~name,      ~activity,
+  "Frodo",    "Quest",
+  "Frodo",    "Council",
+  "Sam",      "Cooking",
+  "Sam",      "Gardening",
+  "Gandalf",  "Magic",
+  "Gandalf",  "Reading",
+  "Legolas",  "Archery",
+  "Legolas",  "Scouting",
+  "Gimli",    "Battle",
+  "Gimli",    "Ale Drinking"
+)
+
+lotr_battles <- tribble(
+  ~name,      ~battle,
+  "Frodo",    "Moria",
+  "Frodo",    "Mount Doom",
+  "Sam",      "Moria",
+  "Sam",      "Mount Doom",
+  "Gandalf",  "Helm's Deep",
+  "Gandalf",  "Battle of Pelennor Fields",
+  "Legolas",  "Helm's Deep",
+  "Legolas",  "Battle of Pelennor Fields",
+  "Gimli",    "Helm's Deep",
+  "Gimli",    "Battle of Pelennor Fields"
+)
+```
+
+```{r}
+lotr_activities
+
+lotr_battles
+```
+
+#### Without `relationship = "many-to-many"`
+
+```{r}
+#| warning: true
+
+lotr_activities |>
+  left_join(lotr_battles, join_by(name))
 ```
 
 ### Frequent sentiments
@@ -170,17 +213,11 @@ tidy_books |>
 ```{r}
 tidy_books |>
   inner_join(
-    nrc |> filter(sentiment == "surprise"),
+    nrc |> filter(sentiment == "fear"),
     join_by(word),
     relationship = "many-to-many"
   ) |>
-  count(word, sort = TRUE) |>
-  slice_head(n = 3)
-
-tidy_books |>
-  inner_join(nrc |> filter(sentiment == "fear"), join_by(word)) |>
-  count(word, sort = TRUE) |>
-  slice_head(n = 3)
+  count(word, sort = TRUE)
 ```
 
 ### Positive vs. negative sentiment
@@ -274,7 +311,7 @@ lotr_grades |>
 
 ```{r}
 tidy_books |>
-  inner_join(bing, join_by(word)) |>
+  inner_join(bing, join_by(word), relationship = "many-to-many") |>
   count(book, percentile, sentiment)
 ```
 
@@ -283,7 +320,7 @@ tidy_books |>
 
 ```{r}
 tidy_books |>
-  inner_join(bing, join_by(word)) |>
+  inner_join(bing, join_by(word), relationship = "many-to-many") |>
   count(book, percentile, sentiment) |>
   pivot_wider(
     names_from = sentiment,
@@ -297,7 +334,7 @@ tidy_books |>
 ```{r}
 #| code-line-numbers: "9"
 tidy_books |>
-  inner_join(bing, join_by(word)) |>
+  inner_join(bing, join_by(word), relationship = "many-to-many") |>
   count(book, percentile, sentiment) |>
   pivot_wider(
     names_from = sentiment,
@@ -315,7 +352,7 @@ tidy_books |>
 #| output-location: slide
 
 tidy_books |>
-  inner_join(bing, join_by(word)) |>
+  inner_join(bing, join_by(word), relationship = "many-to-many") |>
   count(book, percentile, sentiment) |>
   pivot_wider(
     names_from = sentiment,
@@ -335,7 +372,7 @@ tidy_books |>
 #| output-location: slide
 #| code-line-numbers: "10"
 tidy_books |>
-  inner_join(bing, join_by(word)) |>
+  inner_join(bing, join_by(word), relationship = "many-to-many") |>
   count(book, percentile, sentiment) |>
   pivot_wider(
     names_from = sentiment,
@@ -368,3 +405,5 @@ tidy_books |>
 - Because of these limitations and others, sentiment analysis is increasingly being done with large language models
 
 ## Practice
+
+Download today's notebook from folder 09.

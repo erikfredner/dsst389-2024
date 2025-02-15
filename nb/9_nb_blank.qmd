@@ -5,7 +5,7 @@ author: "Erik Fredner"
 institute: "University of Richmond"
 date: today
 execute:
-  echo: false
+echo: true
   warning: false
 format:
   html:
@@ -110,12 +110,6 @@ Tokenize the `text` of the tweets. Once you are sure you have done this correctl
 
 ```{r}
 #| label: q-tokenize
-
-tidy_posts <- posts |>
-  unnest_tokens(input = text, output = word)
-
-tidy_posts |>
-  slice_sample(n = 5)
 ```
 
 ### Exploratory data analysis
@@ -128,40 +122,12 @@ id == 126188946974720000
 
 ```{r}
 #| label: q-afinn
-
-afinn <- get_sentiments("afinn")
-
-tidy_posts |>
-  left_join(afinn, join_by(word)) |>
-  group_by(id) |>
-  mutate(tweet_word = row_number()) |>
-  summarize(
-    afinn_net = sum(value, na.rm = TRUE),
-    tweet_len = max(tweet_word),
-    afinn_normalized = afinn_net / tweet_len
-  ) |>
-  filter(id == 126188946974720000)
 ```
 
 Using the pipeline above, visualize net sentiment scores per tweet by topic using [`geom_jitter`](https://ggplot2.tidyverse.org/reference/geom_jitter.html) and [`geom_boxplot`](https://ggplot2.tidyverse.org/reference/geom_boxplot.html).
 
 ```{r}
 #| label: q-boxplot
-
-tidy_posts |>
-  left_join(afinn, join_by(word)) |>
-  group_by(id) |>
-  mutate(tweet_word = row_number()) |>
-  summarize(
-    afinn_net = sum(value, na.rm = TRUE),
-    tweet_len = max(tweet_word),
-    afinn_normalized = afinn_net / tweet_len
-  ) |>
-  left_join(tidy_posts |> distinct(id, topic), join_by(id)) |>
-  ggplot(aes(x = topic, y = afinn_normalized, color = topic)) +
-  geom_jitter(width = 0.25, height = 0.25, alpha = 0.1) +
-  geom_boxplot() +
-  scale_color_brewer(palette = "Dark2")
 ```
 
 Based on the chart, it appears that the normalized means and medians are quite similar across topics. Is that true?
@@ -170,26 +136,6 @@ Calculate summary statistics to match the table below to check. (`q25` and `q75`
 
 ```{r}
 #| label: q-summary
-
-tidy_posts |>
-  left_join(afinn, join_by(word)) |>
-  group_by(id) |>
-  mutate(tweet_word = row_number()) |>
-  summarize(
-    afinn_net = sum(value, na.rm = TRUE),
-    tweet_len = max(tweet_word),
-    afinn_normalized = afinn_net / tweet_len
-  ) |>
-  left_join(tidy_posts |> distinct(id, topic), join_by(id)) |>
-  group_by(topic) |>
-  summarize(
-    min = min(afinn_normalized),
-    q25 = quantile(afinn_normalized, 0.25),
-    mean = mean(afinn_normalized),
-    median = median(afinn_normalized),
-    q75 = quantile(afinn_normalized, 0.75),
-    max = max(afinn_normalized)
-  )
 ```
 
 What does this table clarify that we were not able to see in the boxplot?
@@ -200,20 +146,6 @@ Let's see how well these findings match our intuitions. Return the topic and the
 
 ```{r}
 #| label: q-positive-tweets
-
-tidy_posts |>
-  left_join(afinn, join_by(word)) |>
-  group_by(id) |>
-  mutate(tweet_word = row_number()) |>
-  summarize(
-    afinn_net = sum(value, na.rm = TRUE),
-    tweet_len = max(tweet_word),
-    afinn_normalized = afinn_net / tweet_len
-  ) |>
-  left_join(posts |> select(id, topic, text), join_by(id)) |>
-  group_by(topic) |>
-  slice_max(order_by = afinn_normalized, n = 3, with_ties = FALSE) |>
-  select(text)
 ```
 
 Read the text of each tweet, and assess the accuracy of the normalized `afinn` score qualitatively. What do you observe?
@@ -230,26 +162,6 @@ floor_date(dttm, unit = "1 hour")
 
 ```{r}
 #| label: q-time-series
-
-tidy_posts |>
-  left_join(afinn, join_by(word)) |>
-  group_by(id) |>
-  mutate(tweet_word = row_number()) |>
-  summarize(afinn_net = sum(value, na.rm = TRUE)) |>
-  left_join(posts |> select(id, topic, dttm), join_by(id)) |>
-  filter(topic == "apple") |>
-  mutate(one_hour = floor_date(dttm, unit = "1 hour")) |>
-  group_by(one_hour) |>
-  summarize(total_net = sum(afinn_net)) |>
-  mutate(bar_color = case_when(
-    total_net < 0 ~ "gray",
-    total_net > 0 ~ "white",
-    TRUE ~ "black"
-  )) |>
-  ggplot(aes(x = one_hour, y = total_net, fill = bar_color)) +
-  geom_col(color = "black") +
-  scale_fill_identity() +
-  scale_x_datetime(date_breaks = "1 day", date_labels = "%b %d")
 ```
 
 ### Automatic vs. human labels
@@ -262,26 +174,6 @@ Using [`case_when()`](https://dplyr.tidyverse.org/reference/case_when.html), cre
 
 ```{r}
 #| label: q-make-classes
-
-tidy_posts |>
-  left_join(afinn, join_by(word)) |>
-  group_by(id) |>
-  mutate(tweet_word = row_number()) |>
-  summarize(
-    afinn_net = sum(value, na.rm = TRUE),
-    tweet_len = max(tweet_word),
-    afinn_normalized = afinn_net / tweet_len
-  ) |>
-  ungroup() |>
-  mutate(
-    mean_afinn = mean(afinn_normalized, na.rm = TRUE),
-    sd_afinn = sd(afinn_normalized, na.rm = TRUE),
-    afinn_class = case_when(
-      afinn_normalized > mean_afinn + sd_afinn ~ "positive",
-      afinn_normalized < mean_afinn - sd_afinn ~ "negative",
-      TRUE ~ "neutral"
-    )
-  )
 ```
 
 How well dispersed are these classes within each topic? Create a stacked bar chart that shows the proportions of tweets by topic and class.
@@ -296,34 +188,6 @@ scale_y_continuous(labels = percent_format())
 
 ```{r}
 #| label: q-stacked
-
-tidy_posts |>
-  left_join(afinn, join_by(word)) |>
-  group_by(id) |>
-  mutate(tweet_word = row_number()) |>
-  summarize(
-    afinn_net = sum(value, na.rm = TRUE),
-    tweet_len = max(tweet_word),
-    afinn_normalized = afinn_net / tweet_len
-  ) |>
-  ungroup() |>
-  mutate(
-    mean_afinn = mean(afinn_normalized, na.rm = TRUE),
-    sd_afinn = sd(afinn_normalized, na.rm = TRUE),
-    afinn_class = case_when(
-      afinn_normalized > mean_afinn + sd_afinn ~ "positive",
-      afinn_normalized < mean_afinn - sd_afinn ~ "negative",
-      TRUE ~ "neutral"
-    ),
-    afinn_class = fct_relevel(
-      afinn_class, "positive", "neutral", "negative"
-    )
-  ) |>
-  left_join(tidy_posts |> distinct(id, topic), join_by(id)) |>
-  ggplot(aes(x = topic, fill = afinn_class)) +
-  geom_bar(position = "fill") +
-  scale_y_continuous(labels = percent_format()) +
-  scale_fill_brewer(palette = "Dark2")
 ```
 
 Now, how often do these `afinn` classifications match the human-created labels that we have in `post_sentiments`? To test this, we are going to use `geom_tile()` to create what is called a [confusion matrix](https://en.wikipedia.org/wiki/Confusion_matrix). For the confusion matrix, we will compare the "true" human-created values to the sentiment classification model we created above.
@@ -332,35 +196,6 @@ Each of the squares in the confusion matrix should indicate how many posts were 
 
 ```{r}
 #| label: q-confusion
-
-tidy_posts |>
-  left_join(afinn, join_by(word)) |>
-  group_by(id) |>
-  mutate(tweet_word = row_number()) |>
-  summarize(
-    afinn_net = sum(value, na.rm = TRUE),
-    tweet_len = max(tweet_word),
-    afinn_normalized = afinn_net / tweet_len
-  ) |>
-  ungroup() |>
-  mutate(
-    mean_afinn = mean(afinn_normalized, na.rm = TRUE),
-    sd_afinn = sd(afinn_normalized, na.rm = TRUE),
-    afinn_class = case_when(
-      afinn_normalized > mean_afinn + sd_afinn ~ "positive",
-      afinn_normalized < mean_afinn - sd_afinn ~ "negative",
-      TRUE ~ "neutral"
-    ),
-    afinn_class = fct_relevel(
-      afinn_class, "positive", "neutral", "negative"
-    )
-  ) |>
-  inner_join(post_sentiments, join_by(id)) |>
-  count(afinn_class, sentiment_manual) |>
-  ggplot(aes(x = afinn_class, y = sentiment_manual, fill = n)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = n), color = "white") +
-  scale_fill_continuous(low = "gray", high = "black")
 ```
 
 If you have not seen a confusion matrix before, spend some time looking at this to ensure that you understand what it means. In cases where the manual and `afinn` classes match (e.g., the positive-positive intersection), both models classified the same tweet in each way. In mismatched cases, (e.g., manual says positive but `afinn` says netural), that indicates that the model *erred* relative to the human label. It is a "confusion" matrix because it quantifies where and how the model gets confused.
@@ -375,118 +210,18 @@ First, get the `bing` sentiments, then use them to calculate net sentiment score
 
 ```{r}
 #| label: q-setup-bing
-
-bing <- get_sentiments("bing")
-
-tidy_posts |>
-  group_by(id) |>
-  mutate(tweet_len = n()) |>
-  ungroup() |>
-  left_join(bing, join_by(word)) |>
-  drop_na(sentiment) |>
-  group_by(id, tweet_len) |>
-  count(sentiment) |>
-  pivot_wider(
-    names_from = sentiment,
-    values_from = n,
-    values_fill = 0
-  ) |>
-  ungroup() |>
-  mutate(
-    net_sentiment = positive - negative,
-    net_sentiment_normed = net_sentiment / tweet_len,
-    mean_bing = mean(net_sentiment_normed, na.rm = TRUE),
-    sd_bing = sd(net_sentiment_normed, na.rm = TRUE),
-    bing_class = case_when(
-      net_sentiment_normed > mean_bing + sd_bing ~ "positive",
-      net_sentiment_normed < mean_bing - sd_bing ~ "negative",
-      TRUE ~ "neutral"
-    ),
-    bing_class = fct_relevel(
-      bing_class, "positive", "neutral", "negative"
-    )
-  )
 ```
 
 Next, let's recreate the stacked bar plot from above using the `bing` sentiments, and compare to `afinn`:
 
 ```{r}
 #| label: q-stacked-bar-2
-
-tidy_posts |>
-  group_by(id) |>
-  mutate(tweet_len = n()) |>
-  ungroup() |>
-  left_join(bing, join_by(word)) |>
-  drop_na(sentiment) |>
-  group_by(id, tweet_len) |>
-  count(sentiment) |>
-  pivot_wider(
-    names_from = sentiment,
-    values_from = n,
-    values_fill = 0
-  ) |>
-  ungroup() |>
-  mutate(
-    net_sentiment = positive - negative,
-    net_sentiment_normed = net_sentiment / tweet_len,
-    mean_bing = mean(net_sentiment_normed, na.rm = TRUE),
-    sd_bing = sd(net_sentiment_normed, na.rm = TRUE),
-    bing_class = case_when(
-      net_sentiment_normed > mean_bing + sd_bing ~ "positive",
-      net_sentiment_normed < mean_bing - sd_bing ~ "negative",
-      TRUE ~ "neutral"
-    ),
-    bing_class = fct_relevel(
-      bing_class, "positive", "neutral", "negative"
-    )
-  ) |>
-  inner_join(tidy_posts |> distinct(id, topic), by = "id") |>
-  ggplot(aes(x = topic, fill = bing_class)) +
-  geom_bar(position = "fill") +
-  scale_y_continuous(labels = percent_format()) +
-  scale_fill_brewer(palette = "Dark2")
 ```
 
 Finally, let's recreate the confusion matrix and see how `bing` performs compared to `afinn`.
 
 ```{r}
 #| label: q-bing-confusion
-
-tidy_posts |>
-  group_by(id) |>
-  mutate(tweet_len = n()) |>
-  ungroup() |>
-  left_join(bing, join_by(word)) |>
-  drop_na(sentiment) |>
-  group_by(id, tweet_len) |>
-  count(sentiment) |>
-  pivot_wider(
-    names_from = sentiment,
-    values_from = n,
-    values_fill = 0
-  ) |>
-  ungroup() |>
-  mutate(
-    net_sentiment = positive - negative,
-    net_sentiment_normed = net_sentiment / tweet_len,
-    mean_bing = mean(net_sentiment_normed, na.rm = TRUE),
-    sd_bing = sd(net_sentiment_normed, na.rm = TRUE),
-    bing_class = case_when(
-      net_sentiment_normed > mean_bing + sd_bing ~ "positive",
-      net_sentiment_normed < mean_bing - sd_bing ~ "negative",
-      TRUE ~ "neutral"
-    ),
-    bing_class = fct_relevel(
-      bing_class, "positive", "neutral", "negative"
-    )
-  ) |>
-  inner_join(post_sentiments, join_by(id)) |>
-  count(bing_class, sentiment_manual) |>
-  ggplot(aes(x = bing_class, y = sentiment_manual, fill = n)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = n), color = "white") +
-  scale_fill_continuous(low = "gray", high = "black")
 ```
 
 Which of these sentiment lexicons performed better? How do you know? What differences do you observe between the matrices? (Hint: Look at the integers.) What could explain the differences across the two lexicons?
