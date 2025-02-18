@@ -1,0 +1,438 @@
+---
+title: "tf-idf"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  echo: true
+  warning: false
+  message: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    toc: true
+    toc-depth: 2
+    slide-level: 4
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+## "Aboutness"
+
+- How do we quantify what a document is about?
+  - Search engines like Google do this.
+  - How could we?
+
+### Applications
+
+- Retrieving relevant documents
+  - e.g., legal discovery
+- Clustering similar documents
+  - e.g., news articles
+
+## Corpus
+
+We have a corpus of Wikipedia articles for US presidents since 1977 in a `tidytext` format:
+
+```{r}
+#| echo: false
+
+library(tidyverse)
+library(tidytext)
+library(ggrepel)
+set.seed(123)
+theme_set(theme_minimal())
+
+corpus <- tibble(filepath = list.files(
+  path = "../data/president_wikis/",
+  pattern = "\\.txt$",
+  full.names = TRUE
+)) |>
+  mutate(filename = basename(filepath) |> str_remove("\\.txt$")) |>
+  separate(
+    filename,
+    into = c("year", "president"),
+    sep = "-",
+    convert = TRUE
+  ) |>
+  mutate(text = map(filepath, read_lines)) |>
+  unnest(text) |>
+  select(!filepath) |>
+  unnest_tokens(word, text)
+```
+
+```{r}
+corpus |>
+  slice_head(n = 15)
+```
+
+### Frequent non-stop words
+
+Does the frequency of non-stop words tell us what these documents are about? Kind of!
+
+```{r}
+corpus |>
+  anti_join(stop_words, join_by(word)) |>
+  group_by(year, president) |>
+  count(word, sort = TRUE) |>
+  slice_head(n = 1)
+```
+
+### Relative frequency
+
+```{r}
+corpus |>
+  group_by(year, president) |>
+  count(word) |>
+  mutate(doc_len = sum(n), term_freq = n / doc_len) |>
+  anti_join(stop_words, join_by(word)) |>
+  arrange(desc(term_freq)) |>
+  slice(5)
+```
+
+## Zipf's law
+
+[Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law) states that frequency of a word is inversely proportional to its rank in the frequency table.
+
+```{r}
+#| echo: false
+
+labels <- corpus |>
+  anti_join(stop_words, join_by(word)) |>
+  count(word, sort = TRUE) |>
+  mutate(rank = row_number()) |>
+  group_by(bucket = floor(log10(rank))) |>
+  slice_sample(n = 3) |>
+  ungroup()
+```
+
+```{r}
+#| output-location: slide
+
+corpus |>
+  anti_join(stop_words, join_by(word)) |>
+  count(word, sort = TRUE) |>
+  mutate(rank = row_number()) |>
+  ggplot(aes(rank, n)) +
+  geom_col(color = "gray") +
+  # `labels` randomly samples words across the distribution
+  geom_text_repel(data = labels, aes(label = word), force = 25) +
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+#### Zipf for corpus *and* document
+
+```{r}
+#| output-location: slide
+
+corpus |>
+  anti_join(stop_words, join_by(word)) |>
+  count(year, president, word, sort = TRUE) |>
+  mutate(
+    rank = row_number(),
+    president = fct_reorder(president, year)
+  ) |>
+  ggplot(aes(rank, n, color = president, fill = president)) +
+  geom_col() +
+  facet_wrap(vars(president)) +
+  scale_color_brewer(palette = "Dark2") +
+  scale_fill_brewer(palette = "Dark2") +
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+### Frequency alone is not enough for "aboutness"
+
+- Since these articles are all about presidents, they share many words that do not distinguish any particular president (e.g., "president").
+- We could instead compare a term's frequency in one document relative to its frequency in the corpus overall.
+
+### Corpus frequency
+
+```{r}
+corpus_freqs <- corpus |>
+  count(word) |>
+  mutate(corpus_freq = n / sum(n)) |>
+  filter(n >= 5)
+
+corpus_freqs |>
+  anti_join(stop_words, join_by(word)) |>
+  arrange(desc(corpus_freq)) |>
+  slice(10:15)
+```
+
+## Keyness
+
+Keyness measures how much more or less often a word occurs in a document than we would expect based on its frequency in the corpus.
+
+### High keyness
+
+How much *more* often does a word occur in a given document than we would expect, relative to the corpus?
+
+```{r}
+#| output-location: slide
+
+corpus |>
+  group_by(year, president) |>
+  count(word) |>
+  mutate(doc_len = sum(n), doc_freq = n / doc_len) |>
+  left_join(corpus_freqs |> select(word, corpus_freq), join_by(word)) |>
+  mutate(keyness = doc_freq / corpus_freq) |>
+  arrange(desc(keyness)) |>
+  slice_head(n = 1)
+```
+
+### Low keyness
+
+How much *less* often does a word occur in a given document than we would expect, relative to the corpus?
+
+```{r}
+#| output-location: slide
+
+corpus |>
+  group_by(year, president) |>
+  count(word) |>
+  mutate(doc_len = sum(n), doc_freq = n / doc_len) |>
+  left_join(corpus_freqs |> select(word, corpus_freq), join_by(word)) |>
+  mutate(keyness = doc_freq / corpus_freq) |>
+  arrange(keyness) |>
+  slice_head(n = 1)
+```
+
+### Why keyness is not sufficient
+
+- Too sensitive to rare terms
+- Too insensitive to common terms (e.g., "president" in this corpus)
+
+## tf–idf
+
+- Term frequency-inverse document frequency (tf–idf) measures a word's importance in a document relative to its corpus by accounting for the fact that some words appear frequently in general.
+  - We already know that stop words (e.g., *the*, *of*) appear frequently
+  - But some non-stop words are also frequent either in general or in specific corpora.
+  
+### Formula
+
+Here’s the formula with the ratio written as a fraction:
+
+$$
+\text{tf–idf} = \text{tf} \times \log_2\left(\frac{N}{\text{df}}\right)
+$$
+
+- $\text{tf}$ is the term frequency in a document
+- $\text{N}$ is the total number of documents in the corpus
+- $\text{df}$ is the number of documents in the corpus that contain at least one instance of the term
+
+### Calculating `tf`
+
+```{r}
+tfs <- corpus |>
+  group_by(year, president) |>
+  count(word) |>
+  mutate(doc_len = sum(n), tf = n / doc_len) |>
+  ungroup()
+
+tfs |>
+  arrange(desc(tf)) |>
+  slice_head(n = 5)
+```
+
+### Calculating `idf`
+
+```{r}
+idfs <- corpus |>
+  distinct(year, president, word) |>
+  mutate(total_docs = n_distinct(year, president)) |>
+  group_by(word) |>
+  mutate(term_docs = n(), idf = log(total_docs / term_docs)) |>
+  ungroup()
+
+idfs |>
+  arrange(desc(idf)) |>
+  slice_head(n = 3)
+```
+
+### Calculating `tf-idf`
+
+```{r}
+tfs |>
+  left_join(idfs, join_by(year, president, word)) |>
+  mutate(tf_idf = tf * idf) |>
+  group_by(year, president) |>
+  arrange(desc(tf_idf)) |>
+  slice(2:4) |> 
+  select(year, president, word, tf, idf, tf_idf)
+```
+
+### tf-idf the easy way: `bind_tf_idf`
+
+```{r}
+corpus |>
+  count(year, president, word) |>
+  bind_tf_idf(term = word, document = year, n = n) |>
+  group_by(year, president) |>
+  arrange(desc(tf_idf)) |>
+  slice(2:4)
+```
+
+### Alternate tf—idf formulae
+
+In cases where some terms may have a frequency of zero, it is common to add 1 to the term frequency and document frequency as a smoothing parameter.
+
+$$
+\text{tf–idf} = \log_2(\text{tf}) \times \log_2\left(\frac{N}{1+ \text{df}}\right)
+$$
+
+You can find [other examples here](https://en.wikipedia.org/wiki/Tf%E2%80%93idf#Term_frequency%E2%80%93inverse_document_frequency).
+
+### Using tf—idf
+
+#### As a "search engine": Taxes
+
+Almost all presidents change tax policies. Which are most associated with it?
+
+```{r}
+corpus |>
+  count(year, president, word) |>
+  bind_tf_idf(term = word, document = year, n = n) |>
+  filter(word == "tax") |>
+  arrange(desc(tf_idf))
+```
+
+Because `"tax"` appears in every president's article, it has an inverse document frequency of zero (because $\log_2(1) = 0$).
+
+#### As a "search engine:" Israel/Palestine
+
+```{r}
+corpus |>
+  count(year, president, word) |>
+  bind_tf_idf(term = word, document = year, n = n) |>
+  filter(word %in% c("israel", "palestine")) |>
+  arrange(desc(tf_idf))
+```
+
+#### Boxplot comparison
+
+```{r}
+#| echo: false
+#| output-location: slide
+
+# Compute tf–idf for each word in each president’s document
+tfidf_presidents <- corpus |>
+  count(year, president, word) |>
+  bind_tf_idf(word, president, n) |>
+  mutate(
+    president = fct_reorder(president, year),
+    lname = tolower(as.character(president))
+  )
+
+# Filter out rows with non-positive tf–idf to avoid log-scale issues
+tfidf_plot <- tfidf_presidents |>
+  filter(tf_idf > 0)
+
+# For each president, select the top words by tf–idf for labeling
+labels_top <- tfidf_plot |>
+  group_by(year, president) |>
+  filter(!str_detect(word, regex(paste0("^", lname, "('s)?$"), ignore_case = TRUE))) |>
+  slice_max(tf_idf, n = 5) |>
+  ungroup()
+
+tfidf_plot |>
+  ggplot(aes(x = president, y = tf_idf, color = president)) +
+  geom_jitter(width = 0.2, alpha = 0.1) +
+  geom_boxplot(aes(fill = president),
+    outlier.shape = NA,
+    color = "black",
+    alpha = 0.5
+  ) +
+  geom_label_repel(
+    data = labels_top,
+    aes(label = word, color = president),
+    size = 3,
+    max.overlaps = Inf
+  ) +
+  scale_y_log10() +
+  scale_fill_brewer(palette = "Dark2") +
+  scale_color_brewer(palette = "Dark2") +
+  labs(
+    title = "tf–idf distributions for recent US presidents",
+    subtitle = "Using Wikipedia article text from 2025-02-17",
+    x = "President",
+    y = "tf–idf Score (log scale)"
+  )
+```
+
+#### Violin plots
+
+Using [`geom_violin`](https://ggplot2.tidyverse.org/reference/geom_violin.html), which is a symmetrical density plot presented vertically
+
+```{r}
+#| echo: false
+
+tfidf_plot |>
+  ggplot(aes(x = president, y = tf_idf, fill = president, color = president)) +
+  geom_violin(alpha = 0.5, color = "black") +
+  geom_label_repel(
+    data = labels_top,
+    aes(label = word, color = president),
+    fill = "white",
+    max.overlaps = Inf
+  ) +
+  scale_y_log10() +
+  scale_fill_brewer(palette = "Dark2") +
+  scale_color_brewer(palette = "Dark2") +
+  labs(
+    title = "tf–idf distributions for recent US presidents",
+    subtitle = "Using Wikipedia article text from 2025-02-17",
+    x = "President",
+    y = "tf–idf Score (log scale)"
+  )
+```
+
+#### Comparing documents
+
+```{r}
+#| echo: false
+
+biden_trump <- tfidf_presidents |>
+  filter(president %in% c("Biden", "Trump"), tf_idf > 0) |>
+  drop_na() |>
+  select(president, word, tf_idf) |>
+  pivot_wider(names_from = president, values_from = tf_idf) |>
+  drop_na(Biden, Trump) |> 
+  mutate(higher_tf_idf = case_when(
+    Biden > Trump ~ "Biden",
+    Trump > Biden ~ "Trump",
+    TRUE ~ "Equal"
+  ))
+
+ggplot(biden_trump, aes(x = Biden, y = Trump, label = word, color = higher_tf_idf)) +
+  geom_point(alpha = 0.3) +
+  geom_text_repel(max.overlaps = 20) +
+  scale_x_log10() +
+  scale_y_log10() +
+  scale_color_brewer(palette = "Dark2")
+```
+
+
+### Summary
+
+- We can quantify what a text is about.
+  - Frequencies and keyness help somewhat
+- Zipf's law: word frequencies in documents and corpora follow a power law distribution
+- tf-idf measures word importance in a document relative to a corpus
+
+### Practice
+
+Download the notebook for today in folder 10.

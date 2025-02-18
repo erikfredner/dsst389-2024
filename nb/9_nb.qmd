@@ -241,11 +241,13 @@ tidy_posts |>
   mutate(one_hour = floor_date(dttm, unit = "1 hour")) |>
   group_by(one_hour) |>
   summarize(total_net = sum(afinn_net)) |>
-  mutate(bar_color = case_when(
-    total_net < 0 ~ "gray",
-    total_net > 0 ~ "white",
-    TRUE ~ "black"
-  )) |>
+  mutate(
+    bar_color = case_when(
+      total_net < 0 ~ "gray",
+      total_net > 0 ~ "white",
+      TRUE ~ "black"
+    )
+  ) |>
   ggplot(aes(x = one_hour, y = total_net, fill = bar_color)) +
   geom_col(color = "black") +
   scale_fill_identity() +
