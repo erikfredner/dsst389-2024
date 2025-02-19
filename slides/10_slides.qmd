@@ -93,13 +93,19 @@ corpus |>
 ### Relative frequency
 
 ```{r}
+#| output-location: slide
+
 corpus |>
   group_by(year, president) |>
-  count(word) |>
-  mutate(doc_len = sum(n), term_freq = n / doc_len) |>
+  count(word, sort = TRUE) |>
+  mutate(
+    doc_len = sum(n),
+    term_freq = n / doc_len,
+    term_rank = row_number()
+  ) |>
   anti_join(stop_words, join_by(word)) |>
   arrange(desc(term_freq)) |>
-  slice(5)
+  slice_head()
 ```
 
 ## Zipf's law
@@ -120,6 +126,7 @@ labels <- corpus |>
 
 ```{r}
 #| output-location: slide
+#| echo: false
 
 corpus |>
   anti_join(stop_words, join_by(word)) |>
@@ -232,7 +239,7 @@ $$
 
 - $\text{tf}$ is the term frequency in a document
 - $\text{N}$ is the total number of documents in the corpus
-- $\text{df}$ is the number of documents in the corpus that contain at least one instance of the term
+- $\text{df}$ is the number of documents in the corpus that contain at least one instance of the term divided by the number of documents in the corpus.
 
 ### Calculating `tf`
 
@@ -271,7 +278,7 @@ tfs |>
   mutate(tf_idf = tf * idf) |>
   group_by(year, president) |>
   arrange(desc(tf_idf)) |>
-  slice(2:4) |> 
+  slice(2:4) |>
   select(year, president, word, tf, idf, tf_idf)
 ```
 
@@ -298,9 +305,7 @@ You can find [other examples here](https://en.wikipedia.org/wiki/Tf%E2%80%93idf#
 
 ### Using tf—idf
 
-#### As a "search engine": Taxes
-
-Almost all presidents change tax policies. Which are most associated with it?
+#### As a "search engine:" Taxes
 
 ```{r}
 corpus |>
@@ -410,7 +415,7 @@ biden_trump <- tfidf_presidents |>
   drop_na() |>
   select(president, word, tf_idf) |>
   pivot_wider(names_from = president, values_from = tf_idf) |>
-  drop_na(Biden, Trump) |> 
+  drop_na(Biden, Trump) |>
   mutate(higher_tf_idf = case_when(
     Biden > Trump ~ "Biden",
     Trump > Biden ~ "Trump",

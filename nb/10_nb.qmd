@@ -1,0 +1,455 @@
+---
+title: "tf—idf"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+execute:
+  echo: true
+  warning: false
+format:
+  html:
+    anchor-sections: true
+    code-tools: false
+    code-link: true
+    embed-resources: true
+    link-external-icon: true
+    link-external-newwindow: true
+    number-sections: true
+    smooth-scroll: true
+    toc: true
+editor:
+  markdown:
+    wrap: 72
+---
+
+## Environment
+
+### Clean
+
+Run the following in a code chunk or in your R console to clean up your environment:
+
+```r
+if (interactive()) {
+  rstudioapi::restartSession(clean = TRUE)
+}
+```
+
+### Install
+
+You may need to update or install some packages:
+
+```{r}
+packages <- c(
+  "tidytext", "tidyverse", "ggrepel", "fs"
+)
+
+for (pkg in packages) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg)
+  }
+}
+```
+
+### Load
+
+Import needed libraries and apply settings:
+
+```{r}
+#| label: libraries-settings
+
+for (pkg in packages) {
+  library(pkg, character.only = TRUE)
+}
+
+theme_set(theme_minimal())
+
+set.seed(123)
+```
+
+## Data
+
+Today, we're going to work with the text of Wikipedia articles from 10 famous rappers and singers.
+
+If you do not spend much time on Wikipedia, spend a few minutes looking at the article on [Kendrick Lamar](https://en.wikipedia.org/wiki/Kendrick_Lamar) to get a sense of how they are structured and what they discuss.
+
+### Corpus
+
+This corpus is stored in the file `musician_wiki_corpus.csv`, which contains the following columns:
+
+- `artist`: The name under which the musician performs.
+- `role`: The role of the musician (either "rapper" or "singer").
+- `text`: The text of that artist's Wikipedia article. Each cell currently contains one line of the article.
+
+## Analysis
+
+### Tokenization
+
+Load the corpus into a variable called `corpus` using `read_csv()`. Then, tokenize the texts and overwrite `corpus` with the result. Slice the first three rows from the updated `corpus`, which should correspond with the artist's given name.
+
+```{r}
+#| label: q-tokenize
+
+corpus <- read_csv("../data/musician_wiki_corpus.csv")
+
+corpus <- corpus |>
+  unnest_tokens(word, text)
+
+corpus |>
+  group_by(artist) |>
+  slice_head(n = 3)
+```
+
+Calculate the length of each article in words. Store that in a new table called `article_lengths`. Return `article_lengths`.
+
+```{r}
+#| label: q-article-lengths
+
+article_lengths <- corpus |>
+  group_by(artist, role) |>
+  summarize(article_length = n()) |>
+  ungroup()
+
+article_lengths
+```
+
+Rank each word by frequency within each article such that the most frequent word within each article is ranked 1, the second most frequent 2, and so on. Store the result in a new table called `word_ranks`. Return the first two rows for each artist from `word_ranks.
+
+```{r}
+#| label: q-word-ranks
+
+word_ranks <- corpus |>
+  count(artist, role, word, sort = TRUE) |>
+  group_by(artist) |>
+  mutate(rank = row_number())
+
+word_ranks |>
+  group_by(artist) |>
+  slice_head(n = 2)
+```
+
+Now, remove the stopwords from `corpus`, and overwrite `corpus` with the result. Slice the last non-stopword from each article to show that you have done this correctly.
+
+```{r}
+#| label: q-stopword-removal
+
+corpus <- corpus |>
+  anti_join(stop_words)
+
+corpus |>
+  group_by(artist) |>
+  slice_tail(n = 1)
+```
+
+### Mere frequency
+
+Calculate the absolute and relative frequencies of each word in `corpus`. Use `slice_min()` or `slice_max()` to return the top 2 words per artist. Save the relative frequency into a column called `tf` for "term frequency." We will use this later when calculating tf—idf.
+
+:::{.callout-tip}
+With the current version of `corpus`, this is slightly trickier than it sounds.
+:::
+
+```{r}
+#| label: q-mfws
+
+corpus |>
+  count(artist, role, word) |>
+  left_join(article_lengths, join_by(artist, role)) |>
+  mutate(tf = n / article_length) |>
+  group_by(artist) |>
+  slice_max(n = 2, order_by = tf)
+```
+
+Across each of the articles, what do these results have in common? It's not just one thing.
+
+### Zipf's law
+
+Zipf's law states that the frequency of a word is inversely proportional to its rank in the frequency table. In other words, the most common word will appear twice as often as the second most common word, three times as often as the third most common word, and so on.
+
+Using `corpus`, create a line plot showing the relationship between word rank and word frequency for each artist. Use a logarithmic scale on the x- and y-axes. Color the points by artist.
+
+If you would like to match the colors I used, try this:
+
+```r
+scale_color_brewer(palette = "Paired")
+```
+
+```{r}
+#| label: q-zipf
+
+corpus |>
+  left_join(word_ranks, join_by(artist, role, word)) |>
+  ggplot(aes(x = rank, y = n, color = artist)) +
+  geom_line() +
+  scale_color_brewer(palette = "Paired") +
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+You should observe that the relationship between word rank and frequency is linear on a log-log scale. This is a hallmark of Zipf's law. However, there appear to be some differences, too: What explains the difference between the line at the bottom of the plot as compared to the line at the top of the plot? You may need to look back to previous tables in the analysis to figure out the answer to this question.
+
+Now, calculate the total number of times each word in the corpus occurs. Then, calculate summary statistics about the distribution of word frequencies as shown in the sample output using the `summary()` function:
+
+```{r}
+#| label: q-corpus-freqs-summary
+
+corpus |>
+  count(word) |>
+  summarize(
+    min = min(n),
+    q1 = quantile(n, 0.25),
+    median = median(n),
+    mean = mean(n),
+    q3 = quantile(n, 0.75),
+    max = max(n)
+  )
+```
+
+Before you move on, read those summary statistics and try to make a prediction: What should a histogram of those frequencies look like? Put the number of instances of each word on the x-axis and the number of words that have that frequency on the y-axis.
+
+Then, test your mental model by creating a histogram of word frequencies using `geom_histogram()`. Start with 500 bins and apply `theme_classic()` to make sure that you see the bars on the resulting plot. Then, try a few different values for the number of bins to see how it affects the plot.
+
+```{r}
+#| label: q-corpus-freqs-hist
+
+corpus |>
+  count(word) |>
+  ggplot(aes(x = n)) +
+  geom_histogram(bins = 500) +
+  theme_classic()
+```
+
+Most of the plot area appears to be empty. Why?
+
+Note that the values you observe here reflect a general property of texts; it is not a quirk of this particular data set.
+
+### Keyness
+
+The documents we have in this corpus are unified by the fact that they are popular musicians. First, we are going to use keyness to see which words are relatively important to each artist.
+
+As we saw, keyness can be overly sensitive to rare words. To start, filter `corpus` to include words that only appear at a rate that puts them at or above the **third quartile** of the corpus frequency distribution. Use `pull()` to extract that vector of highly frequent words and save it into a variable called `hfw` for "high-frequency words."
+
+Test `hfw` against the following line:
+
+```r
+c("donut", "lamar", "the", "album", "windshield") %in% hfw
+```
+
+```{r}
+#| label: q-keyness-filter
+
+corpus_q3 <- corpus |>
+  count(word) |>
+  summarize(q3 = quantile(n, 0.75)) |>
+  pull()
+
+hfw <- corpus |>
+  count(word) |>
+  filter(n >= corpus_q3) |>
+  pull(word)
+
+c("donut", "lamar", "the", "album", "windshield") %in% hfw
+```
+
+Use `hfw` to filter `corpus` to only include high-frequency words. Then, calculate the rate at which each word is used in the corpus is used overall. Finally, calculate the rate at which each word is used in each article relative to its overall rate of use in the corpus. Return the top 2 terms per artist by keyness. These words should be those used much more frequently in the artist's article than in the corpus as a whole.
+
+```{r}
+#| label: q-keyness
+
+corpus_length <- article_lengths |>
+  summarize(corpus_length = sum(article_length)) |>
+  pull(corpus_length)
+
+corpus_freqs <- corpus |>
+  filter(word %in% hfw) |>
+  count(word) |>
+  mutate(corpus_freq = n / corpus_length) |>
+  arrange(desc(corpus_freq))
+
+corpus |>
+  filter(word %in% hfw) |>
+  count(artist, role, word) |>
+  left_join(article_lengths, join_by(artist, role)) |>
+  mutate(article_freq = n / article_length) |>
+  left_join(corpus_freqs, join_by(word)) |>
+  mutate(keyness = article_freq / corpus_freq) |>
+  group_by(artist) |>
+  arrange(desc(keyness)) |>
+  select(artist, word, article_freq, corpus_freq, keyness) |>
+  slice_head(n = 2)
+```
+
+How do these keywords differ from the most frequent words we found earlier?
+
+### tf—idf
+
+Finally, we are going to calculate tf—idf for each word in the corpus, and use that to compare the artists in the data set.
+
+As we have already calculated term frequency above, we are now going to calculate the inverse document frequency (idf) for each word in the corpus. Save this in a new variable called `idf`. Then, return a sample of 5 rows from `idf`.
+
+```{r}
+#| label: q-idf
+
+n_docs <- corpus |>
+  select(artist) |>
+  n_distinct()
+
+idf <- corpus |>
+  distinct(artist, word) |>
+  count(word, name = "word_docs") |>
+  mutate(idf = log(n_docs / word_docs))
+
+idf |>
+  slice_sample(n = 5)
+```
+
+Now, calculate tf—idf for each word in each document in the corpus. Save this in a new column called `tf_idf`. Read the top 5 words per artist by tf—idf.
+
+```{r}
+#| label: q-tf-idf
+
+corpus |>
+  count(artist, role, word) |>
+  left_join(article_lengths, join_by(artist, role)) |>
+  mutate(tf = n / article_length) |>
+  left_join(idf, join_by(word)) |>
+  mutate(tf_idf = tf * idf) |>
+  group_by(artist) |>
+  arrange(desc(tf_idf)) |>
+  slice_head(n = 5)
+```
+
+#### Predictions
+
+Make a prediction about one word that you expect to be more strongly associated with one of these artists than any of the others by tf-idf. Do not use a word that you have already seen in the outputs. Set the word that you expect to be most strongly associated with a particular artist into `my_word` and set the artist's name into `my_artist`.
+
+My prediction is that "monster" will have a relatively high tf—idf value for Lady Gaga, but that it will also appear for Nicki Minaj and perhaps Eminem.
+
+Then, use `corpus` to find the tf—idf value for `my_word` in `my_artist`. Check if your prediction was right by slicing the artist with the highest tf—idf value for `my_word`, pulling the artist name, and checking if it is equivalent to `my_artist` by using the function `identical()`. Here's a little example of how `identical()` works:
+
+```{r}
+#| echo: true
+
+value <- "hello"
+
+"hello" |>
+  identical(value)
+
+value |>
+  identical("goodbye")
+```
+
+After that, show the entire table to check your results.
+
+```{r}
+#| label: q-tf-idf-prediction
+
+my_word <- "monster"
+my_artist <- "Lady Gaga"
+
+corpus |>
+  count(artist, role, word) |>
+  left_join(article_lengths, join_by(artist, role)) |>
+  mutate(tf = n / article_length) |>
+  left_join(idf, join_by(word)) |>
+  mutate(tf_idf = tf * idf) |>
+  filter(word == my_word) |>
+  arrange(desc(tf_idf)) |>
+  slice_head(n = 1) |>
+  pull(artist) |>
+  identical(my_artist)
+
+corpus |>
+  count(artist, role, word) |>
+  left_join(article_lengths, join_by(artist, role)) |>
+  mutate(tf = n / article_length) |>
+  left_join(idf, join_by(word)) |>
+  mutate(tf_idf = tf * idf) |>
+  filter(word == my_word) |>
+  arrange(desc(tf_idf))
+```
+
+Was your prediction correct? If it was incorrect, how was it incorrect?
+
+#### Violin plot
+
+Using [`geom_violin`](https://ggplot2.tidyverse.org/reference/geom_violin.html), create a violin plot showing the distribution of tf—idf values for each artist. Color the violins by artist using the default `ggplot` color palette. Label the five words by tf—idf per artist on the plot. Filter to only include tf—idf values greater than 0.
+
+Artist names will be difficult to read on the x-axis without rotation, which you can do with the following line:
+
+```r
+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+:::{.callout-warning}
+If you do not filter your labels in advance, the plot will take forever to render!
+:::
+
+```{r}
+#| label: q-violin
+
+labels <- corpus |>
+  count(artist, role, word) |>
+  left_join(article_lengths, join_by(artist, role)) |>
+  mutate(tf = n / article_length) |>
+  left_join(idf, join_by(word)) |>
+  mutate(tf_idf = tf * idf) |>
+  group_by(artist) |>
+  arrange(desc(tf_idf)) |>
+  slice_head(n = 5)
+
+corpus |>
+  count(artist, role, word) |>
+  left_join(article_lengths, join_by(artist, role)) |>
+  mutate(tf = n / article_length) |>
+  left_join(idf, join_by(word)) |>
+  mutate(tf_idf = tf * idf) |>
+  arrange(desc(tf_idf)) |>
+  filter(tf_idf > 0) |>
+  ggplot(aes(x = artist, y = tf_idf, fill = artist)) +
+  geom_violin() +
+  geom_label_repel(data = labels, aes(label = word)) +
+  scale_y_log10() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+#### Comparing performers
+
+Finally, choose two artists to compare visually. Create a scatter plot comparing the tf—idf values for each word in the corpus for the selected artists. Use a logarithmic scale on both axes. Color the points based on the absolute difference between the two artists' tf—idf scores. Only plot the top 10% of words with the greatest absolute difference between the artists. Ensure that only words where both artists have tf—idf values greater than zero are included in the visualization. Add a dashed diagonal reference line to indicate equality between the two artists' tf—idf scores with the following line:
+
+```r
+geom_abline(slope = 1, intercept = 0, linetype = "dashed", alpha = 0.5)
+```
+
+```{r}
+#| label: q-comparison
+
+artist1 <- "Kendrick Lamar"
+artist2 <- "Drake"
+
+tfidf_comparison <- corpus |>
+  count(artist, role, word) |>
+  left_join(article_lengths, join_by(artist, role)) |>
+  mutate(tf = n / article_length) |>
+  left_join(idf, join_by(word)) |>
+  mutate(tf_idf = tf * idf) |>
+  filter(artist %in% c(artist1, artist2)) |>
+  select(artist, role, word, tf_idf) |>
+  pivot_wider(
+    names_from = artist, values_from = tf_idf, values_fill = 0
+  ) |>
+  filter(`Kendrick Lamar` > 0, `Drake` > 0) |>
+  mutate(abs_diff = abs(`Kendrick Lamar` - `Drake`)) |>
+  filter(abs_diff > quantile(abs_diff, 0.90))
+
+tfidf_comparison |>
+  ggplot(aes(x = `Kendrick Lamar`, y = `Drake`, color = abs_diff)) +
+  geom_point(alpha = 0.7) +
+  scale_x_log10() +
+  scale_y_log10() +
+  scale_color_viridis_c() +
+  geom_text_repel(aes(label = word)) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", alpha = 0.5)
+```
+
+If you chose different artists, what did you observe about the relationships between their tf—idf scores? If your comparison had many points solely on the x- or y-axis, how did you interpret that?
