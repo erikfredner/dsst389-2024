@@ -200,23 +200,23 @@ Meeting  Date      Topic
 5        02-03     Sampling and corpora
 6        02-05     Relative frequencies
 7        02-10     Review
-8        02-12     **Group Project 1**
+8        02-12     **Group Project 1 workshop**
 9        02-17     Sentiment analysis
-10       02-19     tf-idf and KNN
-11       02-24     Gradient boosted trees and text classification
-12       02-26     Principal components analysis
-13       03-03     Topic modeling
-14       03-05     **Group Project 2**
+10       02-19     tf-idf
+11       02-24     K-nearest neighbors 
+12       02-26     Text classification
+13       03-03     Elastic nets
+14       03-05     **Group Project 2 workshop**
          03-10     *Spring Break*
          03-12     *Spring Break*
-15       03-17     Network analysis
+15       03-17     Gradient boosted trees 
 16       03-19     Word embeddings
-17       03-24     Data ethics and surveillance capitalism
-18       03-26     APIs
+17       03-24     Network analysis
+18       03-26     Topic modeling
 19       03-31     Web Scraping
 20       04-02     Text and data cleaning
 21       04-07     LLMs
-22       04-09     **Group Project 3**
+22       04-09     **Group Project 3 workshop**
 23       04-14     **Code Interviews**
 24       04-16     Workshop
 25       04-21     Workshop

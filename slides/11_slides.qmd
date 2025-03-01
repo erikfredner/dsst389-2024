@@ -1,0 +1,492 @@
+---
+title: "K-nearest neighbors"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  echo: true
+  warning: false
+  message: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    toc: true
+    toc-depth: 2
+    slide-level: 4
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+## Quiz
+
+1. Go to this URL:
+
+<https://pollev.com/fredner>
+
+2. Please log in to Poll Everywhere using your `@richmond.edu` email address.
+
+## Review: Sentiment analysis
+
+```{r}
+#| echo: false
+
+library(tidyverse)
+library(tidytext)
+library(tidymodels)
+library(scales)
+library(palmerpenguins)
+library(ggforce)
+library(textrecipes)
+
+theme_set(theme_minimal())
+set.seed(123)
+
+posts <- read_csv("../data/tech_twitter_posts.csv")
+post_sentiments <- read_csv("../data/tech_twitter_sentiments.csv")
+penguins <- penguins |> drop_na()
+```
+
+```{r}
+posts
+
+post_sentiments
+```
+
+### Length and net sentiment
+
+```{r}
+#| output-location: slide
+
+tidy_posts <- posts |>
+  unnest_tokens(input = text, output = word)
+
+afinn <- get_sentiments("afinn")
+
+tidy_posts |>
+  left_join(afinn, join_by(word)) |>
+  group_by(id) |>
+  mutate(tweet_word = row_number()) |>
+  summarize(
+    afinn_net = sum(value, na.rm = TRUE),
+    tweet_len = max(tweet_word),
+    afinn_normalized = afinn_net / tweet_len
+  )
+```
+
+### Tweets over time
+
+```{r}
+#| label: q-time-series
+#| output-location: slide
+
+tidy_posts |>
+  left_join(afinn, join_by(word)) |>
+  group_by(id) |>
+  mutate(tweet_word = row_number()) |>
+  summarize(afinn_net = sum(value, na.rm = TRUE)) |>
+  left_join(posts |> select(id, topic, dttm), join_by(id)) |>
+  filter(topic == "apple") |>
+  mutate(one_hour = floor_date(dttm, unit = "1 hour")) |>
+  group_by(one_hour) |>
+  summarize(total_net = sum(afinn_net)) |>
+  mutate(
+    bar_color = case_when(
+      total_net < 0 ~ "gray",
+      total_net > 0 ~ "white",
+      TRUE ~ "black"
+    )
+  ) |>
+  ggplot(aes(x = one_hour, y = total_net, fill = bar_color)) +
+  geom_col(color = "black") +
+  scale_fill_identity() +
+  scale_x_datetime(date_breaks = "1 day", date_labels = "%b %d")
+```
+
+### Classes
+
+```{r}
+#| label: q-make-classes
+#| output-location: slide
+
+afinn_classes <- tidy_posts |>
+  left_join(afinn, join_by(word)) |>
+  group_by(id) |>
+  mutate(tweet_word = row_number()) |>
+  summarize(
+    afinn_net = sum(value, na.rm = TRUE),
+    tweet_len = max(tweet_word),
+    afinn_normalized = afinn_net / tweet_len
+  ) |>
+  ungroup() |>
+  mutate(
+    mean_afinn = mean(afinn_normalized, na.rm = TRUE),
+    sd_afinn = sd(afinn_normalized, na.rm = TRUE),
+    afinn_class = case_when(
+      afinn_normalized > mean_afinn + sd_afinn ~ "positive",
+      afinn_normalized < mean_afinn - sd_afinn ~ "negative",
+      TRUE ~ "neutral"
+    )
+  )
+
+afinn_classes |>
+  select(id, afinn_normalized, afinn_class)
+```
+
+#### Plotting classes
+
+```{r}
+#| output-location: slide
+afinn_classes |>
+  mutate(afinn_class = fct_relevel(
+    afinn_class, "positive", "neutral", "negative"
+  )) |>
+  left_join(tidy_posts |> distinct(id, topic), join_by(id)) |>
+  ggplot(aes(x = topic, fill = afinn_class)) +
+  geom_bar(position = "fill") +
+  scale_y_continuous(labels = label_percent()) +
+  scale_fill_viridis_d(direction = -1)
+```
+
+### Sentiment analysis summary
+
+1. Sentiment lexicons classify word types by valence and/or emotion.
+2. Joining sentiment lexicons to text data allows us to calculate sentiment by document, section, and/or over time.
+3. Aggregate sentiment scores can be used to perform basic *classification* of documents, sections, and/or periods.
+
+## K-nearest neighbors (KNN)
+
+For each record to be classified or predicted:
+
+1. Find K records that have similar features (i.e., similar predictor values).
+2. For classification, find out what the majority class is among those similar records and assign that class to the new record.[@brucePracticalStatisticsData2020]
+
+### Example: Palmer Penguins
+
+```{r}
+penguins |>
+  group_by(species) |>
+  slice_sample(n = 1) |>
+  select(species, bill_length_mm, bill_depth_mm)
+```
+
+### `penguins` visualization
+
+Penguins separate by species based on the relationship between bill length and depth:
+
+```{r}
+#| echo: false
+
+penguins |>
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_point() +
+  scale_color_brewer(palette = "Dark2")
+```
+
+#### Four new penguin observations
+
+If we did not know these penguins' species, what should we predict them to be?
+
+```{r}
+#| output-location: slide
+#| echo: false
+
+new_penguins <- tribble(
+  ~id, ~bill_length_mm, ~bill_depth_mm,
+  1, 42, 15.75,
+  2, 47.5, 15,
+  3, 39, 19,
+  4, 50, 19
+)
+
+penguins |>
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_point(alpha = 0.5) +
+  geom_point(data = new_penguins, color = "black", size = 8) +
+  geom_text(
+    data = new_penguins,
+    color = "white",
+    size = 5,
+    aes(label = id)
+  ) +
+  scale_color_brewer(palette = "Dark2") +
+  scale_fill_brewer(palette = "Dark2")
+```
+
+#### New penguin observation: borders with `geom_mark_hull`
+
+```{r}
+#| output-location: slide
+
+penguins |>
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_mark_hull(aes(group = species, fill = species), alpha = 0.1) +
+  geom_point(alpha = 0.5) +
+  geom_point(data = new_penguins, color = "black", size = 8) +
+  geom_text(
+    data = new_penguins,
+    color = "white",
+    size = 5,
+    aes(label = id)
+  ) +
+  scale_color_brewer(palette = "Dark2") +
+  scale_fill_brewer(palette = "Dark2")
+```
+
+
+### Intuitive analysis
+
+1. Point 1 appears to be a little closer to the border of the Chinstrap and Gentoo clusters than to the Adelie cluster.
+2. But no Chinstrap penguin has ever been observed with such a low bill depth.
+3. Point 1 has depth and length values that have been observed in Adelie and Gentoo penguins, but never at the same time.
+
+### Steps in KNN analysis
+
+- Normalize the values
+- Measure distances between the new point with an unknown class and all other points with known classes
+- Count the classes of the `k` nearest points
+- Assign the new point to the class that is most common among the `k` nearest points
+
+## KNN with `tidymodels`
+
+`tidymodels` is a collection of packages for modeling and machine learning using `tidyverse` principles.
+
+```{r}
+library(tidymodels)
+```
+
+### Create a `recipe()` for normalization
+
+```{r}
+penguin_recipe <- recipe(
+  # "species is modeled by bill length and depth"
+  species ~ bill_length_mm + bill_depth_mm,
+  data = penguins
+) |>
+  step_normalize(all_predictors()) # i.e., convert to z-scores
+```
+
+### Set up the KNN model
+
+`"kknn"` is not a typo; it is [an implementation of KNN](https://parsnip.tidymodels.org/reference/details_nearest_neighbor_kknn.html).
+
+```{r}
+knn_penguins <- nearest_neighbor(neighbors = 11) |>
+  set_mode("classification") |>
+  set_engine("kknn")
+```
+
+Note that we pick an integer for `k` (`neighbors`)!
+
+### Create a workflow that combines our model and recipe
+
+```{r}
+penguin_workflow <- workflow() |>
+  add_model(knn_penguins) |>
+  add_recipe(penguin_recipe)
+```
+
+### Fit (train) the model using the workflow
+
+```{r}
+penguin_fit <- fit(penguin_workflow, data = penguins)
+```
+
+### Predict the classes for the new penguins
+
+Predictions made based on the `k` nearest neighbors evident in the training data:
+
+```{r}
+new_penguin_pred <- predict(penguin_fit, new_data = new_penguins) |>
+  bind_cols(new_penguins) |>
+  rename(species_predicted = .pred_class)
+
+new_penguin_pred
+```
+
+### Visually check our predictions
+
+```{r}
+#| output-location: slide
+
+penguins |>
+  ggplot(aes(x = bill_length_mm, y = bill_depth_mm, color = species)) +
+  geom_mark_hull(aes(group = species, fill = species), alpha = 0.1) +
+  geom_point(alpha = 0.5) +
+  geom_point(
+    data = new_penguin_pred,
+    size = 8,
+    aes(color = species_predicted)
+  ) +
+  geom_text(
+    data = new_penguins,
+    color = "white",
+    size = 5,
+    aes(label = id)
+  ) +
+  scale_color_brewer(palette = "Dark2") +
+  scale_fill_brewer(palette = "Dark2")
+```
+
+### Problems in this example that we will improve later
+
+- We picked `k` intuitively
+- We did not split into training and testing data sets.
+- We did not evaluate our model's performance quantitatively
+- We did not cross-validate our model
+
+## Using KNN to classify texts with tf—idf
+
+In the same way that we used bill length and depth to classify penguins, we can use tf—idf scores for *words* to classify texts.
+
+### Example: Amazon reviews data
+
+```{r}
+reviews <- read_csv("../data/amazon_product_class_small.csv")
+reviews <- reviews |> mutate(label = as_factor(label))
+
+reviews |>
+  group_by(label) |>
+  slice_sample(n = 1) |>
+  select(label, text)
+```
+
+### KNN with tf—idf
+
+Unlike the penguin example, we will test not against "new" data, but a sample of withheld data.
+
+#### Split into training and testing sets
+
+- Training: A random 80% of rows (`prop = 0.8`)
+- Testing: The withheld 20% of the data
+
+```{r}
+reviews_split <- initial_split(reviews, prop = 0.8, strata = label)
+reviews_train <- training(reviews_split)
+reviews_test <- testing(reviews_split)
+```
+
+#### Create a recipe for tokenization and tf-idf
+
+We create a [`recipe()`](https://www.tidymodels.org/start/recipes/) for our KNN model that models the relationship between the `label` and the `text` of the reviews on a token-by-token basis, using tf—idf as the metric. We will also [preprocess the text](https://www.tidymodels.org/learn/work/tune-text/index.html#inputs-for-the-search) with `tidymodels` functions to remove stopwords and limit the number of tokens considered by the model (here, the top 1,000 words).
+
+```{r}
+reviews_recipe <- recipe(label ~ text, data = reviews_train) |>
+  step_tokenize(text) |>
+  step_stopwords(text) |>
+  step_tokenfilter(text, max_tokens = 1000) |>
+  step_tfidf(text)
+```
+
+#### Specify a KNN model
+
+```{r}
+knn_spec <- nearest_neighbor(neighbors = 11) |>
+  set_mode("classification") |>
+  set_engine("kknn")
+```
+
+#### Create a workflow that uses our recipe and model
+
+[`workflow()`](https://workflows.tidymodels.org/) is a part of `tidymodels`.
+
+```{r}
+knn_workflow <- workflow() |>
+  add_model(knn_spec) |>
+  add_recipe(reviews_recipe)
+```
+
+#### Fit the model
+
+Using our workflow and our training data:
+
+```{r}
+knn_fit <- fit(knn_workflow, data = reviews_train)
+```
+
+:::{.callout-warning}
+Fitting can take a long time, especially for bigger data sets.
+:::
+
+#### Evaluate on the test set
+
+Using our withheld testing data, we evaluate the model's performance on unseen data:
+
+```{r}
+knn_predictions <- predict(knn_fit, new_data = reviews_test) |>
+  bind_cols(reviews_test)
+```
+
+#### What did the model get wrong in the test data?
+
+```{r}
+knn_predictions |>
+  filter(label != .pred_class) |>
+  slice_head(n = 1) |>
+  select(text, label, .pred_class)
+```
+
+Full text:
+
+```{r}
+#| echo: false
+
+knn_predictions |>
+  filter(label != .pred_class) |>
+  slice_head(n = 1) |>
+  select(text, label, .pred_class) |>
+  pull(text)
+```
+
+#### Performance metrics
+
+```{r}
+knn_metrics <- knn_predictions |>
+  metrics(truth = label, estimate = .pred_class)
+
+knn_metrics |>
+  filter(.metric == "accuracy")
+```
+
+```{r}
+#| echo: false
+
+acc_above_chance <- scales::percent(
+  knn_metrics |>
+    filter(.metric == "accuracy") |>
+    pull(.estimate) - 0.5,
+  accuracy = 0.1
+)
+```
+
+Since there are only two possible labels, we know that the model's accuracy was `{r} acc_above_chance` better than chance.
+
+#### Confusion matrix
+
+```{r}
+knn_conf_mat <- knn_predictions |>
+  conf_mat(truth = label, estimate = .pred_class)
+
+knn_conf_mat
+```
+
+## Summary
+
+1. KNN relies on finding the `k` nearest neighbors in feature space.
+2. For classification, the majority class among neighbors is assigned to the new observation.
+3. Normalization (for numeric features) or tf–idf (for text) can enhance performance.
+4. A `tidymodels` workflow includes a recipe (for data preprocessing), a model specification, and fitting to training data.
+5. Model performance should be assessed on a test set.
+
+## Works cited

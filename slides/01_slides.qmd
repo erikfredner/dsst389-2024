@@ -1,0 +1,315 @@
+---
+title: "Introduction"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    mermaid:
+      theme: neutral
+    toc: true
+    toc-depth: 1
+    slide-level: 3
+    slide-number: true
+    preview-links: auto
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+# Introductions
+
+1. Name
+2. Pronouns
+3. Something you *dislike*
+
+e.g.,
+
+1. Professor Erik Fredner
+2. He/him
+3. "It is what it is."
+
+# Why (advanced) data science?
+
+## One perspective
+
+- There is too much data relative to information.
+  - e.g., Every minute of every day, approximately 500 hours of video are uploaded to YouTube.^[[YouTube Copyright Transparency Report](https://storage-googleapis-com.newman.richmond.edu/transparencyreport/report-downloads/pdf-report-22_2022-1-1_2022-6-30_en_v1.pdf)]
+  - Almost none of those 500 hours are worth your finite time.
+
+### IMG_0001: from data to information
+
+- The art project ["IMG_0001"](https://walzr.com/IMG_0001) was recently [written up](https://www.newyorker.com/culture/infinite-scroll/the-artist-exposing-the-data-we-leave-online) in *The New Yorker*.
+  - Transforms data (matching filenames) into information (time capsules)
+- People value information, not data.
+
+### Netflix Prize
+
+In 2006, Netflix offered a $1M prize to whoever could write a better algorithm for predicting user ratings for films based on their previous film ratings using 100M ratings like so:
+
+| movie_id | user_id | rating | date       |
+|----------|---------|--------|------------|
+| 1        | 1488844 | 3      | 2005-09-06 |
+| 1        | 822109  | 5      | 2005-05-13 |
+| 1        | 885013  | 4      | 2005-10-19 |
+
+In 2009, Netflix awarded the prize to a team that beat Netflix's initial algorithm by 10%.
+
+### Inside Airbnb
+
+- Does Airbnb contribute to housing scarcity and high rents?
+  - Are people renting spare rooms ("sharing economy") or whole homes?
+- "Inside Airbnb" aligns Airbnb data with local housing maps
+- Recent [report on Dallas](https://insideairbnb.com/reports/inside-airbnb-dallas-march-2023.pdf) finds that:
+
+> Returning entire home short-term rentals from lodging to the housing
+market would make 16% more rental housing units available across Dallas and up to 62% more in some Council Districts.
+
+### College Scorecard
+
+- In 2015, the US Department of Education released the [College Scorecard](https://collegescorecard.ed.gov)
+- Aggregates data for students about college
+  - [University of Richmond's entry](https://collegescorecard.ed.gov/school/?233374-University-of-Richmond)
+- Scorecard tacitly assumes that the most important thing about education is return-on-investment
+
+### The Opportunity Atlas
+
+Raj Chetty et al. use Census data to study economic mobility based on where children grew up. Richmond is exemplary of a trend [they find](https://opportunityinsights.org/paper/the-opportunity-atlas/) nationally:
+
+>children’s outcomes vary sharply across nearby tracts: for children of parents at the 25th percentile of the income distribution, the standard deviation of mean household income at age 35 is $5,000 across tracts within counties.
+
+See [The Opportunity Atlas](https://www.opportunityatlas.org).
+
+### Is the Love Song Dying?
+
+*The Pudding*'s data journalism resembles the kind of thing we will be doing in this class. A good recent example is, ["Is the Love Song Dying?"](https://pudding.cool/2024/11/love-songs/)
+
+### Examples
+
+Title               DS for...
+----                ----
+Inside Airbnb       Activism
+IMG_0001            Art
+Netflix Prize       Business
+College Scorecard   Government
+Love Song           Journalism
+Opportunity Atlas   Research
+
+## What is Advanced Data Science?
+
+- We will create, organize, explore, visualize, and model different kinds of data, extending DSST289.
+- We will create professional-quality research reports and slides using scientific publishing software.
+- We will work with many data types this semester, but will emphasize data derived from and metadata describing texts.
+
+## What isn't Advanced Data Science?
+
+- Not about causal inference (i.e., cause-and-effect)
+  - DSST310: Causal Inference
+- Not primarily about machine learning
+  - DSST312: Predictive Models
+- Not primarily about regression
+  - DSST331: Regression Theory and Applications
+
+## What tools will we use?
+
+- R
+- `tidyverse`
+- Other R packages
+- RStudio
+- Quarto
+- Generative AI
+  
+## What is "the whole game?"
+
+```{mermaid}
+flowchart LR
+    subgraph Get_Data [Get Data]
+        direction LR
+        A[Import]
+        G[Create]
+    end
+    A --> B[Tidy]
+    G --> B[Tidy]
+    B --> C[Transform]
+    subgraph Understand
+        direction LR
+        C --> D[Visualize]
+        D --> E[Model]
+        E --> C
+    end
+    Understand --> F[Communicate]
+    subgraph "The Whole Game"
+        direction LR
+        Get_Data
+        B
+        Understand
+        F
+    end
+```
+
+### DSST289 emphases
+
+```{mermaid}
+flowchart LR
+    subgraph Get_Data [Get Data]
+        direction LR
+        A[Import]
+        G[Create]
+    end
+    A --> B[Tidy]
+    G --> B[Tidy]
+    B --> C[Transform]
+    subgraph Understand
+        direction LR
+        C --> D[Visualize]
+        D --> E[Model]
+        E --> C
+    end
+    Understand --> F[Communicate]
+    subgraph "The Whole Game"
+        direction LR
+        Get_Data
+        B
+        Understand
+        F
+    end
+    style A fill:#E69F00,stroke:#000,stroke-width:2
+    style C fill:#E69F00,stroke:#000,stroke-width:2
+    style D fill:#E69F00,stroke:#000,stroke-width:2
+    style F fill:#E69F00,stroke:#000,stroke-width:2
+```
+
+---
+
+### DSST389 emphases
+
+```{mermaid}
+flowchart LR
+    subgraph Get_Data [Get Data]
+        direction LR
+        A[Import]
+        G[Create]
+    end
+    A --> B[Tidy]
+    G --> B[Tidy]
+    B --> C[Transform]
+    subgraph Understand
+        direction LR
+        C --> D[Visualize]
+        D --> E[Model]
+        E --> C
+    end
+    Understand --> F[Communicate]
+    subgraph "The Whole Game"
+        direction LR
+        Get_Data
+        B
+        Understand
+        F
+    end
+    style G fill:#56B4E9,stroke:#000,stroke-width:2
+    style B fill:#56B4E9,stroke:#000,stroke-width:2
+    style E fill:#56B4E9,stroke:#000,stroke-width:2
+    style F fill:#56B4E9,stroke:#000,stroke-width:2
+```
+
+# Syllabus
+
+Available on [Blackboard](https://blackboard.richmond.edu/ultra/courses/_58636_1/cl/outline)
+
+## Questions?
+
+## LLMs (e.g., ChatGPT)
+
+- *No one* knows the best course of action for students or professors regarding large language models (LLMs)
+- LLMs are already widespread in all domains of programming.
+
+### "Agents"
+
+Sam Altman, OpenAI (ChatGPT) CEO, [recently wrote](https://blog.samaltman.com/reflections):
+
+> We believe that, in 2025, we may see the first AI agents “join the workforce” and materially change the output of companies.
+
+### Your take
+
+What role, if any, do you think LLMs should have in college?
+
+# Setup
+
+## R
+
+[Install R](https://archive.linux.duke.edu/cran/) version `4.4.2+`.
+
+If you have a Mac that was made in 2020 or later, make sure to choose "Apple Silicon."
+
+## RStudio
+
+[Install RStudio Desktop](https://posit.co/download/rstudio-desktop/) version `2024.12.0+`
+
+## `tidyverse`
+
+Install `tidyverse` version `2.0.0+`
+
+```r
+install.packages("tidyverse")
+```
+
+## Update packages
+
+In your RStudio Console, write:
+
+```r
+update.packages(ask = FALSE)
+```
+
+## Quarto
+
+[Install Quarto](https://quarto.org/docs/download/) version `1.6.40+`
+
+## `tinytex`
+
+1. In RStudio, select **Terminal** (not Console)
+2. Run one of the following commands to install `tinytex` version `2025.01+`
+
+```bash
+quarto install tinytex
+```
+or
+
+```bash
+quarto update tinytex
+```
+
+## Test
+
+1. RStudio > File > New File > Quarto Document
+2. Select PDF as the output type
+3. Save the file anywhere on your system
+4. Click "Render"
+5. Open the generated PDF
+
+## Class chat
+
+[**Join**](https://dsst.zulipchat.com/join/ykpgbx5gchy6wmxdmshxrmii/) the Zulip chat for DSST 389.
+
+(Zulip is like Slack or Discord, but [open source](https://github.com/zulip/zulip).)
+
+- The chat is for **students**.
+  - I will not routinely check it. Email me.
+- You can use it to discuss work, coordinate study groups, and plan group projects.
+
+## Debugging
+
+- If you ran into a problem with any of your installations, raise your hand.
+- If you have finished your installations and can help others, go to the closest person with their hand up.
+
+# With remaining time
+
+Read the notes for next class:
+
+Blackboard > Course Documents > 02

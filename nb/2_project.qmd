@@ -1,0 +1,368 @@
+---
+title: "Group Project 2"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+execute:
+  echo: true
+  warning: false
+format:
+  html:
+    anchor-sections: true
+    code-tools: false
+    code-link: true
+    embed-resources: true
+    link-external-icon: true
+    link-external-newwindow: true
+    number-sections: true
+    smooth-scroll: true
+    toc: true
+editor:
+  markdown:
+    wrap: 72
+---
+
+## Deadline
+
+Project 1 is due by the start of class on Monday, March 17.
+
+## Data: Song lyrics
+
+For this assignment, your goal is to *teach me something about Taylor Swift's lyrics* using data. This goal, like those of the other group projects, is open-ended by design.
+
+I encourage you to bring your preexisting knowledge and preferences to this analysis!
+
+### Taylor Swift corpus
+
+The dataset that everyone will be working with is [the Corpus of Taylor Swift lyrics](https://github.com/sagesolar/Corpus-of-Taylor-Swift).
+
+These lyrics are stored as `.tsv` (tab-separated values) rather than the `.csv` (comma-separated values) files you are more familiar with. Rather than comma characters, these files use tabs to separate columns.
+
+The code chunk below loads, joins, and cleans a few of the tables from the `tsv` folder together in a format that will be familiar for our work on text analysis.
+
+You may use my code below to get started with your analysis, but you don't have to.
+
+```{r}
+library(tidyverse)
+set.seed(123)
+
+songs <- read_tsv("../data/swift_corpus/cots-song-details.tsv") |>
+  select(Album, Track, Title, FeaturedArtists, FromTheVault) |>
+  rename(song_title = Title)
+
+albums <- read_tsv("../data/swift_corpus/cots-album-details.tsv") |>
+  select(Code, Title, SubTitle, Year) |>
+  rename(album_title = Title)
+
+lyrics <- read_tsv(
+  file = "../data/swift_corpus/cots-lyric-details.tsv",
+  col_names = FALSE
+)
+
+lyrics <- lyrics |>
+  rename(metadata = 1, text = 2) |>
+  separate(
+    metadata,
+    into = c("album_code", "track", "line", "part"),
+    sep = ":",
+    convert = TRUE
+  )
+
+lyrics <- lyrics |>
+  left_join(albums, join_by(album_code == Code)) |>
+  left_join(songs, join_by(album_code == Album, track == Track)) |>
+  mutate(part = case_when(
+    part == "V" ~ "Verse",
+    part == "C" ~ "Chorus",
+    part == "B" ~ "Bridge",
+    part == "I" ~ "IntroOutro",
+    part == "R" ~ "Refrain",
+    TRUE ~ part
+  )) |>
+  rename(
+    album_subtitle = SubTitle,
+    year = Year,
+    featured_artists = FeaturedArtists,
+    from_the_vault = FromTheVault
+  ) |>
+  select(
+    song_title, featured_artists, album_title, album_subtitle,
+    track, from_the_vault, year, line, part, text
+  )
+
+lyrics |>
+  group_by(album_title, album_subtitle) |>
+  slice_sample(n = 1)
+```
+
+### Make your own lyrics corpus!
+
+The challenge for this assignment is to teach me something about Taylor Swift's lyrics. If you already know a lot about Swift, you may be able to do that by comparing different albums or groups of songs to one another.
+
+Another way you may want to do that would be by comparing Swift to other artists whose songs you know well. The code chunk below creates a series of functions designed to scrape lyrics from [azlyrics.com](https://www.azlyrics.com) and combine them into a single tibble. You can read the comments to understand what the code is doing.
+
+```{r}
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(rvest)
+  library(stringr)
+  library(purrr)
+  library(tibble)
+})
+
+# Internal helper function to scrape a single azlyrics.com URL
+# Return a tibble with columns: artist, song, line_number, text, stanza, source_url
+read_azlyrics <- function(url) {
+  # Read HTML
+  page <- read_html(url)
+
+  # Parse the <title>, e.g. "Aesop Rock & Blockhead - Difficult Lyrics | AZLyrics.com"
+  title_text <-
+    page |>
+    html_element("title") |>
+    html_text2()
+
+  # Extract artist and song
+  artist <-
+    title_text |>
+    str_remove("\\s-.*$")
+  song <-
+    title_text |>
+    str_remove("^.*-\\s") |>
+    str_remove("\\sLyrics\\s\\|\\sAZLyrics\\.com$")
+
+  # Find the <div> that includes "Usage of azlyrics.com content..."
+  div_candidates <-
+    page |>
+    html_elements("div:not([class])")
+
+  right_divs <-
+    div_candidates |>
+    keep(\(div) str_detect(html_text2(div), "Usage of azlyrics.com content"))
+
+  if (length(right_divs) == 0) {
+    stop("Could not find the expected <div> with lyrics comment. Layout may have changed.")
+  }
+
+  # Use the first matching div
+  lyrics_div <- right_divs[[1]]
+
+  # Extract raw lyric text
+  lyrics_raw <-
+    lyrics_div |>
+    html_text2()
+
+  # Remove any HTML comment blocks <!-- ... --> inline
+  # so that they don't mask early lines
+  lyrics_raw <-
+    lyrics_raw |>
+    str_remove_all(
+      regex("<!--.*?-->", dotall = TRUE)
+    )
+
+  # Split into lines
+  raw_lines <-
+    lyrics_raw |>
+    str_split("\n") |>
+    (\(x) x[[1]])() |>
+    # Remove any disclaimers without removing partial lyric lines
+    str_remove("Usage of azlyrics.com content.*") |>
+    str_trim()
+
+  # Keep blank lines to mark stanzas, remove them later
+  df_pre <-
+    tibble(raw_line = raw_lines) |>
+    mutate(
+      # increment "stanza" when we see a blank line
+      stanza = cumsum(lag(raw_line == "", default = FALSE)) + 1
+    )
+
+  # Filter out empty lines from the final result
+  df_lyrics <-
+    df_pre |>
+    filter(raw_line != "") |>
+    mutate(
+      line_number = row_number(),
+      artist      = artist,
+      song        = song
+    ) |>
+    rename(text = raw_line) |>
+    select(artist, song, line_number, text, stanza)
+
+  # Optionally add a column for the source URL
+  df_lyrics <- df_lyrics |>
+    mutate(source_url = url)
+
+  return(df_lyrics)
+}
+
+# Main function to scrape multiple azlyrics.com URLs
+#   - `urls` = character vector of azlyrics.com lyrics page URLs
+#   - `wait_sec` = how many seconds to wait between each URL
+scrape_azlyrics_list <- function(urls, wait_sec = 2) {
+  # For each URL in 'urls', scrape lyrics,
+  # wait a little, then combine results into one tibble
+  map_dfr(seq_along(urls), function(i) {
+    this_url <- urls[[i]]
+
+    message("Scraping: ", this_url)
+    # Scrape
+    df <- read_azlyrics(this_url)
+
+    # Wait to reduce chance of being blacklisted
+    if (i < length(urls)) {
+      Sys.sleep(wait_sec)
+    }
+    df
+  })
+}
+```
+
+#### How to use
+
+This chunk below demonstrates how to use the functions above to scrape lyrics from three different Aesop Rock songs. You can modify this code chunk to choose any songs by any artist you like. If you plan to download a large number of songs to compare (e.g., 10+), I would recommend setting the `wait_sec` parameter to a larger number (e.g., 5 to 10) to avoid being blocked by the website.
+
+Each of the URLs you select should be a link to the lyrics of a song on azlyrics.com. You can find these links by searching for the song on the website and copying the URL from the address bar. [Here is an example](https://www.azlyrics.com/lyrics/aesoprock/shrunk.html).
+
+```{r}
+#| eval: false
+
+urls <- c(
+  "https://www.azlyrics.com/lyrics/aesoprock/difficult.html",
+  "https://www.azlyrics.com/lyrics/aesoprock/infinityfillgoosedown.html",
+  "https://www.azlyrics.com/lyrics/aesoprock/cornmaze.html"
+)
+all_lyrics <- scrape_azlyrics_list(urls, wait_sec = 3)
+```
+
+You don't need to re-download the lyrics of your choosing every time you start the notebook. You can write the `all_lyrics` object to a `.csv` file and import it again later:
+
+```{r}
+#| eval: false
+
+all_lyrics |>
+  write_csv("sample_lyrics.csv")
+
+all_lyrics <- read_csv("sample_lyrics.csv")
+```
+
+### A word of caution about making your own corpus
+
+If you decide to download songs to compare to Swift's songs, you will need to identify and justify the **principle of selection** used to create your corpus. This principle should be based on your research question and the goals of your analysis.
+
+An example of a good principles of analysis would be something like the following: How does the vocabulary of one Taylor Swift album differ from the vocabulary of the other top ten albums in that same year? In this case, your corpus has a clear principle of construction. This approach is especially good because it is *reproducible*. Someone else could recreate your decisions and get the same results.
+
+Another good example would be something like this: Taylor Swift has often cited Joni Mitchell as an important influence on her songwriting. Which features of Mitchell's songs are present in Swift's? This is also reproducible in that the goal would similarly be to create either a complete corpus or a representative sample of Mitchell's songs to compare to Swift's.
+
+Here is an example of a more challenging principle of selection to justify: How does the vocabulary of Taylor Swift's songs compare to other contemporary pop musicians? While pop is an established genre, you would need to do more to explain why the comparators you chose are suitable representatives of pop as opposed to other genres or features.
+
+## Contribution to learning goals
+
+This project directly addresses the following learning goals for this course:
+
+- Collect, manipulate, tidy, visualize, and explore data using basic and advanced techniques.
+- Understand key aspects of the [R programming language](https://www.r-project.org) and the [`tidyverse`](https://www.tidyverse.org).
+- Use the [RStudio](https://posit.co/products/open-source/rstudio/) integrated development environment.
+- Use [Quarto](https://quarto.org/) to create high-quality research documents and websites.
+- Use programming language documentation, cookbooks, and large language models to solve programming problems.
+
+## So what?
+
+As with your previous assignment, the most important part of the project is the argument or "so what?" of your analysis.
+
+A good argument tests existing assumptions. For example, many people associate Swift with breakup songs. It would be a good research question to figure out what proportion of Swift's songs discuss a breakup, and whether there are any characteristic features of breakup as compared to non-breakup songs. This could address the extent to which Swift's reputation is accurate.
+
+## External resources
+
+As the purpose of this group project is to imitate data science work that one might do outside of school, it is an **open-resource** project. This means that you may use books, websites, and, yes, generative artificial intelligence (GenAI) tools in order to complete this work.
+
+All external resources must be cited in your final document. I do not require a formal citation style. However, if you want a model to follow, I recommend [The Chicago Manual of Style](https://richmond.primo.exlibrisgroup.com/permalink/01URICH_INST/191gg5k/alma9928619711206241).
+
+Your use of all external resources, including GenAI, is constrained by the rules set out in the syllabus, which include the following:
+
+### Prohibited Uses of GenAI
+
+- Submitting model output, in part or in whole, as if it were your original work. This includes code *or* writing.
+- Uploading any data used in this course (e.g., `.csv` files) directly to multimodal GenAI tools like ChatGPT.
+- Using models for assistance *without* citing your interaction with the model.
+- Using models to generate outputs that you cannot verify, explain, or understand.^[However, if a model does produce an output that you cannot verify, explain, or understand, you may use the model to improve your understanding of that output.]
+
+### Permitted Uses of GenAI
+
+I ask you to do these things in this order when you can't figure something out:
+
+1. Review the course notes and slides, if relevant.
+2. Talk to your classmates.
+3. Search for credible information online (e.g., StackOverflow).
+4. Chat with the [Custom GPT](https://chatgpt.com/g/g-6783c8a8603c8191862f677689207682-dsst389-gpt) for this class.
+5. If you use information from the Custom GPT, **cite** your interactions with it.
+
+[This page](https://help.openai.com/en/articles/7925741-chatgpt-shared-links-faq) explains how to share a link to a ChatGPT interaction.
+
+### Things to consider when using GenAI
+
+#### Style
+
+The [Custom GPT](https://chatgpt.com/g/g-6783c8a8603c8191862f677689207682-dsst389-gpt) for this course is designed to help you with programming problems while following the conventions of this class. However, **you** are ultimately responsible for ensuring that your code follows the class style requirements:
+
+- Use the base R pipe (`|>`), not the `magrittr` pipe (`|>`)
+- Use `<-` to assign outputs to objects. *Do not* use `=`.
+- Use `tidyverse` functions instead of base R whenever possible.
+  - e.g., `as_factor()` is `tidyverse`; `as.factor()` is `{base}`.
+- Style your code in accordance with the [`tidyverse` style guide](https://style.tidyverse.org/).
+- Code without comments and/or documentation is incomplete.
+
+#### Accuracy
+
+LLMs get things wrong. That can happen because the model makes a mistake, or the person prompting the model makes a mistake. Either way, the accuracy of your code is your responsibility.
+
+## Rubric
+
+| Criterion                   | Description                                                                                                                                                                                                                                                                          | Weight |
+|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------|
+| Significance               | Addresses a meaningful question about Taylor Swift’s lyrics, and explains why it matters.                                          | 30%    |
+| Analysis & Data Integration| Uses effective data manipulation and integration of relevant data sets (e.g., the Taylor Swift corpus, your own corpus). Briefly explains how you cleaned or manipulated data, references external resources and GenAI usage, and justifies decisions made regarding principle of selection. | 20%    |
+| Outputs                    | Offers at least two clear, meaningful outputs (tables, figures, visualizations) that illuminate the analysis. These must be labeled, referenced in the text, and tie back to the research question or argument.                                                                      | 20%    |
+| Code Quality & Style       | Uses well-documented, neat R code following tidyverse style conventions (pipes, naming, etc.). Incorporates advanced Quarto features (like figure captions, cross-references, or in-line calculations) where appropriate.                                                            | 10%    |
+| Prose                      | Document includes at least 400 words describing the motivation, the analysis, and its findings. Is rendered as a professional Quarto PDF, with clear organization, headings, and formal writing style.          | 20%    |
+
+## Groups
+
+```{r}
+#| warning: false
+#| echo: false
+
+library(tidyverse)
+library(knitr)
+library(readxl)
+
+df <- read_excel("../GITIGNORED/dsst389_roster.xlsx", sheet = "all")
+
+df <- df |>
+  select(Section, `First Name in Use`, `Last Name`) |>
+  mutate(Section = as.integer(Section)) |>
+  rename(
+    section = Section,
+    first_name = `First Name in Use`,
+    last_name = `Last Name`
+  ) |>
+  mutate(last_initial = str_sub(last_name, 1, 1))
+
+df |>
+  group_by(section) |>
+  slice_sample(prop = 1) |>
+  mutate(
+    row = row_number(),
+    group_id = case_when(
+      n() %% 2 == 0 ~ as.integer(ceiling(row / 2)),
+      row <= 3 ~ 1L,
+      TRUE ~ as.integer(1L + ceiling((row - 3) / 2))
+    )
+  ) |>
+  ungroup() |>
+  select(-row) |>
+  arrange(section, last_initial, first_name) |>
+  select(section, first_name, last_initial, group_id) |>
+  kable()
+```

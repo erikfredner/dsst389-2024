@@ -1,0 +1,532 @@
+---
+title: "*k*-nearest neighbors"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+execute:
+  echo: false
+  warning: true
+format:
+  html:
+    anchor-sections: true
+    code-tools: false
+    code-link: true
+    embed-resources: true
+    link-external-icon: true
+    link-external-newwindow: true
+    number-sections: true
+    smooth-scroll: true
+    toc: true
+editor:
+  markdown:
+    wrap: 72
+---
+
+## Environment
+
+### Clean
+
+Run the following code chunk to clean up your environment:
+
+```{r}
+#| eval: false
+#| label: clean-env
+
+if (interactive()) {
+  rstudioapi::restartSession(clean = TRUE)
+}
+```
+
+### Install
+
+You may need to update or install some packages:
+
+```{r}
+#| label: get-packages
+
+packages <- c("tidyverse", "tidymodels", "textrecipes", "kknn")
+
+for (pkg in packages) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+  }
+}
+```
+
+### Load
+
+Import needed libraries and apply settings:
+
+```{r}
+#| label: libraries-settings
+
+for (pkg in packages) {
+  library(pkg, character.only = TRUE)
+}
+
+theme_set(theme_minimal())
+
+set.seed(123)
+```
+
+## *k*-nearest neighbors
+
+In this notebook, we will be practicing using the *k*-nearest neighbors (KNN) algorithm for classification.
+
+Please watch the short video below to review how the KNN algorithm works:
+
+{{< video https://youtu.be/HVXime0nQeI?t=21 >}}
+
+## Data
+
+You will be working with two data sets in this notebook. In both cases, you will use KNN to classify unseen data.
+
+### Breast cancer
+
+The UC Irvine machine learning repository [maintains](https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic) a donated data set from the University of Wisconsin about breast cancer. This data set contains diagnoses associated with cancer biopsies measuring 30 features. These measurements include the mean, standard error, and worst (i.e., largest) value for 10 different characteristics of the digitized cell nuclei, such as radius, texture, area, smoothness, and compactness.
+
+#### Breast cancer data dictionary
+
+You can find the data dictionary [here](https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/wdbc.names).
+
+### Amazon reviews
+
+We are also going to use a **bigger** version of the Amazon reviews data that you saw in the slides. Key differences:
+
+- Reviews have one of three labels: book, film, or food
+  - The version that you saw in the slides only has two labels
+- There are 2,750 observations of each label
+
+:::{.callout-warning}
+Because there are many observations in this dataset, some tasks may take longer to run than usual.
+
+That said, if any of your operations run for more than two minutes, there is likely an error in your code.
+:::
+
+#### Amazon data dictionary
+
+| Column Name | Data Type | Description |
+|-------------|-----------|-------------|
+| `doc_id`    | `string`  | A unique identifier for each review document. |
+| `label`     | `string`  | The category of the reviewed product, such as `book`, `film`, or `food`. |
+| `train_id`  | `string`  | Indicates whether the review is part of the `train` or `valid` dataset. |
+| `text`      | `string`  | The full text of the product review. |
+
+### Load data
+
+```{r}
+#| label: load-bc
+
+bc <- read_csv("../data/wisc_bc.csv")
+
+bc |> glimpse()
+```
+
+
+```{r}
+#| label: load-amazon
+
+amazon <- read_csv("../data/amazon_product_class_large.csv")
+
+amazon |>
+  group_by(label) |>
+  slice_sample(n = 1)
+```
+
+## Breast cancer analysis
+
+### Data cleaning
+
+First, check the `bc` dataset for missing values.
+
+:::{.callout-tip}
+We discussed how to do this before! You may need the `everything()` function.
+:::
+
+If any rows contain missing values, remove that row from `bc` and overwrite the data set. To confirm that you have done this correctly, return the number of rows in `bc`.
+
+```{r}
+#| label: q-bc-missing
+
+missing_ids <- bc |>
+  filter(if_any(everything(), is.na)) |>
+  pull(id)
+
+bc <- bc |>
+  filter(!id %in% missing_ids)
+
+bc |> tally()
+```
+
+The `bc` dataset contains two diagnoses: `"B"` for benign and `"M"` for malignant. Let's change these to their full names for clarity. We will also treat these as factors for a later step in the analysis. Overwrite the `diagnosis` column with the full names. Return the first five rows' ids and diagnoses from `bc` to confirm that you have done this correctly.
+
+```{r}
+#| label: q-diagnosis-rename
+
+bc <- bc |>
+  mutate(
+    diagnosis = if_else(diagnosis == "B", "Benign", "Malignant"),
+    diagnosis = as_factor(diagnosis)
+  )
+
+bc |>
+  slice_head(n = 5) |>
+  select(id, diagnosis)
+```
+
+### Train/test splitting
+
+Unlike the `penguins` example, we are not trying to label unlabeled points from new biopsies. Instead, to evaluate our model, we are going to split the `bc` data into 80/20 train/test sets. Also, because we are dealing with a classification problem, we want to ensure that the proportion of benign and malignant tumors is the same in both the training and testing sets. Return the result of your initial split.
+
+```{r}
+#| label: q-bc-split
+
+bc_split <- initial_split(bc, prop = 0.8, strata = diagnosis)
+bc_train <- training(bc_split)
+bc_test <- testing(bc_split)
+
+bc_split
+```
+
+
+### Data analysis
+
+Now that `bc` has been cleaned and split, we are going to perform a *k*-nearest neighbors analysis to determine how well we can predict whether a tumor is benign or malignant based on the 30 features in the data set.
+
+Create a `tidymodels` recipe that scales all of the features in the `bc` data set. Store this recipe in an object called `bc_recipe`. To do this, you will need to take the following steps:
+
+1. Your formula will be given by:
+
+```r
+diagnosis ~ .
+```
+
+The `.` is shorthand for "every column except `diagnosis`," which is being modeled. Unfortunately, this will also treat the `id` column as a feature. Don't forget which data set you are supposed to use to train the model!
+
+2. Remove the `id` column by passing it to the `step_rm()` function before normalizing.
+
+3. Normalize all of the remaining predictors.
+
+Return `bc_recipe` before continuing.
+
+```{r}
+#| label: q-bc-recipe
+
+bc_recipe <- recipe(diagnosis ~ ., data = bc_train) |>
+  step_rm(id) |>
+  step_normalize(all_predictors())
+
+bc_recipe
+```
+
+#### Aside: Normalization
+
+We need to normalize the numeric columns in the dataset because we will be measuring the *distance* between observations. If we do not normalize the data, the algorithm will be biased towards features with larger scales simply because they are larger, not because they are necessarily more predictive.
+
+Given the above, if we did not normalize, which column would have the most influence on the classification results? Look at the data set to answer this question.
+
+Below is an example of how you could check this programmatically. It involves a couple of patterns we have seen rarely, so consider this just for your information:
+
+```{r}
+bc |>
+  select(-id, -diagnosis) |>
+  summarise(across(
+    everything(),
+    ~ list(c(
+      min = min(.x),
+      max = max(.x),
+      diff = diff(range(.x))
+    ))
+  )) |>
+  pivot_longer(
+    everything(),
+    names_to = "column",
+    values_to = "stats"
+  ) |>
+  unnest_wider(stats) |>
+  arrange(desc(diff)) |>
+  slice_head(n = 5)
+```
+
+Without normalizing, the `area_` columns would be the most important features because they have the largest scales.
+
+Let's normalize one column manually to understand what is going on under the hood. To normalize, we are going to convert the area_worst column to a [z-score](https://en.wikipedia.org/wiki/Standard_score). Z-scores are a way to compare scores from different distributions. They are calculated by subtracting the mean of the distribution from the score and dividing by the standard deviation. A value exactly one standard deviation above the mean will have a z-score of 1.
+
+```{r}
+#| label: q-z-score
+
+bc |>
+  select(id, diagnosis, area_worst) |>
+  mutate(
+    area_worst_z = (area_worst - mean(area_worst)) / sd(area_worst)
+  )
+```
+
+The `step_normalize()` function in the `recipe` object does this automatically for all numeric columns in the data set.
+
+### Set up the model
+
+Now, set up the model in a variable called `bc_model` using `nearest_neighbors()`. Set a variable called `k` equal to 5, and use that variable in the `neighbors` argument of the `nearest_neighbors()` function. Set the model mode to classification, and the engine to the `kknn` implementation of KNN.
+
+```{r}
+#| label: q-bc-model
+
+k <- 5
+
+bc_model <- nearest_neighbor(neighbors = k) |>
+  set_mode("classification") |>
+  set_engine("kknn")
+```
+
+### Combine model and recipe in a workflow
+
+Write your workflow into a variable called `bc_workflow`.
+
+```{r}
+#| label: q-bc-workflow
+
+bc_workflow <- workflow() |>
+  add_model(bc_model) |>
+  add_recipe(bc_recipe)
+```
+
+Now, fit your model to the training data, and return the `bc_fit` object.
+
+```{r}
+#| label: q-bc-fit
+
+bc_fit <- fit(bc_workflow, data = bc_train)
+bc_fit
+```
+
+### Evaluate the model
+
+Using the withheld testing data, evaluate your model's performance by retrieving the accuracy of your predictions:
+
+```{r}
+#| label: q-bc-evaluate
+
+bc_fit |>
+  predict(new_data = bc_test) |>
+  bind_cols(bc_test) |>
+  metrics(truth = diagnosis, estimate = .pred_class) |>
+  filter(.metric == "accuracy")
+```
+
+Spend a few moments interpreting the accuracy score. What exactly does it mean in this case? How much better is it than we would expect? How do you know?
+
+Now, retrieve a confusion matrix for your model:
+
+```{r}
+#| label: q-confusion
+
+bc_fit |>
+  predict(new_data = bc_test) |>
+  bind_cols(bc_test) |>
+  conf_mat(truth = diagnosis, estimate = .pred_class)
+```
+
+### Different numbers of neighbors
+
+Above, we set the value `k`. Try changing the variable `k` to other values and re-run your results. Try at least one value and one higher value. What do you observe within this data set?
+
+#### Aside: Automating the process
+
+The code chunk below automates the process of trying different values of `k` and finding the one that maximizes accuracy. It may take a minute or two to run because it tests every odd number from 1 to 99.
+
+Read the code below and try to understand what is generally happening. There are a few features that we have not discussed yet (e.g., `rowwise()`, `list()`) that you may need to look up if you want to understand it completely.
+
+```{r}
+#| label: k-search
+
+k_values <- seq(1, 99, by = 2)
+
+k_results <- tibble(k = k_values) |>
+  rowwise() |>
+  mutate(
+    model = list(nearest_neighbor(neighbors = k) |>
+      set_mode("classification") |>
+      set_engine("kknn")),
+    workflow = list(
+      workflow() |> add_model(model) |> add_recipe(bc_recipe)
+    ),
+    fit = list(fit(workflow, data = bc_train)),
+    predictions = list(
+      predict(fit, new_data = bc_test) |> bind_cols(bc_test)
+    ),
+    metrics = list(
+      metrics(predictions, truth = diagnosis, estimate = .pred_class)
+    ),
+    accuracy = filter(metrics, .metric == "accuracy") |>
+      pull(.estimate)
+  ) |>
+  ungroup() |>
+  select(k, accuracy)
+```
+
+Now, check out something interesting in these results for `k`:
+
+```{r}
+#| label: k-not-most-accurate
+
+k_results |>
+  filter(accuracy != max(accuracy)) |>
+  pull(k)
+```
+
+You will notice that the values of `k` that maximize accuracy are "Goldilocks" values. Values that are too low or too high do not maximize accuracy. But a wide range of values in the middle all perform at the same level of accuracy in this data set.
+
+## Amazon reviews analysis
+
+### Initial predictions
+
+You probably have some experience reading product reviews on the internet.
+
+This dataset contains reviews of books, films, and food products from Amazon.
+
+Which two of these three categories would you expect to have **more** overlapping words? Why might that be true? Write a sentence or two. We will check this prediction later.
+
+In making this prediction, don't forget that we will be reducing the dataset to a subset of highly frequent words. So, even if a word like "Spielberg" is generally a very good predictor of the film category, it's unlikely to show up often enough to make it into the model.
+
+If it is the case that two of these three categories should have more similar reviews to each other than either of their reviews are to the third category, what impact do you think that will have on the classification results? Write a sentence or two so that we can check your prediction later.
+
+### Data cleaning
+
+There is only one cleaning step that we need to take for the `amazon` data: We have to convert the `label` column to a factor. Overwrite `amazon` with an updated version of the dataset.
+
+We need to do this because the `label` column is a character vector, and we need it to be a factor for the KNN model.
+
+```{r}
+#| label: q-amazon-factor
+
+amazon <- amazon |>
+  mutate(label = as_factor(label))
+```
+
+### KNN with tf—idf
+
+Above, we manually and then automatically normalized all of the columns used as predictors for the breast cancer data. Instead of z-scores, for the Amazon reviews data, we are normalizing our values using tf—idf scores. Take a moment to think about why tf—idf might be a better choice for textual data than z-scores.
+
+#### Split into training and testing sets
+
+Split `amazon` into training and testing sets with a 75%/25% training/test split. Use the `label` column as the stratification variable. Return the split object.
+
+```{r}
+#| label: q-amazon-split
+
+amazon_split <- initial_split(amazon, prop = 0.75, strata = label)
+amazon_train <- training(amazon_split)
+amazon_test <- testing(amazon_split)
+amazon_split
+```
+
+#### Create a recipe for tokenization and tf-idf
+
+Save your recipe into a variable called `amazon_recipe`. Tokenize your text, remove stopwords, filter for the 500 most frequent words, and convert your word counts to tf—idf scores using the `step_` functions from the `textrecipes` package.
+
+```{r}
+#| label: q-amazon-recipe
+
+amazon_recipe <- recipe(label ~ text, data = amazon_train) |>
+  step_tokenize(text) |>
+  step_stopwords(text) |>
+  step_tokenfilter(text, max_tokens = 500) |>
+  step_tfidf(text)
+```
+
+#### Specify a KNN model
+
+Create a KNN model specification for classification with 11 neighbors and the `kknn` engine. Store this specification in a variable called `amazon_model`.
+
+```{r}
+#| label: q-amazon-model
+
+amazon_model <- nearest_neighbor(neighbors = 11) |>
+  set_mode("classification") |>
+  set_engine("kknn")
+```
+
+#### Create a workflow that combines our recipe and model
+
+Save the workflow into a variable called `amazon_workflow`.
+
+```{r}
+#| label: q-amazon-workflow
+
+amazon_workflow <- workflow() |>
+  add_model(amazon_model) |>
+  add_recipe(amazon_recipe)
+```
+
+#### Fit the model
+
+Using our workflow and our training data, fit your model on the training data, and store the result in a variable called `amazon_fit`.
+
+:::{.callout-warning}
+Fitting can take a long time, especially for bigger data sets! When done as expected, this takes about 1 minute on my laptop, which is about five years old.
+:::
+
+```{r}
+#| label: q-amazon-fit
+
+amazon_fit <- fit(amazon_workflow, data = amazon_train)
+```
+
+#### Evaluate on the test set
+
+Using our withheld testing data, evaluate the model's performance on the testing data:
+
+```{r}
+#| label: q-amazon-evaluate
+
+amazon_predictions <- predict(amazon_fit, new_data = amazon_test) |>
+  bind_cols(amazon_test)
+amazon_predictions
+```
+
+#### What did the model get wrong in the test data?
+
+Randomly select one example of *each kind of labeling error* in the data set. For example, one type of error would be when the model predicted a review was a book review, but it was actually a film review. Return the text of the review, the true label, and the predicted label for each of these examples.
+
+```{r}
+#| label: q-amazon-errors
+
+amazon_errors <- amazon_predictions |>
+  mutate(correct = .pred_class == label) |>
+  filter(!correct) |>
+  select(text, label, .pred_class)
+
+amazon_errors |>
+  group_by(label, .pred_class) |>
+  slice_sample(n = 1)
+```
+
+#### Performance metrics
+
+Get the accuracy of the model's predictions on the test set from its `metrics()`.
+
+Before running the result, make a prediction: Would you expect this model's predictions to be more or less accurate than the previous model? Why?
+
+```{r}
+#| label: q-amazon-accuracy
+
+amazon_metrics <- amazon_predictions |>
+  metrics(truth = label, estimate = .pred_class)
+
+amazon_metrics |>
+  filter(.metric == "accuracy")
+```
+
+#### Confusion matrix
+
+Finally, return the confusion matrix from your predictions object.
+
+```{r}
+#| label: q-amazon-confusion
+
+amazon_predictions |>
+  conf_mat(truth = label, estimate = .pred_class)
+```
+
+Now, go *back* to the beginning of this section. Were you correct about which categories would be more likely to be miscategorized by the model?

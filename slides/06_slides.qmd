@@ -1,0 +1,211 @@
+---
+title: "Relative Frequencies"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  echo: true
+  warning: false
+  message: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    toc: true
+    toc-depth: 2
+    slide-level: 4
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+## Poll
+
+1. Go to this URL:
+
+<https://pollev.com/fredner>
+
+2. Please log in to Poll Everywhere using your `@richmond.edu` email address.
+
+### `tibble()` vs. `tribble()`
+
+- Both create tibbles (modern data frames) in R.
+- `tibble()`:
+  - Inputs data by columns (each argument represents a column).
+  - Ideal for programmatic creation using existing vectors.
+- `tribble()`:
+  - Inputs data row-by-row using a transposed (<mark>tr</mark>ibble, <mark>tr</mark>anspose) format.
+  - Uses `~` to denote column names.
+  
+
+#### `tibble()` example
+
+```{r}
+library(tidyverse)
+
+products <- tibble(
+  brand = c("Nike", "Adidas", "Lululemon", "Under Armour"),
+  item  = c("leggings", "hoodie", "sports bra", "tank top"),
+  price = c(60, 80, 70, 50)
+)
+
+products
+```
+
+
+#### `tribble()` example
+
+```{r}
+products <- tribble(
+  ~brand,        ~item,       ~price,
+  "Nike",        "leggings",  60,
+  "Adidas",      "hoodie",    80,
+  "Lululemon",   "sports bra",70,
+  "Under Armour","tank top",  50
+)
+
+products
+```
+
+## Notebook 4 review
+
+```{r}
+#| label: libraries
+#| echo: false
+
+library(tidyverse)
+library(ggrepel)
+library(tidytext)
+library(gutenbergr)
+library(janeaustenr)
+theme_set(theme_minimal())
+set.seed(123)
+
+books <- austen_books() |>
+  group_by(book) |>
+  mutate(
+    linenumber = row_number(),
+    chapter = cumsum(str_detect(
+      text,
+      regex("^chapter [\\divxlc]", ignore_case = TRUE)
+    ))
+  ) |>
+  ungroup()
+```
+
+```{r}
+books
+```
+
+#### Tokenization
+
+```{r}
+#| label: q-unnest
+
+tidy_books <- books |>
+  unnest_tokens(output = word, input = text)
+
+tidy_books |>
+  slice_sample(n = 5)
+```
+
+#### Keywords in context
+
+```{r}
+#| label: q-kwic
+
+sample <- tidy_books |>
+  slice_sample(n = 5)
+
+sample
+
+sample |>
+  left_join(books, join_by(book, linenumber, chapter)) |> 
+  select(word, text)
+```
+
+#### Identifying specific keywords
+
+```{r}
+#| label: q-filter
+
+tidy_books |>
+  filter(word == "breakfast") |>
+  left_join(books, join_by(book, linenumber, chapter)) |> 
+  select(word, text)
+```
+
+#### Stop words
+
+```{r}
+#| label: q-remove-stop
+
+data(stop_words)
+
+tidy_books <- tidy_books |>
+  anti_join(stop_words, join_by(word))
+
+tidy_books |>
+  left_join(tidy_books |> count(word), join_by(word)) |> 
+  arrange(desc(n))
+```
+
+#### Collocates
+
+```{r}
+#| label: q-collocates-2
+
+my_word <- "breakfast"
+
+tidy_books |>
+  semi_join(
+    tidy_books |> filter(word == my_word),
+    join_by(book, chapter, linenumber)
+  ) |>
+  filter(word != my_word) |>
+  count(word, sort = TRUE)
+```
+
+#### Aside: Why `my_word`?
+
+```{r}
+my_word <- "sun"
+
+tidy_books |>
+  semi_join(
+    tidy_books |> filter(word == my_word),
+    join_by(book, chapter, linenumber)
+  ) |>
+  filter(word != my_word) |>
+  count(word, sort = TRUE)
+```
+
+#### Words in every book
+
+```{r}
+#| label: q-words-in-all
+
+n_books <- tidy_books |>
+  summarize(n_books = n_distinct(book)) |> 
+  pull(n_books)
+
+tidy_books <- tidy_books |>
+  distinct(book, word) |>
+  count(word) |>
+  filter(n == n_books) |>
+  inner_join(tidy_books, join_by(word))
+
+tidy_books |> slice_sample(n = 5)
+```
+
+## Practice
