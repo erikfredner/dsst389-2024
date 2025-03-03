@@ -1,0 +1,136 @@
+---
+title: "Group Project 2"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  echo: true
+  warning: false
+  message: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    toc: true
+    toc-depth: 2
+    slide-level: 4
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+## Change of plans
+
+- We are going to start working on Project 2 today
+- We will cover elastic nets on Wednesday
+  - If you have not yet watched those videos, please do so
+
+## R updates
+
+R version 4.4.3 was released on 2025-02-28
+
+Download and install the latest version:
+
+<https://cran.r-project.org/>
+
+[Release notes](https://cran.r-project.org/doc/manuals/r-release/NEWS.html)
+
+### Package updates
+
+After a version update, it's good to check for package updates.
+
+Run this line in your R console:
+
+```r
+update.packages(ask = FALSE, checkBuilt = TRUE)
+```
+
+### RStudio updates
+
+Go to the menu bar, click on `Help`, and then `Check for Updates`.
+
+## Project 1 review
+
+Overall, people did good work!
+
+### Tips for Project 2
+
+- Less is more.
+  - Keep the writing to about 400 words.
+  - Don't show code, figures, or tables that don't advance your argument.
+- Edit aggressively.
+  - Good editing shows that you *say what you intend*.
+- Don't torture your data.
+  - Don't try to make your data say something it can't.
+- Use the `styler` package to help with code formatting.
+  
+### Set up `styler`
+
+`styler` ([link](https://cloud.r-project.org/web/packages/styler/index.html)) is a package that formats code according to [the `tidyverse` style guide](https://style.tidyverse.org/), which we use in this class.
+
+First, install it:
+
+```r
+install.packages("styler")
+```
+
+### Run `styler` on save
+
+You can set up RStudio to run `styler` to reformat your code every time you save a file.
+
+1. Go to `Tools` and select `Global Options`
+2. Click on `Code` in the left-hand pane
+3. Select `Formatting` from the tabs and set `styler` as your formatter
+4. Then click  on the `Saving` tab and check the option that says `Reformat documents on save`
+5. Next time you save a `.qmd` or `.R` file, your code will be reformatted according to the `tidyverse` style guide.
+
+### Optional: Check style compliance with `lintr`
+
+`styler` cannot fix all style issues automatically. But you can combine `styler` with `lintr` to check for style issues that `styler` cannot fix.
+
+First, install `lintr`:
+
+```r
+install.packages("lintr")
+```
+
+Then, configure it to use the `tidyverse` style:
+
+```r
+lintr::use_lintr(type = "tidyverse")
+```
+
+### Linting a file
+
+You can run `lintr` on your current file like so:
+
+1. Open the command palette: `Cmd + Shift + P` on macOS or `Ctrl + Shift + P` on Windows
+2. Type `lint` and select `lintr: Lint current file`
+
+### Example output
+
+Depending on the style violations you have, you will see a message like this under the Markers tab in the same pane as your Console:
+
+![`lintr` output](images/lintr.png)
+
+## Project 2 overview
+
+### Questions?
+
+## Meet up with your group
+
+1. Make sure you know each other's names
+2. Share contact information
+3. Schedule times to work on the project
+4. Review the data
+5. Discuss possible topics

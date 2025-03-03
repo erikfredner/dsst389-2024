@@ -25,23 +25,25 @@ editor:
 
 ## Deadline
 
-Project 1 is due by the start of class on Monday, March 17.
+This project is due by the start of class on Monday, March 17.
 
 ## Data: Song lyrics
 
-For this assignment, your goal is to *teach me something about Taylor Swift's lyrics* using data. This goal, like those of the other group projects, is open-ended by design.
-
-I encourage you to bring your preexisting knowledge and preferences to this analysis!
+For this assignment, your goal is to *teach me something about Taylor Swift's lyrics* using data. This goal, like those of the other group projects, is open-ended by design. However, I have selected this topic partially on the assumption that many of you will have preexisting knowledge and opinions about Swift's music and lyrics that you can bring to this analysis.
 
 ### Taylor Swift corpus
 
 The dataset that everyone will be working with is [the Corpus of Taylor Swift lyrics](https://github.com/sagesolar/Corpus-of-Taylor-Swift).
 
-These lyrics are stored as `.tsv` (tab-separated values) rather than the `.csv` (comma-separated values) files you are more familiar with. Rather than comma characters, these files use tabs to separate columns.
+In addition to the lyrics for her songs, this repository contains a ton of additional information about Swift's language usage, including how common or rare words are, parts of speech, etc. See [the README](https://github.com/sagesolar/Corpus-of-Taylor-Swift/blob/main/README.md) for all of the details.
+
+#### Data
+
+These tables are stored as `.tsv` (tab-separated values) rather than the `.csv` (comma-separated values) files you are more familiar with. Rather than comma characters, these files use tab characters to separate columns.
 
 The code chunk below loads, joins, and cleans a few of the tables from the `tsv` folder together in a format that will be familiar for our work on text analysis.
 
-You may use my code below to get started with your analysis, but you don't have to.
+You may modify my code below to get started with your analysis.
 
 ```{r}
 library(tidyverse)
@@ -93,14 +95,15 @@ lyrics <- lyrics |>
 
 lyrics |>
   group_by(album_title, album_subtitle) |>
-  slice_sample(n = 1)
+  slice_sample(n = 1) |>
+  select(song_title, line, text)
 ```
 
-### Make your own lyrics corpus!
+### Make your own comparison corpus of lyrics
 
-The challenge for this assignment is to teach me something about Taylor Swift's lyrics. If you already know a lot about Swift, you may be able to do that by comparing different albums or groups of songs to one another.
+The challenge for this assignment is to teach me something about Taylor Swift's lyrics. If you already know a lot about Swift, you may be able to do that by comparing different Swift albums or groups of songs to one another.
 
-Another way you may want to do that would be by comparing Swift to other artists whose songs you know well. The code chunk below creates a series of functions designed to scrape lyrics from [azlyrics.com](https://www.azlyrics.com) and combine them into a single tibble. You can read the comments to understand what the code is doing.
+If you don't know much about Swift, you could instead compare Swift to other artists whose songs you know well. The code chunk below creates a function designed to scrape lyrics from [azlyrics.com](https://www.azlyrics.com) and combine them into a single tibble. You can read the comments to understand what the code is doing.
 
 ```{r}
 suppressPackageStartupMessages({
@@ -112,12 +115,13 @@ suppressPackageStartupMessages({
 })
 
 # Internal helper function to scrape a single azlyrics.com URL
-# Return a tibble with columns: artist, song, line_number, text, stanza, source_url
+# Return a tibble with columns:
+# artist, song, line_number, text, stanza, source_url
 read_azlyrics <- function(url) {
   # Read HTML
   page <- read_html(url)
 
-  # Parse the <title>, e.g. "Aesop Rock & Blockhead - Difficult Lyrics | AZLyrics.com"
+  # Parse the <title>
   title_text <-
     page |>
     html_element("title") |>
@@ -142,7 +146,10 @@ read_azlyrics <- function(url) {
     keep(\(div) str_detect(html_text2(div), "Usage of azlyrics.com content"))
 
   if (length(right_divs) == 0) {
-    stop("Could not find the expected <div> with lyrics comment. Layout may have changed.")
+    stop(
+      "Could not find the expected <div> with lyrics comment.
+         Layout may have changed."
+    )
   }
 
   # Use the first matching div
@@ -221,9 +228,11 @@ scrape_azlyrics_list <- function(urls, wait_sec = 2) {
 
 #### How to use
 
-This chunk below demonstrates how to use the functions above to scrape lyrics from three different Aesop Rock songs. You can modify this code chunk to choose any songs by any artist you like. If you plan to download a large number of songs to compare (e.g., 10+), I would recommend setting the `wait_sec` parameter to a larger number (e.g., 5 to 10) to avoid being blocked by the website.
+The chunk below demonstrates how to use the function above to scrape lyrics from three different Aesop Rock songs.
 
-Each of the URLs you select should be a link to the lyrics of a song on azlyrics.com. You can find these links by searching for the song on the website and copying the URL from the address bar. [Here is an example](https://www.azlyrics.com/lyrics/aesoprock/shrunk.html).
+You can replace the URLs below to choose any number of songs that you want to compare to Swift. If you plan to download a large number of songs to compare (e.g., 10+), I would recommend setting the `wait_sec` parameter to a larger number (e.g., 5 to 10) to avoid being blocked by the website.
+
+Each of the URLs you select should be a link to the lyrics of a song on azlyrics.com. You can find these links by searching for the song on the website and copying the URL from the address bar. [Here is an example of what these pages look like](https://www.azlyrics.com/lyrics/aesoprock/shrunk.html).
 
 ```{r}
 #| eval: false
@@ -249,11 +258,11 @@ all_lyrics <- read_csv("sample_lyrics.csv")
 
 ### A word of caution about making your own corpus
 
-If you decide to download songs to compare to Swift's songs, you will need to identify and justify the **principle of selection** used to create your corpus. This principle should be based on your research question and the goals of your analysis.
+If you decide to download songs to compare to Swift's songs, you will need to identify and justify the **principle of selection** used to create your comparison corpus. This principle should be based on your research question and the goals of your analysis.
 
-An example of a good principles of analysis would be something like the following: How does the vocabulary of one Taylor Swift album differ from the vocabulary of the other top ten albums in that same year? In this case, your corpus has a clear principle of construction. This approach is especially good because it is *reproducible*. Someone else could recreate your decisions and get the same results.
+An example of a good principle of analysis would be something like the following: How does the vocabulary of one Taylor Swift album differ from the vocabulary of the other top ten albums in that same year? In this case, your corpus has a clear principle of construction. This approach is especially good because it is *reproducible*. Someone else could recreate your decisions and get the same results.
 
-Another good example would be something like this: Taylor Swift has often cited Joni Mitchell as an important influence on her songwriting. Which features of Mitchell's songs are present in Swift's? This is also reproducible in that the goal would similarly be to create either a complete corpus or a representative sample of Mitchell's songs to compare to Swift's.
+Another good example would be something like this: Taylor Swift has often cited Joni Mitchell as an important influence on her songwriting. Which textual features of Mitchell's songs are present in Swift's? This is also reproducible in that the goal would similarly be to create either a complete corpus or a representative sample of Mitchell's songs to compare to Swift's.
 
 Here is an example of a more challenging principle of selection to justify: How does the vocabulary of Taylor Swift's songs compare to other contemporary pop musicians? While pop is an established genre, you would need to do more to explain why the comparators you chose are suitable representatives of pop as opposed to other genres or features.
 
@@ -269,15 +278,15 @@ This project directly addresses the following learning goals for this course:
 
 ## So what?
 
-As with your previous assignment, the most important part of the project is the argument or "so what?" of your analysis.
+As with your previous assignment, the most important part of the project is the argument or "so what?" of your analysis. You should be able to summarize your work with one or two sentences explaining what difference your analysis makes, and why the reader should care.
 
-A good argument tests existing assumptions. For example, many people associate Swift with breakup songs. It would be a good research question to figure out what proportion of Swift's songs discuss a breakup, and whether there are any characteristic features of breakup as compared to non-breakup songs. This could address the extent to which Swift's reputation is accurate.
+Good arguments often test existing assumptions. For example, many people associate Swift with breakup songs. So, figuring out what proportion of Swift's songs discuss a breakup, and whether there are any characteristic features of breakup as compared to non-breakup songs would be a good research question. This would make a difference because it could address the extent to which Swift's reputation is accurate.
 
 ## External resources
 
 As the purpose of this group project is to imitate data science work that one might do outside of school, it is an **open-resource** project. This means that you may use books, websites, and, yes, generative artificial intelligence (GenAI) tools in order to complete this work.
 
-All external resources must be cited in your final document. I do not require a formal citation style. However, if you want a model to follow, I recommend [The Chicago Manual of Style](https://richmond.primo.exlibrisgroup.com/permalink/01URICH_INST/191gg5k/alma9928619711206241).
+All external resources must be cited in your final document. I recommend using [The Chicago Manual of Style](https://richmond.primo.exlibrisgroup.com/permalink/01URICH_INST/191gg5k/alma9928619711206241).
 
 Your use of all external resources, including GenAI, is constrained by the rules set out in the syllabus, which include the following:
 
@@ -322,10 +331,10 @@ LLMs get things wrong. That can happen because the model makes a mistake, or the
 | Criterion                   | Description                                                                                                                                                                                                                                                                          | Weight |
 |----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------|
 | Significance               | Addresses a meaningful question about Taylor Swift’s lyrics, and explains why it matters.                                          | 30%    |
-| Analysis & Data Integration| Uses effective data manipulation and integration of relevant data sets (e.g., the Taylor Swift corpus, your own corpus). Briefly explains how you cleaned or manipulated data, references external resources and GenAI usage, and justifies decisions made regarding principle of selection. | 20%    |
+| Analysis & Data Integration| Briefly explains how you cleaned or manipulated data, references external resources and GenAI usage, and justifies your principle of selection. | 20%    |
 | Outputs                    | Offers at least two clear, meaningful outputs (tables, figures, visualizations) that illuminate the analysis. These must be labeled, referenced in the text, and tie back to the research question or argument.                                                                      | 20%    |
-| Code Quality & Style       | Uses well-documented, neat R code following tidyverse style conventions (pipes, naming, etc.). Incorporates advanced Quarto features (like figure captions, cross-references, or in-line calculations) where appropriate.                                                            | 10%    |
-| Prose                      | Document includes at least 400 words describing the motivation, the analysis, and its findings. Is rendered as a professional Quarto PDF, with clear organization, headings, and formal writing style.          | 20%    |
+| Code Quality & Style       | Uses well-documented, neat R code following `tidyverse` style. Incorporates advanced Quarto features (like figure captions, cross-references, or in-line calculations) where appropriate.                                                            | 10%    |
+| Prose                      | Document includes at least 400 words describing the motivation, the analysis, and its findings.          | 20%    |
 
 ## Groups
 
