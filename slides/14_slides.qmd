@@ -1,0 +1,528 @@
+---
+title: "Regularization"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  echo: true
+  warning: false
+  message: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    toc: true
+    toc-depth: 2
+    slide-level: 4
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+## Regularization
+
+Elastic net regularization combines the strengths of ridge and lasso regression penalties for linear models. It simultaneously shrinks coefficients (like ridge) and pushes some of them to zero (like lasso).
+
+This balance helps the model handle highly correlated features, avoid overfitting, and maintain interpretability by **filtering out less important variables**.
+
+### Example use cases
+
+1. Predicting the price of a house based on its features (e.g., Zillow)
+2. Predicting the likelihood of a customer to churn (e.g., Netflix)
+3. Predicting whether an email is spam (e.g., Gmail)
+
+### Intuitive example: Political favorability
+
+| year | zip_code | med_income | avg_wind_speed | dem_fav |
+|-----:|---------:|--------------:|---------------:|----------------------:|
+| 2020 |   90210  |        120000 |            5.2 |                  0.45 |
+| 2020 |   60601  |         85000 |            4.3 |                  0.46 |
+| 2021 |   94105  |        110000 |            3.9 |                  0.50 |
+| 2021 |   10001  |         95000 |            5.7 |                  0.48 |
+| 2022 |   30301  |         70000 |            6.1 |                  0.43 |
+
+#### Intuitive analysis
+
+We would expect average wind speed to be *less* predictive of Democratic favorability than other variables in this table, like year, ZIP code, and income.
+
+## Why regularize?
+
+Linear regression makes several strong assumptions that regularization can help address:
+
+- A linear relationship exists
+- The data set has more observations than features
+  - i.e., in a tidy data set, more rows than columns
+- No multicollinearity exists between features
+
+### What are we doing when we are regularizing?
+
+We are adding a **penalty term**---ridge, lasso, or both, which is the elastic net---to the sum of the squared errors (i.e., the sum of the squared residuals) in our linear model.
+
+The penalty term drives coefficients *down*. Without regularization, coefficients can grow large, leading to overfitting.
+
+## Example: Predicting baseball salaries based on batting statistics
+
+Which aspects of a baseball player's performance at the plate best predict their salary?
+
+### Data: `Hitters`
+
+```{r}
+#| echo: false
+
+library(tidyverse)
+library(tidymodels)
+library(ISLR2)
+library(fastDummies)
+data(Hitters, package = "ISLR2")
+set.seed(123)
+theme_set(theme_minimal())
+
+Hitters <- Hitters |>
+  drop_na(Salary)
+```
+
+```{r}
+Hitters |> glimpse()
+```
+
+### `Hitters` salary distributions
+
+```{r}
+#| echo: false
+
+Hitters |>
+  ggplot(aes(Salary)) +
+  geom_density(fill = "pink", alpha = 0.2) +
+  scale_x_continuous(labels = scales::dollar_format(scale = 1000)) +
+  labs(x = "Salary")
+```
+
+A small number of hitters have significantly higher salaries than most.
+
+### How well do errors predict salary?
+
+```{r}
+#| echo: false
+
+Hitters |>
+  ggplot(aes(Errors, Salary)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  geom_segment(
+    aes(
+      xend = Errors,
+      yend = predict(lm(Salary ~ Errors, data = Hitters))
+    ),
+    alpha = 0.2
+  ) +
+  scale_y_continuous(labels = scales::dollar_format(scale = 1000)) +
+  labs(x = "Errors", y = "Salary (USD, thousands)")
+```
+
+### How well does getting walked predict salary?
+
+```{r}
+#| echo: false
+
+Hitters |>
+  ggplot(aes(CWalks, Salary)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  geom_segment(
+    aes(
+      xend = CWalks,
+      yend = predict(lm(Salary ~ CWalks, data = Hitters))
+    ),
+    alpha = 0.2
+  ) +
+  scale_y_continuous(labels = scales::dollar_format(scale = 1000)) +
+  labs(x = "Career Walks", y = "Salary (USD, thousands)")
+```
+
+### How well do career runs predict salary?
+
+```{r}
+#| echo: false
+
+Hitters |>
+  ggplot(aes(CRuns, Salary)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, color = "yellow") +
+  geom_segment(
+    aes(
+      xend = CRuns,
+      yend = predict(lm(Salary ~ CRuns, data = Hitters))
+    ),
+    alpha = 0.2
+  ) +
+  scale_y_continuous(labels = scales::dollar_format(scale = 1000)) +
+  labs(x = "Career Runs", y = "Salary (USD, thousands)")
+```
+
+### Career Runs, Home Runs, and Salary
+
+- Career runs and salary appear to be positively correlated
+- Career runs and home runs are *necessarily* correlated
+  - Every home run is at least one additional run
+
+```{r}
+Hitters |>
+  select(CRuns, CHmRun, Salary) |>
+  cor() |> # calculate correlation
+  round(2)
+```
+
+### Given collinearity, which features should we choose?
+
+```{r}
+#| echo: false
+
+Hitters |>
+  select(where(is.numeric)) |>
+  cor() |>
+  corrplot::corrplot()
+```
+
+### Deciding on regularization approach
+
+- Ridge is not the best choice here because it does not eliminate any of the features
+- Lasso is a good choice because it can eliminate some features entirely
+- Elastic net regression (ENET) is another good choice because it can eliminate some features *and* shrink others
+
+## Lasso on `Hitters`
+
+The [`glmnet` package](https://glmnet.stanford.edu/index.html) implements these regularization techniques. We can use it in combination with the `tidymodels` package we used with KNN.
+
+### Split our data
+
+```{r}
+hitters_split <- initial_split(Hitters, prop = 0.8, strata = Salary)
+hitters_train <- training(hitters_split)
+hitters_test <- testing(hitters_split)
+```
+
+We are stratifying by a **continuous variable** (salary) to ensure that the distribution of salaries is similar in the training and testing sets.
+
+### Create our lasso model
+
+When using the `linear_reg()` function, we need to set the `mixture` parameter:
+
+- `mixture = 0`: Ridge
+- `mixture = 1`: Lasso
+- `0 < mixture < 1`: Elastic net
+
+We also need to set a `penalty`, which is the lambda (λ) value that controls the strength of the regularization.
+
+```{r}
+lasso_model <- linear_reg(penalty = 0.5, mixture = 1) |>
+  set_mode("regression") |>
+  set_engine("glmnet")
+```
+
+### Create our recipe
+
+```{r}
+lasso_recipe <- recipe(Salary ~ ., data = hitters_train) |>
+  step_normalize(all_numeric_predictors()) |>
+  step_dummy(all_nominal_predictors())
+```
+
+#### `step_dummy(all_nominal_predictors())`?
+
+This converts categorical variables into [dummy variables](https://en.wikipedia.org/wiki/Dummy_variable_(statistics)). `Hitters` has a categorical variable for whether players were in the American or National league:
+
+```{r}
+#| echo: false
+
+hitters_train |>
+  select(League) |>
+  slice_sample(n = 4)
+```
+
+After conversion, the `League` variables will look like this:
+
+```{r}
+#| echo: false
+
+hitters_train |>
+  select(League) |>
+  slice_sample(n = 4) |>
+  dummy_cols() |>
+  select(!League)
+```
+
+### Create our workflow
+
+```{r}
+lasso_wf <- workflow() |>
+  add_recipe(lasso_recipe) |>
+  add_model(lasso_model)
+```
+
+### Fit our model using our workflow
+
+Don't forget to use *training* data when fitting.
+
+```{r}
+lasso_fit <- lasso_wf |> fit(data = hitters_train)
+```
+
+### Review our coefficients
+
+[`parsnip`](https://parsnip.tidymodels.org/) is a package in the `tidymodels` ecosystem.
+
+```{r}
+lasso_fit |>
+  extract_fit_parsnip() |>
+  tidy() |>
+  slice_head(n = 4)
+```
+
+Which features were shrunk to zero?
+
+```{r}
+#| echo: false
+
+lasso_fit |>
+  extract_fit_parsnip() |>
+  tidy() |>
+  filter(estimate == 0)
+```
+
+#### Large coefficients
+
+The coefficients with the largest absolute values are the most important predictors of salary in this data set with this penalty:
+
+```{r}
+lasso_fit |>
+  extract_fit_parsnip() |>
+  tidy() |>
+  arrange(desc(abs(estimate))) |>
+  slice_head(n = 5)
+```
+
+#### Interpreting coefficients
+
+```{r}
+#| echo: false
+
+cruns_est <- lasso_fit |>
+  extract_fit_parsnip() |>
+  tidy() |>
+  filter(term == "CRuns") |>
+  pull(estimate) * 1000
+```
+
+Since our features are normalized such that mean = 0 and standard deviation = 1, we interpret the coefficients like so:
+
+For every 1 standard deviation above the mean value of career runs (`CRuns`), the average salary increases by `{r} scales::dollar(cruns_est)`.
+
+### Evaluate our model
+
+```{r}
+lasso_fit |>
+  predict(new_data = hitters_test) |>
+  bind_cols(hitters_test) |>
+  metrics(truth = Salary, estimate = .pred)
+```
+
+#### What are those metrics?
+
+| **Metric** | **Name**                             | **What It Measures**                                                                                      |
+|------------|--------------------------------------|------------------------------------------------------------------------------------------------------------|
+| `rmse`     | [Root Mean Squared Error](https://en.wikipedia.org/wiki/Root_mean_square_deviation)          | The square root of the average of the squared differences between predicted and actual values.             |
+| `rsq`      | [R Squared (Coefficient of determination)](https://en.wikipedia.org/wiki/Coefficient_of_determination) | The proportion of variance in the outcome that is explained by the model.                                  |
+| `mae`      | [Mean Absolute Error](https://en.wikipedia.org/wiki/Mean_absolute_error)              | The average of the absolute differences between predicted and actual values.                               |
+
+#### How do we use these metrics?
+
+- We select a metric to optimize depending on the data and its use.
+- Given an optimization metric, it is possible to automatically select the best lambda penalty for our model.
+- We can also use these metrics to compare this model to other models.
+
+#### When do we optimize for a particular metric?
+
+- Use Root Mean Squared Error if large errors are particularly costly
+  - e.g., predicting expenses, because large errors can lead to large financial losses
+- Use $R^2$ if we want a measure of explained variance.
+  - e.g., predicting the extent to which additional hours of studying help students pass exams
+- Use Mean Absolute Error if each error is equally important
+  - e.g., predicting drive time in Google Maps
+
+## Automating lambda selection
+
+In the previous example, we arbitrarily chose a lambda value of 0.5. Instead, we can `tune()` to automatically select the best lambda. This is a form of [hyperparameter tuning](https://en.wikipedia.org/wiki/Hyperparameter_optimization).
+
+```{r}
+lasso_tune_model <- linear_reg(penalty = tune(), mixture = 1) |>
+  set_mode("regression") |>
+  set_engine("glmnet")
+
+lasso_tune_wf <- workflow() |>
+  add_recipe(lasso_recipe) |>
+  add_model(lasso_tune_model)
+```
+
+### Cross-validation
+
+[Cross-validation](https://en.wikipedia.org/wiki/Cross-validation_(statistics)) systematically evaluates different lambda values and finds the one that minimizes prediction error. By splitting the training data into folds (`v = 10`), the model is trained on $n-1$ folds and tested on the remaining fold, repeating the process across all possible splits. This helps prevent overfitting and ensures that the selected lambda generalizes well to new data.
+
+```{r}
+hitters_folds <- vfold_cv(hitters_train, v = 10, strata = Salary)
+```
+
+### Tune over a grid of penalty values
+
+`tune_grid()` fits the lasso model across the penalty values given in `grid`, using the cross-validation folds we just created:
+
+```{r}
+tuned_results <- tune_grid(
+  lasso_tune_wf,
+  resamples = hitters_folds,
+  grid = 50 # number of penalty values to try
+)
+```
+
+#### Visualize tuning process
+
+```{r}
+autoplot(tuned_results)
+```
+
+### Identify the best penalty value
+
+We choose a metric to optimize for with `select_best()`:
+
+```{r}
+best_lasso <- select_best(tuned_results, metric = "rmse")
+
+best_lasso
+```
+
+### Run workflow with the best penalty
+
+```{r}
+final_lasso_wf <- finalize_workflow(lasso_tune_wf, best_lasso)
+```
+
+### Fit the finalized workflow and evaluate on the test set
+
+```{r}
+final_lasso_fit <- final_lasso_wf |> fit(data = hitters_train)
+
+final_lasso_fit |>
+  predict(new_data = hitters_test) |>
+  bind_cols(hitters_test) |>
+  metrics(truth = Salary, estimate = .pred)
+```
+
+### Is that `rmse` any good?
+
+It could be better. The root mean squared error is about half of the mean salary.
+
+```{r}
+mean_salary <- hitters_train |>
+  summarize(mean_salary = mean(Salary)) |>
+  pull()
+
+rmse <- final_lasso_fit |>
+  predict(new_data = hitters_test) |>
+  bind_cols(hitters_test) |>
+  metrics(truth = Salary, estimate = .pred) |>
+  filter(.metric == "rmse") |>
+  pull(.estimate)
+
+rmse / mean_salary
+```
+
+## Elastic net
+
+Let's see if we can do better with elastic net regularization.
+
+### Create our elastic net model
+
+You will notice that the only difference between the lasso and elastic net models is the `mixture` parameter, which we now `tune()` as well:
+
+```{r}
+enet_model <- linear_reg(penalty = tune(), mixture = tune()) |>
+  set_engine("glmnet")
+```
+
+### Create our elastic net workflow
+
+We can use the same recipe as before, so we will move straight to the workflow:
+
+```{r}
+enet_wf <- workflow() |>
+  add_recipe(lasso_recipe) |> # same recipe as before
+  add_model(enet_model)
+```
+
+### Create cross-validation folds
+
+```{r}
+enet_folds <- vfold_cv(hitters_train, v = 10, strata = Salary)
+```
+
+### Tune over a grid of penalty values
+
+```{r}
+tuned_enet_results <- tune_grid(
+  enet_wf,
+  resamples = enet_folds,
+  grid = 50
+)
+```
+
+### Identify the best penalty value
+
+```{r}
+best_enet <- select_best(tuned_enet_results, metric = "rmse")
+```
+
+### Run workflow with the best penalty
+
+```{r}
+final_enet_wf <- finalize_workflow(enet_wf, best_enet)
+```
+
+### Fit the finalized workflow and evaluate on the test set
+
+```{r}
+final_enet_fit <- final_enet_wf |> fit(data = hitters_train)
+
+final_enet_fit |>
+  predict(new_data = hitters_test) |>
+  bind_cols(hitters_test) |>
+  metrics(truth = Salary, estimate = .pred)
+```
+
+This performs slightly better than lasso, but we could do better with further tuning.
+
+## Summary
+
+Regularization controls model complexity by shrinking or eliminating variables.
+
+  - **Ridge (`mixture = 0`)** shrinks coefficients toward zero but typically keeps them all in the model.
+  - **Lasso (`mixture = 1`)** zeros out some coefficients.
+  - **Elastic net (`0 < mixture < 1`)** combines the strengths of both lasso and ridge.
+- **Tuning** the penalty (`lambda`) balances bias and variance.
+- **Interpretation** of coefficients after normalization requires us to recall that each numeric predictor is on a standardized scale (mean = 0, standard deviation = 1).
+- **Performance** is evaluated using error metrics like RMSE, $R^2$, and MAE.
+
+## How could you use regularization for Project 2?
+
+- Given the Taylor Swift lyrics and those of one other artist, predict whether an unlabeled song was written by Swift, *and* how the model "knows."
+  - Lasso and ENET can tell you which words are most predictive of e.g., Swift authorship.
+- Predict whether a song is from a particular year (continuous variable) or "era" (categorical variable) based on its lyrics.
+- Predict Spotify streams using lyrics or other features from the corpus.

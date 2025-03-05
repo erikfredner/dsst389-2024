@@ -205,11 +205,11 @@ Meeting  Date      Topic
 10       02-19     tf-idf
 11       02-24     K-nearest neighbors 
 12       02-26     Text classification
-13       03-03     Elastic nets
-14       03-05     **Group Project 2 workshop**
+13       03-03     **Group Project 2 workshop**
+14       03-05     Elastic nets
          03-10     *Spring Break*
          03-12     *Spring Break*
-15       03-17     Gradient boosted trees 
+15       03-17     Gradient boosted trees
 16       03-19     Word embeddings
 17       03-24     Network analysis
 18       03-26     Topic modeling
