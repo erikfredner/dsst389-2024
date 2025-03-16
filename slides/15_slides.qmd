@@ -1,0 +1,415 @@
+---
+title: "Gradient Boosted Trees"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  echo: true
+  message: false
+  warning: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    toc: true
+    toc-depth: 2
+    slide-level: 4
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+## Decision Trees
+
+- Decision trees split data into regions based on features
+  - The goal is for each split to yield the most information
+  - The first split is the "root" of the tree
+    - Which is why a tree with a single split is a "stump"
+- Splitting on multiple features creates more complex decisions
+
+### Example: [Growing a Tree](http://www.r2d3.us/visual-intro-to-machine-learning-part-1/)
+
+## Balancing bias and variance
+
+::: {.r-fit-text}
+- When training the models, we have to balance **bias** and **variance**
+- **Bias** errs from overly simplistic assumptions
+  - Errors are consistent and persistent
+  - e.g., "People who are older than 85 are women."
+- **Variance** produces error from overfitting to training data
+  - Errors are inconsistent
+  - e.g., "People who are older than 85 AND...AND...AND...AND...AND...AND...AND...AND...are women."
+- When tuning a model, we want to minimize *both*
+:::
+
+### Example: [A Tangible Example of Variance](http://www.r2d3.us/visual-intro-to-machine-learning-part-2/)
+
+## Ensemble methods
+
+- What knowledge should a good trivia team have?
+  - Science, History, Art, Literature, Sports, Pop Culture, etc.
+  - Often, different team members are responsible for each of these areas
+- Like a good trivia team, by combining *multiple* decision trees, we can make a model that is better than the sum of its parts
+  
+### Ensemble diagram
+
+![A diagram of an ensemble process](images/ensemble.png)
+
+### How to make ensembles
+
+- The allocation function copies and splits the training data up among the trees (`M1`, `M2`, etc.)
+- Each tree trains on its subset of the training data
+- The combination function weights the predictions of each tree
+- The final prediction is the sum of the weighted predictions
+
+## Ensemble method of choice: Gradient Boosted Trees (GBT)
+
+- GBTs are also known as Gradient Boosting Machines (GBMs)
+- [XGBoost](https://en.wikipedia.org/wiki/XGBoost) is a popular implementation that wins many machine learning competitions
+
+### Aside: Why "gradient?"
+
+- This method uses the slope of the error to guide improvements
+- For a given prediction, the gradient is the derivative of the loss function
+- By following the gradient (i.e., the direction of the steepest error reduction), the model gradually improves its predictions
+
+### Description of gradient boosting algorithm
+
+::: {.r-fit-text}
+1. Select a random subset of the training data.
+2. Build a decision tree on this subset to predict values.
+3. Compute residuals (prediction errors) from this tree and scale them by a small **learning rate**. This prevents any one tree from dominating.
+4. Select another random subset of the training data.
+5. Build a new decision tree to predict these scaled residuals.
+6. Repeat this process, adding trees that successively correct previous errors.
+7. Produce final predictions by combining (ensemble) all the trees’ contributions.
+:::
+
+## Implementing GBTs
+
+We're going to use:^[This is an updated version of [this](https://www.r-bloggers.com/2020/05/using-xgboost-with-tidymodels/) tutorial.]
+
+- `tidymodels`
+- [`parsnip::boost_tree()`](https://parsnip.tidymodels.org/reference/boost_tree.html), which makes it easy to use `xgboost`
+
+### Data
+
+We going to predict housing prices in Ames, Iowa.
+
+```{r}
+#| echo: false
+
+library(tidymodels)
+library(tidyverse)
+library(AmesHousing)
+library(janitor)
+library(future)
+library(xgboost)
+library(pdp)
+
+all_cores <- parallel::detectCores(logical = FALSE)
+plan(multisession, workers = all_cores)
+
+set.seed(123)
+theme_set(theme_minimal())
+
+ames <- make_ames() |>
+  janitor::clean_names()
+```
+
+```{r}
+ames |> glimpse()
+```
+
+### Exploratory data analysis
+
+#### Price
+
+```{r}
+#| echo: false
+
+ames |>
+  ggplot(aes(x = sale_price)) +
+  geom_density(fill = "red", alpha = 0.5) +
+  scale_x_continuous(labels = scales::dollar_format()) +
+  labs(title = "Density plot of house sale prices")
+```
+
+#### Square footage
+
+```{r}
+#| echo: false
+
+ames |>
+  ggplot(aes(x = gr_liv_area)) +
+  geom_density(fill = "blue", alpha = 0.5) +
+  labs(title = "Density plot of house square footage")
+```
+
+#### Year built
+
+```{r}
+#| echo: false
+
+ames |>
+  ggplot(aes(x = year_built)) +
+  geom_density(fill = "yellow", alpha = 0.5) +
+  labs(title = "Density plot of the year in which the house was built")
+```
+
+#### Garage size (cars)
+
+```{r}
+#| echo: false
+
+ames |>
+  ggplot(aes(x = garage_cars)) +
+  geom_bar(fill = "orange", alpha = 0.5) +
+  scale_x_continuous(breaks = ames |> distinct(garage_cars) |> pull()) +
+  labs(title = "Bar chart of the number of cars in each house's garage")
+```
+
+### Splitting
+
+Note that we are stratifying on `sale_price`:
+
+```{r}
+ames_split <- initial_split(ames, prop = 0.8, strata = sale_price)
+ames_train <- training(ames_split)
+ames_test <- testing(ames_split)
+```
+
+### Preprocessing recipe
+
+Unlike kNN, GBT does *not* require normalizing data.
+
+```{r}
+ames_recipe <- recipe(sale_price ~ ., data = ames_train) |>
+  step_string2factor(all_nominal_predictors()) |>
+  step_other(all_nominal_predictors(), threshold = 0.01) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_nzv(all_predictors())
+```
+
+#### `step_` functions
+
+- `step_string2factor()`: Converts character columns to factors.  
+- `step_other()`: Groups infrequent factor levels into an "Other" category based on a frequency threshold (e.g., 1%).  
+- `step_dummy()`: Converts factor variables into one-hot encoded (binary) dummy variables.  
+- `step_nzv()`: Removes near-zero variance predictors (i.e., columns with very little variation that provide minimal predictive value).  
+
+### Set up cross validation
+
+We are using three-fold here **solely** to reduce processing time. Five to ten folds are recommended.
+
+```{r}
+ames_folds <- vfold_cv(ames_train, v = 3)
+```
+
+### Specify the model
+
+Although we use this for *regression*, XGBoost can also be used for classification by changing the `mode` and the `objective`.
+
+```{r}
+xgb_model <- boost_tree(
+  mode = "regression",
+  trees = 500,
+  min_n = tune(),
+  tree_depth = tune(),
+  learn_rate = tune(),
+  loss_reduction = tune()
+) |>
+  set_engine("xgboost", objective = "reg:squarederror")
+```
+
+### Hyperparameter tuning
+
+```{r}
+xgb_params <- parameters(
+  min_n(),
+  tree_depth(),
+  learn_rate(),
+  loss_reduction()
+)
+xgb_grid <- grid_space_filling(xgb_params, size = 20)
+```
+
+### Hyperparameter grid
+
+```{r}
+xgb_grid
+```
+
+
+#### What are these parameters?
+
+  - `min_n`: Minimum number of data points required in a node before it can split.
+  - `tree_depth`: Maximum depth of each decision tree (controls complexity).
+    - Larger values risk overfitting; smaller values might underfit.
+  - `learn_rate`: Controls the contribution of each tree; smaller values require more trees but generalize better.
+  - `loss_reduction`: Minimum improvement required to make a further split.
+
+#### What are other parameters we could tune?
+
+::: {.r-fit-text}
+  - `subsample`: fraction of rows used per boosting round; reduces overfitting (stochastic boosting).
+  - `colsample_bytree`: fraction of columns (features) randomly selected per tree; reduces overfitting.
+  - `early_stopping_rounds`: stops training when validation error stops improving.
+  - Regularization parameters (`lambda` and `alpha`): penalize complex models to reduce overfitting. 
+  - `early_stopping_rounds`: automatically stops training when validation performance plateaus.
+
+:::
+
+### Workflow
+
+```{r}
+xgb_wf <- workflow() |>
+  add_recipe(ames_recipe) |>
+  add_model(xgb_model)
+```
+
+### Tuning
+
+```{r}
+xgb_tune <- tune_grid(
+  xgb_wf,
+  resamples = ames_folds,
+  grid = xgb_grid,
+  metrics = metric_set(rmse, rsq, mae),
+  control = control_grid(verbose = TRUE)
+)
+
+# Check tuning notes for troubleshooting
+show_notes(xgb_tune)
+```
+
+### Selecting the best hyperparameters for final fit
+
+```{r}
+best_params <- select_best(xgb_tune, metric = "rmse")
+
+final_wf <- finalize_workflow(xgb_wf, best_params)
+
+final_fit <- final_wf |> fit(data = ames_train)
+```
+
+### Evaluate training data performance
+
+```{r}
+train_preds <- predict(final_fit, ames_train) |>
+  bind_cols(ames_train)
+
+train_preds |>
+  metrics(truth = sale_price, estimate = .pred) |>
+  mutate(.estimate = round(.estimate, 2))
+```
+
+### Evaluate testing data performance
+
+The ideal is that the model performs identically on the training and testing data. In reality, it will perform slightly worse on the testing data.
+
+If the model performs much better on training data than testing data, that almost certainly means that it **overfit**.
+
+```{r}
+test_preds <- predict(final_fit, ames_test) |>
+  bind_cols(ames_test)
+
+test_preds |>
+  metrics(truth = sale_price, estimate = .pred) |>
+  mutate(.estimate = round(.estimate, 2))
+```
+
+### Evaluate performance visually
+
+Plotting residuals can reveal bias. Ideally, the errors will be randomly distributed around zero.
+
+```{r}
+#| output-location: slide
+
+test_residuals <- test_preds |>
+  mutate(residual_pct = (sale_price - .pred) / .pred)
+
+ggplot(test_residuals, aes(x = residual_pct)) +
+  geom_histogram(bins = 30, alpha = 0.5) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
+  labs(x = "Error percentage") +
+  scale_x_continuous(labels = scales::percent)
+```
+
+## Interpretation
+
+In addition to measuring its performance on metrics like `rmse`, `rsq`, and `mae`, we can interpret the model to understand *how* it makes predictions.
+
+### Identifying important features
+
+`Gain` measures how much a feature improves model accuracy when used for splitting.
+
+```{r}
+final_model <- final_fit |> extract_fit_engine()
+
+importance_df <- xgb.importance(model = final_model) |>
+  as_tibble() |>
+  arrange(desc(Gain)) |>
+  slice_head(n = 10)
+
+importance_df
+```
+
+### Partial dependence plot
+
+Partial dependence plots show how the model's predictions change as a feature varies, while holding all other features constant.
+
+```{r}
+#| echo: false
+
+# Extract the prepped predictors from the fitted workflow
+prepped_data <- final_fit |>
+  extract_recipe() |>
+  bake(new_data = ames_train) |>
+  select(-sale_price) # remove target variable
+
+# Compute the partial dependence for the feature "gr_liv_area"
+pdp_gr_liv_area <- partial(
+  object = final_model,
+  pred.var = "gr_liv_area",
+  train = prepped_data,
+  grid.resolution = 20
+)
+
+# Plot the partial dependence
+autoplot(pdp_gr_liv_area) +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  labs(
+    title = "Partial Dependence Plot for gr_liv_area",
+    x = "Living Area (square feet)",
+    y = "Predicted Sale Price"
+  )
+```
+
+## Summary: Trees
+
+Gradient Boosted Trees (GBTs) sequentially fit decision trees on the residuals of prior models.
+
+- **Decision Trees** form the building blocks by splitting data into regions that maximize information gain.
+- **Bias and Variance:** Balancing these is essential for model performance, with decision trees prone to high variance if over-complex.
+- **Ensemble Methods:** Combining multiple trees—each contributing a small part—helps to mitigate overfitting and improve predictions.
+
+## Summary: Gradient boosted trees
+
+::: {.r-fit-text}
+- **Gradient Boosting:** By iteratively adding trees that correct previous errors, gradient boosting leverages the strengths of each tree.
+- **Practical Implementation:** Using `tidymodels` and `xgboost`, we demonstrated how to build, tune, and evaluate a gradient boosted model on the Ames housing dataset.
+- Gradient boosted trees are great for regression and classification tasks, especially when combined with systematic hyperparameter tuning and proper data preprocessing.
+  - These models generalize well while effectively managing the bias–variance tradeoff.
+  
+:::

@@ -246,7 +246,7 @@ This converts categorical variables into [dummy variables](https://en.wikipedia.
 
 hitters_train |>
   select(League) |>
-  slice_sample(n = 4)
+  slice_head(n = 4)
 ```
 
 After conversion, the `League` variables will look like this:
@@ -256,7 +256,7 @@ After conversion, the `League` variables will look like this:
 
 hitters_train |>
   select(League) |>
-  slice_sample(n = 4) |>
+  slice_head(n = 4) |>
   dummy_cols() |>
   select(!League)
 ```
@@ -455,6 +455,7 @@ You will notice that the only difference between the lasso and elastic net model
 
 ```{r}
 enet_model <- linear_reg(penalty = tune(), mixture = tune()) |>
+  set_mode("regression") |>
   set_engine("glmnet")
 ```
 

@@ -210,11 +210,11 @@ Meeting  Date      Topic
          03-10     *Spring Break*
          03-12     *Spring Break*
 15       03-17     Gradient boosted trees
-16       03-19     Word embeddings
-17       03-24     Network analysis
-18       03-26     Topic modeling
-19       03-31     Web Scraping
-20       04-02     Text and data cleaning
+16       03-19     Logistic regression 
+17       03-24     Word embeddings
+18       03-26     Network analysis 
+19       03-31     Topic modeling
+20       04-02     Web scraping
 21       04-07     LLMs
 22       04-09     **Group Project 3 workshop**
 23       04-14     **Code Interviews**
