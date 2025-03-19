@@ -1,0 +1,411 @@
+---
+title: "Logistic Regression and Classification"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  cache: true
+  echo: true
+  message: false
+  warning: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    toc: true
+    toc-depth: 2
+    slide-level: 4
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+## From regression to classification
+
+- Last time, we predicted a continuous variable (house price) using gradient boosted trees (GBT)
+- To understand how to predict categorical variables, it will help to understand logistic regression
+- Logistic regression is a classification method that estimates probabilities for categorical outcomes.
+- GBTs can perform similar classification tasks but use decision trees instead of logistic curves.
+
+### Example: Studying
+
+Can you predict how likely a student is to pass an exam based on the number of hours that they study?
+
+In `passed`, `0` is `FALSE` and `1` is `TRUE`.
+
+```{r}
+#| echo: false
+
+library(tidyverse)
+library(tidymodels)
+library(xgboost)
+library(parallel)
+library(future)
+
+all_cores <- parallel::detectCores()
+plan(multisession, workers = all_cores)
+
+set.seed(123)
+
+study_data <- tribble(
+  ~hours_studied, ~passed, ~grade,
+  0.50, 0, 45,
+  0.75, 0, 48,
+  1.00, 0, 50,
+  1.25, 0, 52,
+  1.50, 0, 54,
+  1.75, 0, 55,
+  1.75, 1, 62,
+  2.00, 0, 56,
+  2.25, 1, 60,
+  2.50, 0, 57,
+  2.75, 1, 62,
+  3.00, 0, 59,
+  3.25, 1, 65,
+  3.50, 0, 61,
+  4.00, 1, 68,
+  4.25, 1, 70,
+  4.50, 1, 72,
+  4.75, 1, 74,
+  5.00, 1, 75,
+  5.50, 1, 78
+)
+
+study_data <- study_data |> mutate(passed = as_factor(passed))
+
+study_data |> arrange(hours_studied)
+```
+
+### Review: [Linear regression](https://en.wikipedia.org/wiki/Linear_regression)
+
+For our two continuous variables---grades and hours studied---we fit a line using [least squares](https://en.wikipedia.org/wiki/Least_squares).
+
+```{r}
+#| echo: false
+
+study_data |>
+  ggplot(aes(x = hours_studied, y = grade, color = passed)) +
+  geom_point(size = 5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(x = "Hours Studied", y = "Grade", title = "Linear Regression") +
+  scale_color_manual(values = c("red", "black"), labels = c("No", "Yes")) +
+  geom_hline(yintercept = 60, linetype = "dashed", color = "gray") +
+  theme_minimal()
+```
+
+### Interpreting linear regression: estimates
+
+```{r}
+lm_model <- linear_reg() |>
+  set_engine("lm") |>
+  set_mode("regression")
+
+lm_fit <- lm_model |>
+  fit(grade ~ hours_studied, data = study_data)
+
+lm_fit |> tidy()
+```
+
+```{r}
+#| echo: false
+
+hours_est <- lm_fit |>
+  tidy() |>
+  filter(term == "hours_studied") |>
+  pull(estimate) |>
+  round(2)
+```
+
+Each additional hour of studying is associated with an average increase of `{r} hours_est` points on exam grades.
+
+### Interpreting linear regression: $R^2$
+
+And the $R^2$ shows that this linear model explains almost all of the variance in this data:
+
+```{r}
+#| echo: false
+
+lm_fit |> glance()
+```
+
+### [Logistic regression](https://en.wikipedia.org/wiki/Logistic_regression)
+
+What if you wanted to use that data to figure out how little you could study while still being likely to pass?
+
+### Visualizing output
+
+Hours studied remain on the x-axis, while the y-axis represents the probability of passing the exam
+
+```{r}
+#| echo: false
+
+logistic_model <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+logistic_fit <- logistic_model |>
+  fit(passed ~ hours_studied, data = study_data)
+
+prediction_data <- tibble(hours_studied = seq(0, 6, length.out = 100)) %>%
+  mutate(passed_prob = predict(logistic_fit, new_data = ., type = "prob")$.pred_1)
+
+lr_plot <- ggplot(study_data, aes(x = hours_studied, y = as.numeric(passed) - 1, color = passed)) +
+  geom_point(size = 5) +
+  geom_line(data = prediction_data, aes(y = passed_prob), color = "blue", linewidth = 2) +
+  labs(x = "Hours Studied", y = "Probability of Passing", title = "Logistic Regression Curve", color = "Passed") +
+  scale_color_manual(values = c("red", "black"), labels = c("No", "Yes")) +
+  theme_minimal()
+
+lr_plot
+```
+
+### Characteristics of logistic regression
+
+- Predicts categorical outcomes (yes/no, pass/fail).
+- Outputs probabilities between 0 and 1.
+- Models probabilities with an S-shaped curve (logistic function).
+- Shows the impact of each predictor on the outcome.
+- Predicts log-odds, which are converted to probabilities or odds ratios for interpretation.
+
+### How logistic regression works
+
+- Set outcomes as indicator variables (e.g., `pass = 1`)
+- Fit a logistic function (S-shaped curve) to the data by maximizing the likelihood of observing the outcomes.
+- Choose the curve that minimizes prediction errors across all data points.
+- Set a cutoff (often 0.5) to classify predictions.
+- The curve predicts how each additional unit of input (e.g., +1 hour of studying) changes the *probability* of the outcome (i.e., probability of passing).
+
+### Useful and easy to interpret
+
+e.g., In this model, going between 2 and 3 hours of studying is the "tipping point" for probably passing, but studying more than 4 hours has diminishing returns.
+  
+```{r}
+#| echo: false
+
+lr_plot
+```
+
+### Assumptions and limitations
+
+- Observations are independent.
+  - e.g., Each student only took the test once.
+- No multicollinearity among predictors.
+  - e.g., hits, runs, career hits, and career runs
+- Linear relationship between predictors and log-odds
+- Logistic regression struggles with predictors that have complex, nonlinear relationships with outcomes.
+  - GBTs often do better in these cases.
+
+### Learn more
+
+Here is a series of videos that you can watch if you want to go deeper into the details of logistic regression:
+
+- [Logistic Regression](https://www.youtube.com/watch?v=vN5cNN2-HWE)
+- [$R^2$ for LR](https://www.youtube.com/watch?v=xxFYro8QuXA)
+- [Odds vs. log(odds)](https://www.youtube.com/watch?v=ARfXDSkQf1Y)
+- [Odds ratios](https://www.youtube.com/watch?v=8nm0G-1uJzA)
+- [Maximum Likelihood Estimation](https://www.youtube.com/watch?v=BfKanl1aSG0)
+
+## Real data: Graduate school admissions
+
+Let's apply logistic regression to real data about admissions to graduate school.^[This builds on [this tutorial](https://stats.oarc.ucla.edu/r/dae/logit-regression/).]
+
+### Data
+
+```{r}
+#| echo: false
+
+admissions <- read_csv("../data/admissions.csv") |>
+  mutate(admit = as_factor(admit), rank = as_factor(rank))
+
+admissions
+```
+
+- `admit`: 0 if rejected; 1 if admitted
+- `rank`: tiered rank of applicant's undergrad institution, with 1 as highest and 4 as lowest tier
+
+### Logistic regression model
+
+```{r}
+#| output-location: slide
+
+logit_recipe <- recipe(admit ~ ., data = admissions)
+
+logit_spec <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+logit_wf <- workflow() |>
+  add_recipe(logit_recipe) |>
+  add_model(logit_spec)
+
+logit_fit <- logit_wf |> fit(admissions)
+
+logit_fit |> tidy()
+```
+
+```{r}
+#| echo: false
+
+gpa_est <- logit_fit |>
+  tidy() |>
+  filter(term == "gpa") |>
+  pull(estimate) |>
+  round(2)
+```
+
+### Interpreting estimates
+
+:::{.callout-warning}
+You can't interpret logistic regression coefficients in the same way as linear regression coefficients. Logistic regression coefficients are log-odds, not points on a scale.
+:::
+
+Logistic regression coefficients represent log-odds. Exponentiating these coefficients converts them into odds ratios, which show how much the odds of the outcome multiply with each unit increase in a predictor.
+
+```{r}
+gpa_or <- gpa_est |>
+  exp() |>
+  round(2)
+gpa_or
+```
+
+Here, a one point increase in GPA is associated with a rough doubling in the odds of admission.
+
+### Key points about logistic regression
+
+- Unlike linear regression, which estimates continuous variables, logistic regression estimates probabilities.
+  - The coefficients are log-odds, which can be converted to probabilities or odds ratios for interpretation.
+- You can use the fitted model to predict outcomes for new data.
+  - Often this is used to estimate the probability of a binary outcome for unobserved data (e.g., new applicants).
+
+## Using gradient boosted trees for classification
+
+- Like logistic regression, GBTs can be used for classification
+- Where logistic regression fits a curve to all of the data, GBTs fit a series of decision trees, as we saw with regression
+- Like logistic regression but unlike linear regression, when used for classification, GBTs output *probabilities*
+
+### Implementation
+
+#### Split and recipe
+
+```{r}
+admissions_split <- initial_split(admissions, prop = 0.8, strata = admit)
+admissions_train <- training(admissions_split)
+admissions_test <- testing(admissions_split)
+
+admission_recipe <- recipe(admit ~ ., data = admissions_train) |>
+  step_dummy(all_nominal_predictors())
+```
+
+#### Model specification, workflow, and folds
+
+```{r}
+xgb_tune_spec <- boost_tree(
+  trees = tune(),
+  tree_depth = tune(),
+  min_n = tune(),
+  learn_rate = tune(),
+  loss_reduction = tune()
+) |>
+  set_engine("xgboost") |>
+  set_mode("classification")
+
+admission_wf <- workflow() |>
+  add_recipe(admission_recipe) |>
+  add_model(xgb_tune_spec)
+
+folds <- vfold_cv(admissions_train, v = 10, strata = admit)
+```
+
+#### Making a grid
+
+`extract_parameter_set_dials` takes the parameters we set to `tune()` in the model specification, which we use to create a grid of possible values.
+
+```{r}
+xgb_params <- extract_parameter_set_dials(admission_wf)
+xgb_grid <- grid_space_filling(xgb_params, size = 20)
+xgb_grid
+```
+
+#### Tuning the model
+
+```{r}
+tune_results <- admission_wf |>
+  tune_grid(
+    resamples = folds,
+    grid = xgb_grid,
+    metrics = metric_set(roc_auc, accuracy),
+    control = control_grid(save_pred = TRUE)
+  )
+```
+
+#### Aside: The `roc_auc` metric?
+
+- The [ROC curve](https://en.wikipedia.org/wiki/Receiver_operating_characteristic) is a plot of the true positive rate against the false positive rate for different cutoffs.
+- AUC measures the area under that curve.
+- AUC is good for evaluating classification models, especially when class distribution is imbalanced, because it assesses performance across all thresholds rather than relying on a single cutoff.
+  - If you prioritize accuracy alone when most applicants are rejected, the model may reject everyone to maximize accuracy!
+- [More information about this metric](https://www.youtube.com/watch?v=4jRBRDbJemM)
+
+#### Best parameters and finalizing the workflow
+
+```{r}
+best_auc <- select_best(tune_results, metric = "roc_auc")
+
+final_xgb_wf <- admission_wf |> finalize_workflow(best_auc)
+
+final_xgb_fit <- final_xgb_wf |> fit(data = admissions_train)
+
+admissions_test_results <- final_xgb_fit |>
+  predict(admissions_test, type = "prob") |>
+  bind_cols(predict(final_xgb_fit, admissions_test)) |>
+  bind_cols(admissions_test)
+
+admissions_test_results
+```
+
+#### Final fit
+
+```{r}
+best_auc <- tune_results |> select_best(metric = "roc_auc")
+
+final_xgb_wf <- admission_wf |> finalize_workflow(best_auc)
+
+final_xgb_fit <- final_xgb_wf |> fit(data = admissions_train)
+
+final_xgb_fit
+```
+
+#### Evaluation
+
+```{r}
+admissions_test_results |> conf_mat(truth = admit, estimate = .pred_class)
+
+admissions_test_results |> accuracy(truth = admit, estimate = .pred_class)
+
+admissions_test_results |> roc_auc(truth = admit, .pred_1)
+```
+
+#### Descriptive evaluation
+
+- The model's overall accuracy is about 70%.
+  - This is better than random guessing, but not by a ton.
+- This model does a better job predicting who will be rejected than who will be admitted.
+- If the dataset were larger, we might expect better performance.
+
+## Summary
+
+- Both logistic regression and GBTs can be used for classification.
+  - Logistic regression fits an S-shaped curve to the data
+  - GBTs fit a series of decision trees
+- Both produce predictions as probabilities.
+- Both models can be used to predict outcomes for new data, or describe the relationships between predictors and outcomes in the training data.
