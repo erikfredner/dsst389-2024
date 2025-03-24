@@ -33,8 +33,8 @@ nocite: |
 
 header-includes:
   - \usepackage{fontspec}
-  - \setmainfont{Atkinson Hyperlegible}
-  - \setsansfont{Atkinson Hyperlegible}
+  - \setmainfont{Atkinson Hyperlegible Next}
+  - \setsansfont{Atkinson Hyperlegible Next}
   - \setmonofont{IBM Plex Mono}
   - \usepackage{sectsty}
   - \allsectionsfont{\sffamily}

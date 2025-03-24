@@ -144,7 +144,7 @@ What if you wanted to use that data to figure out how little you could study whi
 
 ### Visualizing output
 
-Hours studied remain on the x-axis, while the y-axis represents the probability of passing the exam
+Hours studied remain on the x-axis, while the y-axis represents the *probability* of passing the exam
 
 ```{r}
 #| echo: false
@@ -171,7 +171,7 @@ lr_plot
 
 ### Characteristics of logistic regression
 
-- Predicts categorical outcomes (yes/no, pass/fail).
+- Predicts categorical outcomes (yes|no, pass|fail).
 - Outputs probabilities between 0 and 1.
 - Models probabilities with an S-shaped curve (logistic function).
 - Shows the impact of each predictor on the outcome.
@@ -278,8 +278,6 @@ gpa_or <- gpa_est |>
 gpa_or
 ```
 
-Here, a one point increase in GPA is associated with a rough doubling in the odds of admission.
-
 ### Key points about logistic regression
 
 - Unlike linear regression, which estimates continuous variables, logistic regression estimates probabilities.
@@ -373,16 +371,13 @@ admissions_test_results <- final_xgb_fit |>
 admissions_test_results
 ```
 
-#### Final fit
+
+#### Which features matter the most?
 
 ```{r}
-best_auc <- tune_results |> select_best(metric = "roc_auc")
+final_xgb_object <- extract_fit_engine(final_xgb_fit)
 
-final_xgb_wf <- admission_wf |> finalize_workflow(best_auc)
-
-final_xgb_fit <- final_xgb_wf |> fit(data = admissions_train)
-
-final_xgb_fit
+xgb.importance(model = final_xgb_object)
 ```
 
 #### Evaluation

@@ -1,0 +1,713 @@
+---
+title: "Word Vectors"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  cache: true
+  echo: true
+  message: false
+  warning: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    toc: true
+    toc-depth: 2
+    slide-level: 4
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+## Code Interviews
+
+### Structure
+
+- Interviews are individual, will take place during our regular class period, and will last approximately five minutes.
+- During your interview, I will present you with chunks of code pulled from the notebooks and slides.
+- I will ask you either a specific question about the code (e.g., “What does `function()` do here?”) or a more conceptual one (e.g., “Why is lasso regularization a good choice for this data set?”)
+- Each question will take less than a minute.
+
+### Evaluation
+
+- The code interview is worth 10% of your grade in the course.
+- I am looking for evidence of your attention to and knowledge of course materials *without* being able to look anything up.
+- I will award partial credit on questions, so “I know *X* but I don’t know *Y*” can be a good response.
+
+### Preparation
+
+- Review all slides and notebooks.
+- Practice answering questions about code *succinctly* out loud.
+  - If you are not succinct enough, you may not be able to finish all of the questions in the allotted time.
+  - Partner with someone from class to quiz one another.
+  - If you study alone, practice giving your answers out loud.
+  - Time yourself during practice.
+
+### Other points
+
+- If you get a question to which you don't know the answer, skip it and come back later.
+  - Don't waste your time when you may get the others right.
+- If you are unable to attend class on April 14 , please let me know as soon as possible.
+
+### Questions about the code interview?
+
+## Project 2
+
+- Overall, most folks did well.
+- I want to discuss some recurring limitations with the analyses.
+
+### Issues
+
+- Setting Quarto output to be a PDF rather than HTML.
+  - `format: pdf` in the YAML
+  - Or, File > New > Quarto Document > PDF
+- Not using term frequencies
+- Not checking for $R^2$ values in linear models
+- Not stating expected values
+- Testing differences in means: eyeballing, t-test, ANOVA
+
+### Data
+
+```{r}
+#| echo: false
+
+library(tidyverse)
+library(tidytext)
+library(tidymodels)
+library(textrecipes)
+library(textdata)
+library(proxy)
+library(glmnet)
+library(ggrepel)
+set.seed(123)
+
+songs <- read_tsv("../data/swift_corpus/cots-song-details.tsv") |>
+  select(Album, Track, Title, FeaturedArtists, FromTheVault) |>
+  rename(song_title = Title)
+
+albums <- read_tsv("../data/swift_corpus/cots-album-details.tsv") |>
+  select(Code, Title, SubTitle, Year) |>
+  rename(album_title = Title)
+
+lyrics <- read_tsv(
+  file = "../data/swift_corpus/cots-lyric-details.tsv",
+  col_names = FALSE
+)
+
+lyrics <- lyrics |>
+  rename(metadata = 1, text = 2) |>
+  separate(
+    metadata,
+    into = c("album_code", "track", "line", "part"),
+    sep = ":",
+    convert = TRUE
+  )
+
+lyrics <- lyrics |>
+  left_join(albums, join_by(album_code == Code)) |>
+  left_join(songs, join_by(album_code == Album, track == Track)) |>
+  mutate(part = case_when(
+    part == "V" ~ "Verse",
+    part == "C" ~ "Chorus",
+    part == "B" ~ "Bridge",
+    part == "I" ~ "IntroOutro",
+    part == "R" ~ "Refrain",
+    TRUE ~ part
+  )) |>
+  rename(
+    album_subtitle = SubTitle,
+    year = Year,
+    featured_artists = FeaturedArtists,
+    from_the_vault = FromTheVault
+  ) |>
+  select(
+    song_title, featured_artists, album_code, album_title,
+    album_subtitle, track, from_the_vault, year,
+    line, part, text
+  )
+```
+
+```{r}
+lyrics |>
+  group_by(album_title) |>
+  slice_sample(n = 1) |>
+  select(song_title, line, text)
+```
+
+### Term frequencies
+
+When you are comparing documents (e.g., albums, books) to each other, converting word counts to term frequencies accounts for *absolute* differences in document length.
+
+#### Why is using counts a problem?
+
+If you compare counts, longer documents will "win" on more metrics than they should. For example, let's observe the relationship between song *length* and the number of *sentiment* words:
+
+```{r}
+#| output-location: slide
+
+afinn <- get_sentiments("afinn")
+
+len <- lyrics |>
+  unnest_tokens(word, text) |>
+  left_join(afinn, join_by(word)) |>
+  mutate(
+    value = replace_na(value, 0),
+    value = if_else(value != 0, 1, 0)
+  ) |>
+  group_by(album_title, song_title) |>
+  summarize(
+    afinn_net = sum(value),
+    word_count = n(),
+    .groups = "drop"
+  )
+
+len_model <- lm(afinn_net ~ word_count, data = len)
+len_model_r2 <- glance(len_model) |> pull(r.squared)
+
+len |>
+  ggplot(aes(x = word_count, y = afinn_net)) +
+  geom_point() +
+  geom_text_repel(aes(label = song_title)) +
+  geom_smooth(method = "lm") +
+  annotate(
+    geom = "text",
+    x = 950,
+    y = 5,
+    label = paste("R² =", round(len_model_r2, 2)),
+  )
+```
+
+
+#### Calculating term frequencies
+
+Below, I calculate term frequencies by album:
+
+```{r}
+#| output-location: slide
+
+lyrics |>
+  unnest_tokens(word, text) |>
+  count(album_title, word) |>
+  group_by(album_title) |>
+  mutate(word_freq = n / sum(n)) |>
+  arrange(desc(word_freq)) |>
+  slice_head(n = 1)
+```
+
+### $R^2$ in linear models
+
+- Many projects analyzed the sentiment of Swift's lyrics over time on the hypothesis that sentiment scores would *decrease* over time.
+- We know several ways to fit linear models to the data.
+- Especially when the fit is not good, we should check and report the $R^2$ value.
+  - Low $R^2$ should also cause us to reconsider linear models and/or our hypothesis.
+
+#### Setup
+
+```{r}
+#| output-location: slide
+
+album_afinn <- lyrics |>
+  unnest_tokens(word, text) |>
+  left_join(afinn, join_by(word)) |>
+  mutate(value = replace_na(value, 0)) |>
+  group_by(album_title, year) |>
+  summarize(
+    afinn_net = sum(value),
+    word_count = n(),
+    afinn_normalized = afinn_net / word_count,
+    .groups = "drop"
+  ) |>
+  mutate(afinn_normalized = scale(afinn_normalized)) |>
+  drop_na(year) |>
+  arrange(year)
+
+album_afinn
+```
+
+#### Basic `lm` plot with `geom_smooth`
+
+The standard error (`se`) on this chart is huge! A couple of possible explanations:
+
+- One observation in 2006; the rest in the 2010s
+- Only a few observations (albums); could get more observations by song
+- A linear model may not be the best way to describe this data
+
+```{r}
+#| output-location: slide
+
+album_afinn |>
+  ggplot(aes(x = year, y = afinn_normalized)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(title = "Visibly bad R^2!")
+```
+
+#### Checking $R^2$
+
+We have seen two ways to do this:
+
+```{r}
+model <- lm(afinn_normalized ~ year, data = album_afinn)
+
+model |> glance()
+
+model |> summary()
+```
+
+#### Evaluating $R^2$
+
+- $R^2$ measures how well a linear model fits the data:
+  - Values close to **1** indicate a good fit. The model explains most of the variability.
+  - Values close to **0** indicate a bad fit. The model explains little variability.
+- Rough heuristics for interpreting $R^2$:
+  - $R^2 < 0.3$: Weak fit; not much explanatory power.
+  - $0.3 ≤ R^2 < 0.7$: Moderate fit; explains some variability.
+  - $R^2 ≥ 0.7$: Strong fit; explains much of the variability.
+  
+#### Using $R^2$
+
+- Report the $R^2$ for linear models.
+  - This is *especially* important when $R^2 < 0.7$
+- You can't and shouldn't rely solely on $R^2$ to evaluate a model.
+- Multiple R-squared vs. Adjusted R-squared:
+  - Multiple R-squared shows the proportion of variance explained by the predictors.
+  - Adjusted R-squared penalizes adding extra predictors that don’t significantly improve the model.
+  - When comparing models, prefer **Adjusted R-squared**, as it accounts for the number of predictors and prevents overfitting.
+
+#### In this case, is low $R^2$ a function of few observations?
+
+To check, we're going to calculate net sentiment 1) per *song* 2) since 2015, then 3) fit a linear model:
+
+```{r}
+#| output-location: slide
+
+song_afinn <- lyrics |>
+  unnest_tokens(word, text) |>
+  left_join(afinn, join_by(word)) |>
+  mutate(value = replace_na(value, 0)) |>
+  group_by(album_title, song_title, year) |>
+  summarize(
+    afinn_net = sum(value),
+    word_count = n(),
+    afinn_normalized = afinn_net / word_count,
+    .groups = "drop"
+  ) |>
+  filter(year >= 2015)
+
+song_afinn |>
+  ggplot(aes(x = year, y = afinn_normalized)) +
+  geom_jitter(aes(color = album_title)) +
+  geom_smooth(method = "lm", color = "black") +
+  scale_color_brewer(palette = "Set3")
+```
+
+#### Checking $R^2$ for the new model
+
+- A linear model does not fit this data well.
+  - We can see that from the low $R^2$ and high p-value.
+- But that does *not* mean that there is not a difference between these groups!
+
+```{r}
+model <- lm(afinn_normalized ~ year, data = song_afinn)
+
+model |> summary()
+```
+
+### Observed values
+
+```{r}
+#| output-location: slide
+
+album_afinn |>
+  filter(year >= 2015) |>
+  mutate(afinn_normalized = scale(afinn_normalized)) |>
+  ggplot(aes(x = afinn_normalized, y = fct_reorder(album_title, year))) +
+  geom_col()
+```
+
+### Expected values
+
+- State what you expect to see!
+  - e.g., More recent albums will have below-average sentiment scores.
+
+```{r}
+#| output-location: slide
+
+album_afinn |>
+  filter(year >= 2015) |>
+  mutate(
+    afinn_avg = mean(afinn_normalized),
+    afinn_ratio = scale(afinn_normalized / afinn_avg)
+  ) |>
+  ggplot(aes(x = afinn_ratio, y = fct_reorder(album_title, year))) +
+  geom_col()
+```
+
+#### A lagged value
+
+Alternatively, you could [`lag()`](https://dplyr.tidyverse.org/reference/lead-lag.html) these values to see if the sentiment in an album is lower than in the previous album:
+
+```{r}
+album_lagged <- album_afinn |>
+  filter(year >= 2015) |>
+  mutate(
+    afinn_lag = lag(afinn_normalized),
+    afinn_ratio = scale(afinn_normalized / afinn_lag)
+  )
+
+album_lagged |>
+  select(afinn_normalized, afinn_lag, afinn_ratio)
+```
+
+#### Plotting lagged values
+
+```{r}
+album_lagged |>
+  ggplot(aes(x = afinn_ratio, y = fct_reorder(album_title, year))) +
+  geom_col()
+```
+
+### Differences between averages
+
+- Many projects compared differences in average sentiment on the hypothesis that more recent albums should be more negative.
+- One way we have visualized this kind of analysis is with a boxplot and jittered points.
+- But this does not tell us if these differences are *statistically significant*.
+
+```{r}
+#| output-location: slide
+
+song_afinn |>
+  ggplot(aes(y = album_title, x = afinn_normalized)) +
+  geom_boxplot() +
+  geom_jitter(alpha = 0.2)
+```
+
+#### Testing differences in means: t-test
+
+- [Welch's t-test](https://en.wikipedia.org/wiki/Welch%27s_t-test) is a common way to test if the difference in means is significant.
+- We'll treat the first five albums *chronologically* as one group, and last five as another for purposes of this demonstration.
+
+```{r}
+#| echo: false
+
+album_order <- tribble(
+  ~album_title, ~order,
+  "Fearless", 1, # 2008
+  "Speak Now", 2, # 2010
+  "Red", 3, # 2012
+  "1989", 4, # 2014
+  "Reputation", 5, # 2017
+  "Lover", 6, # 2019
+  "Folklore", 7, # 2020 (July)
+  "Evermore", 8, # 2020 (December)
+  "Midnights", 9, # 2022
+  "The Tortured Poets Department", 10
+)
+```
+
+
+```{r}
+#| output-location: slide
+
+song_afinn <- lyrics |>
+  left_join(album_order, join_by(album_title)) |>
+  drop_na(order) |>
+  unnest_tokens(word, text) |>
+  left_join(afinn, join_by(word)) |>
+  mutate(value = replace_na(value, 0)) |>
+  group_by(album_title, song_title, order) |>
+  summarize(
+    afinn_net = sum(value),
+    word_count = n(),
+    afinn_normalized = afinn_net / word_count,
+    .groups = "drop"
+  ) |>
+  mutate(afinn_normalized = scale(afinn_normalized)) |>
+  arrange(order) |>
+  mutate(album_group = ifelse(order <= 5, "Early", "Late"))
+
+song_afinn |>
+  t.test(afinn_normalized ~ album_group, data = _)
+```
+
+#### Interpreting t-test outputs
+
+- Test statistic (`t`): Measures the difference between group means relative to variation within groups. Higher absolute values indicate stronger evidence of difference.
+
+- [Degrees of freedom](https://en.wikipedia.org/wiki/Degrees_of_freedom_(statistics)) (`df`): Reflects sample sizes and variability; used to determine the shape of the t-distribution.
+
+- p-value: Probability of observing a difference this extreme if no real difference exists. Small values (< 0.05) indicate strong evidence of a real difference.
+
+- 95% Confidence Interval: Range likely containing the true difference between group means with 95% confidence.
+
+#### Conditions for Welch’s t-Test
+
+- Two Groups: Comparing *exactly* two independent groups.
+
+- Independence: Each observation should be independent from others.
+
+- Approximately Normal: Data within each group are roughly normally distributed (especially important with small samples).
+
+- Unequal Variances: Welch's may be used when the groups have different variances or sample sizes, unlike Student’s t-test.
+
+### How would we compare the means of each *album*? ANOVA
+
+- ANOVA stands for [analysis of variance](https://en.wikipedia.org/wiki/Analysis_of_variance)
+  - Where the t-test compared exactly two groups, ANOVA compares more than two groups
+- For either, the assumption (null hypothesis) is that there is no significant difference between the means of the groups
+- The function `aov()` in R conducts an ANOVA
+
+#### Implementing ANOVA
+
+```{r}
+song_afinn |>
+  aov(afinn_normalized ~ album_title, data = _) |>
+  summary()
+```
+
+#### Implementing One-way ANOVA
+
+- ANOVA assumes that the variances of the groups are equal.
+- [One-way ANOVA](https://en.wikipedia.org/wiki/One-way_analysis_of_variance) does not:
+
+```{r}
+song_afinn |>
+  oneway.test(afinn_normalized ~ album_title, data = _)
+```
+
+#### Interpreting ANOVA outputs
+
+- Interpretation: "Mean `afinn_normalized` scores differ significantly by album."
+- Why?
+  - `F value`: Measures group variance vs. residual variance; higher indicates greater difference between groups.
+  - p-value: Strength of the evidence that differences among albums are not due to chance.
+    - `Pr(>F)`: Probability of observing an F value this extreme if no real difference exists.
+  
+### t-test vs. ANOVA: When to use?
+
+- Welch’s t-test: Exactly two groups with potentially unequal variances
+  - e.g., early vs. late albums
+- ANOVA: Comparing multiple groups simultaneously
+  - Use one-way ANOVA (`oneway.test()`) if variances differ
+  - e.g., comparing sentiment scores across all albums
+  
+### t-test vs. ANOVA: Similarities and differences?
+
+- Similarities:
+  - Both test differences between group means
+  - Both produce p-values
+  - Both assume data within groups are approximately normally distributed
+- Differences:
+  - Welch’s t-test compares exactly two groups; ANOVA compares more than two groups.
+- Welch’s t-test does **not** assume equal variances; standard ANOVA assumes equal variances across groups.
+
+### Project 2 feedback summary
+
+- When comparing documents of different lengths, use **term frequencies** rather than term counts.
+- Check and report $R^2$ values for linear models.
+- State values you expect.
+- When comparing means, use t-tests or ANOVA as appropriate.
+
+### Review these concepts
+
+- I recommend [this playlist](https://www.youtube.com/playlist?list=PLblh5JKOoLUIzaEkCLIUxQFjPIlapw8nU) to review these concepts.
+- The fifth video on the playlist explains t-tests and ANOVA, which are closely related.
+
+## Word vectors
+
+{{< video https://www.youtube.com/watch?v=wgfSDrqYMJ4 >}}
+
+### Purpose
+
+- Vectors improve on type counts
+  - e.g., "I love a crisp apple" and "Apple makes the iPhone"
+  - `"apple"` appears in both
+- Represent word types (`"apple"`) in high-dimensional space
+- Words' positions in that space captures aspects of their meaning
+- Vectors can be used with or instead of text data in models
+  - e.g., use word vectors as features for KNN or GBT models
+
+### Making word vectors
+
+- We will be using pretrained [GloVe vectors](https://nlp.stanford.edu/projects/glove/)
+- GloVe models are trained on aggregated global word-word co-occurrence statistics from a corpus
+  - This particular model was trained on 6 billion tokens from Wikipedia and English-language news
+
+### Implementation with `tidymodels`
+
+#### Download the embeddings
+
+We can use these pretrained embeddings to create word vectors for new text data.
+
+:::{.callout-warning}
+This requires about 1 GB of space.
+:::
+
+```{r}
+options(timeout = 1000)
+glove_tbl <- textdata::embedding_glove6b(dim = 300)
+```
+
+#### What do the embeddings look like?
+
+We have a `token` followed by a 300-dimensional embedding of that token derived from the GloVe model's training process.
+
+```{r}
+glove_tbl |>
+  filter(token %in% c("data", "science", "and", "statistics", "389")) |>
+  select(1:4)
+```
+
+#### Intution about the embeddings
+
+- Cosine similarity is a commonly used metric to measure the similarity of words in a word embedding space.
+  - The cosine similarity between two vectors is the cosine of the angle between them.
+- For example, here are the top 10 words most similar to "cat" in the GloVe embeddings:
+
+```{r}
+#| echo: false
+
+cat_vector <- glove_tbl |>
+  filter(token == "cat") |>
+  select(starts_with("d")) |>
+  as.numeric()
+
+embedding_matrix <- glove_tbl |>
+  select(starts_with("d")) |>
+  as.matrix()
+
+rownames(embedding_matrix) <- glove_tbl$token
+
+cat_matrix <- matrix(cat_vector, nrow = 1)
+
+cat_similarity <- proxy::simil(embedding_matrix, cat_matrix, method = "cosine")
+
+similarity_df <- tibble(
+  token = rownames(embedding_matrix),
+  cos_sim = as.numeric(cat_similarity)
+)
+
+similarity_df |>
+  arrange(desc(cos_sim)) |>
+  slice_head(n = 10)
+```
+
+#### Further intutition
+
+Let's play [Semantris](https://research.google.com/semantris/), which is a word association puzzle game that uses word embeddings to sort words.
+
+#### Data: Felines vs. Cables
+
+- "Cat" can refer both to the animal and to a type of internet cable.
+- We can use word embeddings to distinguish between those senses in these documents.
+- Further, we can identify which documents are the most similar to each other (i.e., which are "about" the same things).
+
+```{r}
+df <- tibble(
+  doc_id = c("feline1", "feline2", "cable1", "cable2"),
+  text = c(
+    "The cat (Felis catus), also referred to as the domestic cat or house cat, is a small domesticated carnivorous mammal.",
+    "Its retractable claws are adapted to killing small prey species such as mice and rats.",
+    "Category 6 cable (Cat 6) is a standardized twisted pair cable for Ethernet and other network physical layers that is backward compatible with the Category 5/5e and Category 3 cable standards.",
+    "The cable standard specifies performance of up to 250 MHz, compared to 100 MHz for Cat 5 and Cat 5e."
+  )
+)
+```
+
+#### Define recipe
+
+- Below, we create new embeddings from the texts about felines and cables using the GloVe embeddings.
+- By default, `step_word_embeddings()` will output word embeddings for each *document*.
+
+```{r}
+text_rec <- recipe(~text, data = df) |>
+  step_tokenize(text) |>
+  step_stopwords(text) |>
+  step_word_embeddings(text, embeddings = glove_tbl)
+
+text_rec
+```
+
+#### Prepare and bake the recipe
+
+- `prep()` estimates all the required transformations on the training data using the recipe.
+- `bake()` executes the transformations that the `recipe()` and `prep()` set up.
+
+```{r}
+text_prep <- prep(text_rec)
+
+word_vectors <- bake(text_prep, new_data = NULL)
+```
+
+#### Set up our data structures
+
+- Computing cosine similarity requires a matrix of word vectors rather than our familiar tibbles.
+- Matrices only contain a single data type (here, numeric), whereas tibbles can contain multiple data types.
+
+```{r}
+word_vectors <- df |>
+  select(doc_id) |>
+  bind_cols(word_vectors)
+
+emb_matrix <- word_vectors |>
+  select(-doc_id) |>
+  as.matrix()
+
+rownames(emb_matrix) <- word_vectors |> pull(doc_id)
+```
+
+#### Compute document similarities
+
+```{r}
+emb_matrix |>
+  simil(method = "cosine")
+```
+
+#### Preview: visualizing word similarity
+
+```{r}
+#| echo: false
+
+df_tokens <- df |>
+  unnest_tokens(word, text) |>
+  anti_join(stop_words) |>
+  distinct(doc_id, word)
+
+glove_df <- df_tokens |>
+  inner_join(glove_tbl, join_by(word == token))
+
+emb_matrix <- glove_df |>
+  select(-doc_id, -word) |>
+  as.matrix()
+
+pca_res <- prcomp(emb_matrix, scale. = TRUE)
+
+# Convert the first 2 principal components into a tibble
+pca_df <- as_tibble(pca_res$x[, 1:2]) |>
+  mutate(
+    word = df_tokens$word,
+    doc_id = df_tokens$doc_id
+  )
+
+ggplot(pca_df, aes(x = PC1, y = PC2, label = word, color = doc_id)) +
+  geom_point() +
+  geom_text_repel() +
+  labs(
+    title = "Word-Level Embeddings (PCA)",
+    x = "PC1",
+    y = "PC2"
+  ) +
+  scale_color_brewer(palette = "Dark2")
+```
+
