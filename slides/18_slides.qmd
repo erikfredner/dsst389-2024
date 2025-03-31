@@ -1,0 +1,243 @@
+---
+title: "Linear Modeling Review"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  cache: true
+  echo: true
+  message: false
+  warning: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    toc: true
+    toc-depth: 2
+    slide-level: 4
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+```{r}
+#| label: get-packages
+#| echo: false
+
+packages <- c(
+  "tidyverse", "tidymodels", "textrecipes", "kknn",
+  "xgboost", "glmnet", "corrplot", "parallel", "future"
+)
+
+for (pkg in packages) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+  }
+}
+
+for (pkg in packages) {
+  library(pkg, character.only = TRUE)
+}
+
+theme_set(theme_minimal())
+
+set.seed(123)
+
+all_cores <- parallel::detectCores()
+plan(multisession, workers = all_cores)
+```
+
+## Notebook 15 review
+
+And code interview practice!
+
+### Data: Wine quality
+
+```{r}
+#| label: load-wine
+
+wine <- read_csv("../data/wine.csv")
+
+wine |>
+  group_by(type) |>
+  slice_sample(n = 1)
+```
+
+### Exploratory data analysis (EDA)
+
+Why is EDA important *before* data modeling?
+
+#### Quality by type
+
+```{r}
+#| label: q-eda-quality
+
+wine |>
+  ggplot(aes(x = quality, fill = type)) +
+  geom_bar(color = "black", position = "dodge") +
+  scale_fill_manual(values = c("#800e13", "#f4d58d")) +
+  scale_x_continuous(breaks = wine |> distinct(quality) |> pull()) +
+  labs(title = "Wine quality by type")
+```
+
+#### What is the difference between this chart...
+
+```{r}
+#| label: q-eda-quality-prop-all
+#| output-location: slide
+
+wine |>
+  ggplot(aes(x = quality, fill = type)) +
+  geom_bar(color = "black", position = "fill") +
+  scale_fill_manual(values = c("#800e13", "#f4d58d")) +
+  scale_x_continuous(breaks = wine |> distinct(quality) |> pull()) +
+  labs(title = "Wine quality by type (proportional)")
+```
+
+#### ...and this chart?
+
+```{r}
+#| label: q-eda-quality-prop-group
+#| output-location: slide
+
+wine |>
+  count(type, quality) |>
+  group_by(type) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(x = quality, y = prop, fill = type)) +
+  geom_col(color = "black", position = "dodge") +
+  scale_fill_manual(values = c("#800e13", "#f4d58d")) +
+  scale_x_continuous(breaks = wine |> distinct(quality) |> pull()) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Percentages of wines by type and quality",
+    x = "Quality",
+    y = "Percentage of wines by type"
+  )
+```
+
+#### Does this data set seem to be highly multicollinear?
+
+```{r}
+#| label: q-eda-corr
+#| output-location: slide
+
+wine |>
+  select(-type) |>
+  cor() |>
+  corrplot()
+```
+
+#### ENET model
+
+```{r}
+#| label: q-split
+#| echo: false
+
+wine_split <- initial_split(wine, prop = 0.8, strata = quality)
+wine_train <- training(wine_split)
+wine_test <- testing(wine_split)
+
+wine_split
+```
+
+What would happen if instead we set `mixture = 1`?
+
+```{r}
+#| label: q-enet-model
+
+enet_model <- linear_reg(penalty = tune(), mixture = tune()) |>
+  set_mode("regression") |>
+  set_engine("glmnet")
+```
+
+#### Recipe
+
+Why do we need to `dummy` the nominal predictors?
+
+```{r}
+#| label: q-enet-recipe
+
+enet_recipe <- recipe(quality ~ ., data = wine_train) |>
+  step_normalize(all_numeric_predictors()) |>
+  step_dummy(all_nominal_predictors())
+
+enet_recipe
+```
+
+```{r}
+#| label: q-enet-workflow
+#| echo: false
+
+enet_wf <- workflow() |>
+  add_recipe(enet_recipe) |>
+  add_model(enet_model)
+
+enet_wf
+```
+
+#### Cross-validation
+
+What is the point of cross-validation?
+
+```{r}
+#| label: q-enet-folds
+
+enet_folds <- vfold_cv(wine_train, v = 10, strata = quality)
+enet_folds
+```
+
+```{r}
+#| label: q-enet-tune-grid
+#| echo: false
+
+tuned_enet_results <- tune_grid(
+  enet_wf,
+  resamples = enet_folds,
+  grid = 50,
+  metrics = metric_set(rmse, mae)
+)
+```
+
+#### Best model
+
+We get a very small value for `penalty` here. What does that mean?
+
+```{r}
+#| label: q-enet-select
+best_enet <- select_best(tuned_enet_results, metric = "rmse")
+best_enet
+```
+
+```{r}
+#| label: q-enet-final-workflow
+#| echo: false
+
+final_enet_wf <- finalize_workflow(enet_wf, best_enet)
+
+final_enet_fit <- final_enet_wf |>
+  fit(data = wine_train)
+```
+
+#### Important predictors
+
+If you were a Portuguese winegrower, what does this data suggest you should optimize for to improve quality scores?
+
+```{r}
+#| label: q-enet-coefs
+
+final_enet_fit |>
+  extract_fit_parsnip() |>
+  tidy() |>
+  arrange(desc(abs(estimate)))
+```

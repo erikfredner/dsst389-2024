@@ -1,0 +1,330 @@
+---
+title: "Text classification with logistic regression"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  cache: true
+  echo: true
+  message: false
+  warning: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    toc-depth: 2
+    slide-level: 4
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+```{r}
+#| label: get-packages
+#| echo: false
+
+packages <- c(
+  "tidyverse", "tidymodels", "textrecipes", "kknn",
+  "xgboost", "glmnet", "corrplot", "parallel", "future",
+  "textdata"
+)
+
+for (pkg in packages) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+  }
+}
+
+for (pkg in packages) {
+  library(pkg, character.only = TRUE)
+}
+
+theme_set(theme_minimal())
+
+set.seed(123)
+
+all_cores <- parallel::detectCores()
+plan(multisession, workers = all_cores)
+```
+
+## Word embeddings
+
+### Intutition
+
+We're going to play [Semantris](https://research.google.com/semantris/), which is a word association puzzle game that uses word embeddings to sort words.
+
+The goal is to identify words that are similarly embedded to the target word.
+
+## Text classification with logistic regression
+
+We can combine our text analysis and data modeling skills to classify texts using logistic regression. Now, we can either use word counts (term frequencies) or word embeddings as predictors for our models.
+
+Today, we're going to do sentiment analysis backwards: We're going to infer positive or negative sentiment from labeled tweets.
+
+We'll also compare the performance of multiple models.
+
+### Data: Tech tweets
+
+```{r}
+#| label: load-tech
+#| echo: false
+
+posts <- read_csv("../data/tech_twitter_posts.csv")
+post_sentiments <- read_csv("../data/tech_twitter_sentiments.csv")
+
+posts <- posts |>
+  left_join(post_sentiments, join_by(id)) |>
+  filter(sentiment_manual %in% c("positive", "negative")) |>
+  select(id, text, sentiment_manual)
+```
+
+```{r}
+#| label: posts-sample
+
+posts |>
+  group_by(sentiment_manual) |>
+  slice_sample(n = 1)
+```
+
+## Clean Data
+
+Convert sentiment to an indicator variable and factor:
+
+```{r}
+#| label: clean-sentiment
+posts <- posts |> mutate(
+  sentiment_manual = if_else(sentiment_manual == "positive", 1, 0),
+  sentiment_manual = as_factor(sentiment_manual)
+)
+
+posts
+```
+
+## EDA
+
+Plot the class distribution:
+
+```{r}
+#| label: plot-class-distribution
+posts |>
+  ggplot(aes(x = sentiment_manual)) +
+  geom_bar()
+```
+
+## Logistic regression with term frequencies
+
+### Train/Test Split
+
+Split the data stratified by sentiment:
+
+```{r}
+#| label: split-data
+split <- initial_split(posts, prop = 0.8, strata = sentiment_manual)
+train <- training(split)
+test <- testing(split)
+```
+
+### Recipe: Term frequencies
+
+```{r}
+#| label: token-recipe
+text_recipe <- recipe(sentiment_manual ~ text, data = train) |>
+  step_tokenize(text) |>
+  step_stopwords(text) |>
+  step_tokenfilter(text, max_tokens = 500) |>
+  step_tf(text)
+```
+
+### Model Spec: Logistic Regression
+
+```{r}
+#| label: log-reg-spec
+log_spec <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+```
+
+### Workflow and Fit
+
+```{r}
+#| label: token-workflow
+text_wf <- workflow() |>
+  add_recipe(text_recipe) |>
+  add_model(log_spec)
+
+text_fit <- text_wf |> fit(data = train)
+```
+
+### Predict and Evaluate
+
+```{r}
+#| label: token-evaluate
+text_results <- bind_cols(
+  predict(text_fit, test, type = "prob"),
+  predict(text_fit, test),
+  test
+)
+
+text_results |> conf_mat(truth = sentiment_manual, estimate = .pred_class)
+text_results |> accuracy(truth = sentiment_manual, estimate = .pred_class)
+```
+
+### Visualize Probabilities
+
+```{r}
+#| label: token-histogram
+text_results |> ggplot(aes(x = .pred_1, fill = sentiment_manual)) +
+  geom_histogram(bins = 10) +
+  scale_fill_brewer(palette = "Dark2")
+```
+
+### Term Importance
+
+Words most associated with positive sentiment:
+
+```{r}
+#| label: positive-words
+text_fit |>
+  tidy() |>
+  filter(p.value <= 0.05) |>
+  slice_max(estimate, n = 10)
+```
+
+## Logistic regression with word embeddings
+
+Where in the previous model we used term frequencies, we will now try using word embeddings as predictors.
+
+Remember that word embeddings represent the *entire* document in the embedding space.
+
+### GloVe Embeddings
+
+Download and load [GloVe embeddings](https://nlp.stanford.edu/projects/glove/):
+
+```{r}
+#| label: glove-load
+options(timeout = 1000)
+glove <- textdata::embedding_glove6b(dim = 300)
+glove |> slice_sample(n = 5)
+```
+
+### Embedding Recipe
+
+```{r}
+#| label: embedding-recipe
+embedding_recipe <- recipe(sentiment_manual ~ text, data = train) |>
+  step_tokenize(text) |>
+  step_stopwords(text) |>
+  step_word_embeddings(text, embeddings = glove)
+```
+
+## Regularized Logistic Regression
+
+We will regularize when using embeddings because high dimensionality can lead to overfitting:
+
+```{r}
+#| label: reg-log-spec
+log_spec <- logistic_reg(penalty = tune(), mixture = 1) |>
+  set_engine("glmnet") |>
+  set_mode("classification")
+```
+
+### Workflow, folds, grid
+
+```{r}
+#| label: wf-fold
+embedding_wf <- workflow() |>
+  add_recipe(embedding_recipe) |>
+  add_model(log_spec)
+
+folds <- vfold_cv(train, v = 5, strata = sentiment_manual)
+
+grid <- grid_regular(penalty(), levels = 20)
+```
+
+### Tune and finalize
+
+```{r}
+#| label: tune-grid
+embedding_tune <- tune_grid(
+  embedding_wf,
+  resamples = folds,
+  grid = grid,
+  metrics = metric_set(accuracy)
+)
+
+best <- select_best(embedding_tune, metric = "accuracy")
+
+embedding_final <- finalize_workflow(embedding_wf, best)
+```
+
+## Final Fit
+
+```{r}
+#| label: embed-fit
+embed_fit <- embedding_final |> fit(data = train)
+
+embed_results <- bind_cols(
+  predict(embed_fit, test, type = "prob"),
+  predict(embed_fit, test),
+  test
+)
+
+embed_results
+```
+
+## Evaluation
+
+### Confusion matrix and accuracy
+
+```{r}
+#| label: embed-eval
+embed_results |>
+  conf_mat(truth = sentiment_manual, estimate = .pred_class)
+
+embed_results |>
+  accuracy(truth = sentiment_manual, estimate = .pred_class)
+```
+
+### Visualize probabilities
+
+```{r}
+#| label: embed-histogram
+embed_results |> ggplot(aes(x = .pred_1, fill = sentiment_manual)) +
+  geom_histogram(bins = 10) +
+  scale_fill_brewer(palette = "Dark2")
+```
+
+### Compare model performance with a paired t-test
+
+```{r}
+#| label: paired-ttest
+token_correct <- text_results |> pull(.pred_class) == text_results |> pull(sentiment_manual)
+embed_correct <- embed_results |> pull(.pred_class) == embed_results |> pull(sentiment_manual)
+
+token_correct |> sample(10)
+
+t.test(token_correct, embed_correct, paired = TRUE)
+```
+
+## Summary
+
+We compared two models:
+
+- Logistic regression with token frequencies
+- Logistic regression with word embeddings
+
+We evaluated performance with:
+
+- Accuracy
+- Visualizations
+- Paired t-test

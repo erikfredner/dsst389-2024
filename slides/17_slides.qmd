@@ -209,7 +209,7 @@ lyrics |>
 
 - Many projects analyzed the sentiment of Swift's lyrics over time on the hypothesis that sentiment scores would *decrease* over time.
 - We know several ways to fit linear models to the data.
-- Especially when the fit is not good, we should check and report the $R^2$ value.
+- We should always check and report the $R^2$ value.
   - Low $R^2$ should also cause us to reconsider linear models and/or our hypothesis.
 
 #### Setup
@@ -466,7 +466,8 @@ song_afinn |>
 - ANOVA stands for [analysis of variance](https://en.wikipedia.org/wiki/Analysis_of_variance)
   - Where the t-test compared exactly two groups, ANOVA compares more than two groups
 - For either, the assumption (null hypothesis) is that there is no significant difference between the means of the groups
-- The function `aov()` in R conducts an ANOVA
+- Standard ANOVA (`aov()`) assumes equal variances among groups.
+  - If this assumption does not hold, use Welch’s ANOVA (`oneway.test()`).
 
 #### Implementing ANOVA
 

@@ -1,0 +1,602 @@
+---
+title: "Linear models, $R^2$, and differences of means"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+execute:
+  echo: true
+  warning: true
+format:
+  html:
+    anchor-sections: true
+    code-tools: false
+    code-link: true
+    embed-resources: true
+    link-external-icon: true
+    link-external-newwindow: true
+    number-sections: true
+    smooth-scroll: true
+    toc: true
+editor:
+  markdown:
+    wrap: 72
+---
+
+## Environment
+
+### Clean
+
+Run the following code chunk to clean up your environment:
+
+```{r}
+#| eval: false
+#| label: clean-env
+
+if (interactive()) {
+  rstudioapi::restartSession(clean = TRUE)
+}
+```
+
+### Install
+
+You may need to update or install some packages:
+
+```{r}
+#| label: get-packages
+
+packages <- c(
+  "tidyverse", "tidymodels", "textrecipes", "kknn",
+  "xgboost", "glmnet", "corrplot", "parallel", "future",
+  "textdata", "glue"
+)
+
+for (pkg in packages) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+  }
+}
+```
+
+### Load
+
+Import needed libraries and apply settings:
+
+```{r}
+#| label: libraries-settings
+
+for (pkg in packages) {
+  library(pkg, character.only = TRUE)
+}
+
+theme_set(theme_minimal())
+
+set.seed(123)
+
+all_cores <- parallel::detectCores()
+plan(multisession, workers = all_cores)
+```
+
+## Linear models review
+
+### Data
+
+For this section, we'll be predicting the price of tickets for flights in India.
+
+```{r}
+#| label: flights-data
+
+flights <- read_csv("../data/flights.csv")
+
+flights_test <- read_csv("../data/flights_test.csv")
+```
+
+### Data dictionary
+
+Below is an updated data dictionary in Markdown, with column names in backticks and units added where relevant:
+
+| Column             | Description                                                                        | Units         |
+|--------------------|------------------------------------------------------------------------------------|--------------|
+| `airline`          | The name of the airline operating the flight                                       |              |
+| `flight`           | The flight identification code (e.g., G8-153)                                      |              |
+| `source_city`      | The origin city from which the flight departs                                      |              |
+| `departure_time`   | Time of day category when the flight departs (e.g., Morning, Afternoon)   |              |
+| `stops`            | Number of stops the flight makes (e.g., zero, one)                                 |              |
+| `arrival_time`     | Time of day category when the flight arrives (e.g., Morning, Afternoon) |              |
+| `destination_city` | The city where the flight lands (final destination)                                |              |
+| `class`            | Class of the travel ticket (Economy or Business)                               |              |
+| `duration`         | Total flight duration                                                              | Hours        |
+| `days_left`        | Number of days between booking and departure                                       | Days         |
+| `price`            | The ticket price for the flight                                                    | [Indian rupees](https://en.wikipedia.org/wiki/Indian_rupee) |
+
+### Linear model with one numeric predictor
+
+Let's consider prices for longer vs. shorter flights. Model flight price by duration and plot the result.
+
+```{r}
+#| label: q-duration-price
+
+flights |>
+  ggplot(aes(x = duration, y = price)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+Save this model into a variable called `model_d` for "duration." Retrieve the summary of `model_d` and evaluate the output. Does it appear to be a "good" model? How do you know?
+
+After getting the summary, `glance()` the model, pull the $R^2$ value, and print it [using `glue()`](https://glue.tidyverse.org). Here's an example of how you can use `glue` to write variables to standard output:
+
+```{r}
+#| label: glue-example
+
+word <- "flawless"
+glue("I woke up like this, {word}.
+     --Beyoncé")
+```
+
+
+```{r}
+#| label: q-duration-model
+
+model_d <- lm(price ~ duration, data = flights)
+
+model_d |>
+  tidy() |>
+  mutate(across(where(is.numeric), round))
+
+model_d |> summary()
+
+model_d_rsq <- model_d |>
+  glance() |>
+  pull(r.squared) |>
+  round(2)
+
+glue("R-squared: {model_d_rsq}")
+```
+
+This is not a great model. We will improve it below. But first, let's make sure we understand what it is predicting.
+
+Use `tidy()` to retrieve the model estimates and store them in variables. Then use those variables to figure out what price the model predicts for a flight with a 10 hour duration. Use `glue()` to format your answer as shown (note that I have rounded my answer):
+
+```{r}
+#| label: q-model-d-arithmetic
+
+model_d |> tidy()
+
+intercept <- model_d |>
+  tidy() |>
+  filter(term == "(Intercept)") |>
+  pull(estimate)
+
+slope <- model_d |>
+  tidy() |>
+  filter(term == "duration") |>
+  pull(estimate)
+
+est_price <- round(intercept + slope * 10)
+
+glue("The model predicts a price of {est_price} rupees for a 10 hour flight.")
+```
+
+### Linear model with one categorical predictor
+
+Now, let's consider a categorical predictor, because we 
+will need some non-numeric data in order to build a good model of flight prices.
+
+Create a dataset only containing flights coming from Delhi, our city with the most departing flights. Calculate the average price of tickets to each destination city, and make a bar chart showing average prices.
+
+```{r}
+#| label: q-delhi-flights-avg
+
+flights_delhi <- flights |>
+  filter(source_city == "Delhi")
+
+flights_delhi |>
+  group_by(destination_city) |>
+  summarize(avg_price = mean(price)) |>
+  ggplot(aes(x = avg_price, y = destination_city)) +
+  geom_col()
+```
+
+Now, make a linear model that uses destination city to predict prices for flights from Delhi. Retrieve the model summary. After doing so, retrieve the unique destination cities from Delhi.
+
+```{r}
+#| label: q-delhi-flights-summary
+
+model_city <- lm(price ~ destination_city, data = flights_delhi)
+
+model_city |> summary()
+
+flights_delhi |>
+  distinct(destination_city) |>
+  arrange(destination_city)
+```
+
+You can think of each of these estimates as changes in price relative to the intercept city, Bangalore.
+
+Observe the differences between the coefficients of your model and the distinct values in the destination city column. Which of the cities is missing from the summary?
+
+Let's think about what these numbers mean:
+
+Intercept estimate: Price prediction for flights to Bangalore. This city is chosen as an arbitrary baseline. (In this case, it is the first factor because "Bangalore" is first alphabetically.)
+
+Coefficient estimate for `destination_cityChennai`: Relative to flights to Bangalore, how much more do we expect to pay for a flight to Chennai?
+
+As you did in the previous arithmetic question, extract the values from the model, calculate the predicted price for a flight to Chennai, and print the result using `glue()`.
+
+```{r}
+#| label: q-delhi-flights-arithmetic
+
+model_city |> tidy()
+
+intercept <- model_city |>
+  tidy() |>
+  filter(term == "(Intercept)") |>
+  pull(estimate)
+
+slope <- model_city |>
+  tidy() |>
+  filter(term == "destination_cityChennai") |>
+  pull(estimate)
+
+est_price <- round(intercept + slope)
+
+glue("The model predicts a price of {est_price} rupees for a flight to Chennai.")
+```
+
+### Linear model with multiple predictors
+
+Our initial $R^2$ value was low. Let's try to increase it by adding more and better predictors.
+
+Build a model called `model_multi` that uses duration AND class (i.e., Economy or Business) to predict ticket prices. Return the model summary.
+
+```{r}
+#| label: q-multi-model
+
+model_multi <- lm(price ~ duration + class, data = flights)
+
+model_multi |> summary()
+```
+
+Think about the difference between this summary and the previous summary. What do you observe?
+
+Try modifying the predictors in the model above to get the best combination of predictors for `price`. Evaluate new models as you go. Change predictors at least a few times. It will be helpful to look at the `flights` dataset to make good inferences about which predictors may improve the model. You will be able to see what I added in the outputs.
+
+```{r}
+#| label: q-multi-model-add
+
+flights |>
+  lm(price ~ airline + departure_time, data = _) |>
+  summary()
+```
+
+Now that you have tried a few different predictors, you probably have a sense of which worked relatively well or poorly. Rank the columns from best to worst predictors of price:
+
+#### Automating feature selection
+
+This feature selection process is something that we have already learned how to automate with *elastic net*!
+
+Using the `tidymodels` workflow, build an elastic net model, recipe, and workflow that predict price based on all columns except `price` and `flight`. See my outputs for guidance on e.g., recipe steps.
+
+```{r}
+#| label: q-enet-setup
+
+enet_model <- linear_reg(penalty = tune(), mixture = tune()) |>
+  set_mode("regression") |>
+  set_engine("glmnet")
+
+enet_model
+
+flights_recipe <- recipe(price ~ ., data = flights) |>
+  step_rm(flight) |>
+  step_other(all_nominal_predictors()) |>
+  step_novel(all_nominal_predictors()) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_nzv(all_predictors()) |>
+  step_normalize(all_predictors())
+
+flights_recipe
+
+enet_wf <- workflow() |>
+  add_recipe(flights_recipe) |>
+  add_model(enet_model)
+
+enet_wf
+```
+
+Set up 5-fold cross validation stratified on ticket class. Then, search a 20-row grid using your folds to find the best elastic net model.
+
+```{r}
+#| label: q-enet-tune
+
+enet_folds <- vfold_cv(flights, v = 5, strata = class)
+
+enet_folds
+
+tuned_enet_results <- tune_grid(
+  enet_wf,
+  resamples = enet_folds,
+  grid = 20
+)
+
+tuned_enet_results
+```
+
+Select the best model parameters by $R^2$. Finalize your workflow and fit your elastic net on the best parameters. Then, test your best model on the `flights_test` data imported above.
+
+Then, retrieve the five most- and least-important features. Compare them to your list above.
+
+```{r}
+#| label: q-elastic-net
+
+best_enet <- select_best(tuned_enet_results, metric = "rsq")
+
+best_enet
+
+final_enet_wf <- finalize_workflow(enet_wf, best_enet)
+
+final_enet_fit <- final_enet_wf |> fit(data = flights)
+
+final_enet_fit |>
+  predict(new_data = flights_test) |>
+  bind_cols(flights_test) |>
+  metrics(truth = price, estimate = .pred)
+
+print("Five most important:")
+
+final_enet_fit |>
+  extract_fit_parsnip() |>
+  tidy() |>
+  arrange(desc(abs(estimate))) |>
+  slice_head(n = 5)
+
+print("Five least important:")
+
+final_enet_fit |>
+  extract_fit_parsnip() |>
+  tidy() |>
+  arrange(abs(estimate)) |>
+  slice_head(n = 5)
+```
+
+### Linear model with interaction between predictors
+
+Based on the change between our first model and the previous model, it appears that class is an excellent predictor.
+
+Remake the first scatter plot, but create a regression line for each *class* of ticket to check the differences in slope.
+
+```{r}
+#| label: q-flights-two-lms
+
+flights |>
+  ggplot(aes(x = duration, y = price, color = class)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = "lm") +
+  scale_color_brewer(palette = "Dark2")
+```
+
+We can think of the difference in these slopes as reflecting the *interaction* between flight duration and ticket class.
+
+As you will recall, in a model with multiple terms, factor order determines which values others are compared to. Before modeling, reorder the factors in the class column so that Economy is the first factor. By making Economy the first factor, that will tell us how much more expensive Business class tickets are relative to Economy class tickets. If we use the default (alphabetical) order, the result would be the "discount" we get for flying Economy. There are multiple ways of doing this; I used [`fct_relevel()`](https://forcats.tidyverse.org/reference/fct_relevel.html).
+
+We can quantify that difference by building a model that predicts prices based on duration, class, and the interaction (`*`) of these two terms. Save this model as `model_interact` and retrieve the model parameters.
+
+```{r}
+#| label: q-interact-model
+
+flights <- flights |>
+  mutate(class = fct_relevel(class, "Economy", "Business"))
+
+model_interact <- lm(price ~ duration * class, data = flights)
+
+model_interact |> summary()
+```
+
+You will notice a coefficient for the interaction term, `duration:classBusiness`. This coefficient tells us how much the slope of duration changes for business class flights.
+
+As you did in the previous arithmetic problems, extract values from the model's `tidy()` output and save them into variables. Then, use those extracted values to calculate the predicted price of a 10-hour business class flight using those variables, and print the result in a sentence using `glue()`.
+
+```{r}
+#| label: q-interact-arithmetic
+
+model_interact |> tidy()
+
+intercept_economy <- model_interact |>
+  tidy() |>
+  filter(term == "(Intercept)") |>
+  pull(estimate)
+
+business_estimate <- model_interact |>
+  tidy() |>
+  filter(term == "classBusiness") |>
+  pull(estimate)
+
+slope <- model_interact |>
+  tidy() |>
+  filter(term == "duration") |>
+  pull(estimate)
+
+slope_interaction <- model_interact |>
+  tidy() |>
+  filter(term == "duration:classBusiness") |>
+  pull(estimate)
+
+slope_business <- slope + slope_interaction
+
+intercept_business <- intercept_economy + business_estimate
+
+est_price <- round((slope_business * 10) + intercept_business)
+
+glue("The model predicts a price of {est_price} rupees for a 10-hour business class flight.")
+```
+
+### Modeling variability: R squared
+
+Next, we are going to manually calculate $R^2$ for our models to understand it better.
+
+We begin by guessing that every flight has the average price. Then, we calculate how wrong that guess is for every point, square those errors, and calculate the average of those squared errors. This is the mean squared error (MSE).
+
+Create an object called `price_mse` that contains the mean squared error of every flight in `flights`.
+
+```{r}
+#| label: q-price-mse
+
+price_mse <- flights |>
+  mutate(
+    pred_err = price - mean(price),
+    pred_err_sq = pred_err^2
+  ) |>
+  summarize(MSE = mean(pred_err_sq)) |>
+  pull(MSE)
+
+glue("Price variability is {price_mse}")
+```
+
+Next, let's see how the estimates of our first model---`model_d`---compare. Use `augment()` to add model predictions to the `flights` data. By 
+default, the predictions will appear in a variable called `.fitted` and the prediction error will appear under `.resid` for residual.
+
+As above, square the residuals and find the average of the squared residuals across all flights. Save it to an 
+object called `variability_from_model_d`.
+
+```{r}
+#| label: q-model-d-variability
+
+model_d_mse <- augment(model_d, newdata = flights) |>
+  mutate(pred_err_sq = .resid^2) |>
+  summarize(MSE = mean(pred_err_sq)) |>
+  pull(MSE)
+
+glue("The variability from model_d is {model_d_mse}")
+```
+
+These numbers cannot be directly interpreted because they are in rupees squared. However, the *ratio* of these two numbers is useful.
+
+Divide the model's MSE by the MSE of the average. This will summarize how much prediction error we have from `model_d` relative to what error we wouldhave if we just predicted that every flight will have the average flight price. Convert that value into a percentage, and fill in the value in the following sentence using `glue()`: "X% of the total variability in prices is still unexplained by our model." In this context, by "explained" we mean predicted - not causally explained.
+
+Finally, subtract the ratio from 1, and report the result in the following sentence structure: "Y% of the total variability in prices is explained by our model." You will find that this is the same as the $R^2$ value reported by the summary of `model_d`.
+
+```{r}
+#| label: q-mse-unexplained
+
+model_d_var <- model_d_mse / price_mse
+
+model_d_var_pct <- round(100 * model_d_var, 2)
+
+model_d_expl <- 1 - model_d_var
+
+model_d_expl_pct <- round(100 * model_d_expl, 2)
+
+glue("{model_d_var_pct}% of the total variability in prices is unexplained by our model.")
+
+glue("{model_d_expl_pct}% of the total variability in prices is explained by our model.")
+```
+
+## Differences of means
+
+### Welch's t-test
+
+As we have seen above, the duration of the flight does much less to predict ticket prices than the class of the ticket. We will explore whether there are significant differences in the means of the categorical variables in our dataset.
+
+We will begin with one that we expect to be significant. Perform Welch's t-test to compare the average price of Economy and Business class flights.
+
+```{r}
+#| label: q-t-test-class
+
+t.test(price ~ class, data = flights)
+```
+
+The difference is statistically significant. Does it appear to be strong or weak? How do you know?
+
+Let's test another pairing that we might have weaker prior beliefs about. Figure out the two most frequent destination cities for economy tickets in the dataset, then perform a t-test to determine if there is a difference in the average price of economy flights to those cities.
+
+```{r}
+#| label: q-t-test-city
+
+top_cities <- flights |>
+  filter(class == "Economy") |>
+  count(destination_city) |>
+  top_n(2, n) |>
+  arrange(desc(n)) |>
+  pull(destination_city)
+
+pop_destinations <- flights |>
+  filter(
+    class == "Economy",
+    destination_city %in% top_cities
+  )
+
+t.test(price ~ destination_city, data = pop_destinations)
+```
+
+There is a difference between the means of these groups. Is it significant? How do you know?
+
+### ANOVA
+
+One of the variables we have not considered yet is the time of day when the flight departs. If there are only two times, we could use a t-test. How many times are there?
+
+```{r}
+flights |>
+  distinct(departure_time)
+```
+
+Because there are more than two, we will use [ANOVA](https://en.wikipedia.org/wiki/Analysis_of_variance) to test whether there are significant differences in the average price of flights based on their time of departure.
+
+However, we do *not* know if the variances of the groups are equal. This will determine which ANOVA test we run. We can determine that with a Fligner-Killeen test, which tests if the variances in the groups are the same:
+
+```{r}
+flights |>
+  fligner.test(price ~ departure_time, data = _)
+```
+
+The low p-value strongly suggests that we can reject the null hypothesis that the variances are equal. Therefore, we will use Welch's ANOVA (`oneway.test()`) to test for differences in the means of these groups.
+
+```{r}
+#| label: q-anova-time
+
+flights |>
+  oneway.test(price ~ departure_time, data = _)
+```
+
+The p-value is low, suggesting that there are significant differences in the average price of flights based on their time of departure.
+
+We saw above that there was no significant difference in means between the two most popular destination cities for economy flights. Is that true for all economy destinations in this data set? Run all of the appropriate tests we have discussed.
+
+```{r}
+#| label: q-anova-departure
+
+pop_destinations |>
+  fligner.test(price ~ departure_time, data = _)
+
+pop_destinations |>
+  aov(price ~ departure_time, data = _) |>
+  summary()
+
+pop_destinations |>
+  oneway.test(price ~ departure_time, data = _)
+```
+
+This turns out to be a *liminal* case. Do `aov()` and `oneway.test()` give contradictory answers? If so, what does that mean?
+
+One possible response would be to *collect more data*. We can simulate that by running the same tests on the `flights_test` dataset. Don't forget to filter for economy flights to the two most popular destination cities from the original `flights` data first.
+
+```{r}
+#| label: q-anova-test
+
+pop_destinations_test <- flights_test |>
+  filter(
+    class == "Economy",
+    destination_city %in% top_cities
+  )
+
+pop_destinations_test |>
+  fligner.test(price ~ departure_time, data = _)
+
+pop_destinations_test |>
+  aov(price ~ departure_time, data = _) |>
+  summary()
+
+pop_destinations_test |>
+  oneway.test(price ~ departure_time, data = _)
+```
+
+What does this analysis of new data suggest? 

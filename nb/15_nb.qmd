@@ -5,7 +5,7 @@ author: "Erik Fredner"
 institute: "University of Richmond"
 date: today
 execute:
-  echo: false
+  echo: true
   warning: true
 format:
   html:

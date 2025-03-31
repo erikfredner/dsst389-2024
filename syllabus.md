@@ -212,9 +212,9 @@ Meeting  Date      Topic
 15       03-17     Gradient boosted trees
 16       03-19     Logistic regression 
 17       03-24     Word embeddings
-18       03-26     Network analysis 
-19       03-31     Topic modeling
-20       04-02     Web scraping
+18       03-26     Modeling text data 
+19       03-31     Text classification
+20       04-02     Topic modeling
 21       04-07     LLMs
 22       04-09     **Group Project 3 workshop**
 23       04-14     **Code Interviews**

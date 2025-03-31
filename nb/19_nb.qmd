@@ -1,0 +1,528 @@
+---
+title: "Text classification with models"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+execute:
+  cache: true
+  echo: true
+  warning: true
+format:
+  html:
+    anchor-sections: true
+    code-tools: false
+    code-link: true
+    embed-resources: true
+    link-external-icon: true
+    link-external-newwindow: true
+    number-sections: true
+    smooth-scroll: true
+    toc: true
+editor:
+  markdown:
+    wrap: 72
+---
+
+## Environment
+
+### Clean
+
+Run the following code chunk to clean up your environment:
+
+```{r}
+#| eval: false
+#| label: clean-env
+
+if (interactive()) {
+  rstudioapi::restartSession(clean = TRUE)
+}
+```
+
+### Install
+
+You may need to update or install some packages:
+
+```{r}
+#| label: get-packages
+
+packages <- c(
+  "tidyverse", "tidymodels", "textrecipes", "kknn",
+  "xgboost", "glmnet", "corrplot", "parallel", "future",
+  "textdata", "glue", "stats"
+)
+
+for (pkg in packages) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+  }
+}
+```
+
+### Load
+
+Import needed libraries and apply settings:
+
+```{r}
+#| label: libraries-settings
+
+for (pkg in packages) {
+  library(pkg, character.only = TRUE)
+}
+
+theme_set(theme_minimal())
+
+set.seed(123)
+
+all_cores <- parallel::detectCores()
+plan(multisession, workers = all_cores)
+```
+
+## Data: SMS Spam
+
+The [SMS Spam Collection](https://archive.ics.uci.edu/dataset/228/sms+spam+collection) provides the text of SMS messages (i.e., text messages) sent in the United Kingdom that are labeled as "spam" or "ham" (i.e., not spam). You could analyze the text of the messages and predict whether a "new" message (i.e., in your training data) is spam.
+
+We are going to create multiple models each of which will attempt to classify the messages as spam or ham using only their text.
+
+### Columns
+
+There are only two columns in the data set:
+
+- `type`: The type of the message, either "spam" or "ham" (i.e., not spam).
+- `text`: The text of the message.
+
+```{r}
+#| label: load-data
+
+texts <- read_csv("../data/sms.csv")
+
+texts |>
+  group_by(type) |>
+  slice_sample(n = 2)
+```
+
+## Setup
+
+We're going to use logistic regression to model this data in two ways:
+
+1. We're going to predict whether a text is spam by using *term frequencies* as predictors.
+2. Then, we're going to predict whether a text is spam using *word embeddings* as predictors.
+
+### Cleaning the data
+
+Convert the `type` column to an indicator variable such that `"ham" == 0` and `"spam" == 1`. Be sure that `type` is a factor. This will be necessary for modeling.
+
+```{r}
+#| label: q-clean-data
+
+texts <- texts |>
+  mutate(
+    type = if_else(type == "ham", 0, 1),
+    type = as_factor(type)
+  )
+
+texts
+```
+
+### Exploratory data analysis
+
+Create a bar plot of the distribution of target variable in the data.
+
+```{r}
+#| label: q-eda
+
+texts |>
+  ggplot(aes(x = type)) +
+  geom_bar()
+```
+
+This shows that we have *imbalanced classes*. Which type of message do we have more of? How can we deal with this problem in our modeling process?
+
+## Modeling
+
+### Splitting the data
+
+Split your data into training and testing sets (80%-20%), stratified by the message type. Output your splits.
+
+```{r}
+#| label: q-split-data
+
+data_split <- initial_split(texts, prop = 0.8, strata = type)
+train_data <- training(data_split)
+test_data <- testing(data_split)
+
+data_split
+```
+
+## Token-Based Logistic Regression
+
+### Recipe
+
+Create a recipe that tokenizes the text, removes stopwords, converts counts into term frequencies, and filters for the top 100 tokens. Output your recipe.
+
+```{r}
+#| label: q-token-recipe
+
+token_recipe <- recipe(type ~ text, data = train_data) |>
+  step_tokenize(text) |>
+  step_stopwords(text) |>
+  step_tokenfilter(text, max_tokens = 100) |>
+  step_tf(text)
+
+token_recipe
+```
+
+### Model Specification
+
+Specify a logistic regression model for classification using `glm`. Output your model specification.
+
+```{r}
+#| label: q-token-spec
+
+log_spec <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+log_spec
+```
+
+### Workflow and Fitting
+
+Create a workflow, fit the logistic regression model to your training data, and return the fit model object.
+
+```{r}
+#| label: q-token-fit
+
+token_wf <- workflow() |>
+  add_recipe(token_recipe) |>
+  add_model(log_spec)
+
+token_fit <- token_wf |> fit(data = train_data)
+
+token_fit
+```
+
+:::{.callout-warning}
+This fit provokes a warning that the model predicted probabilities of zero or one. That likely means that there are at least some words that are *perfect predictors* of spam or ham. This is not necessarily a problem for the model, but it can result in overfitting. For example, if "inheritance" is a perfect predictor of spam in the training data, the model will mislabel any non-spam discussion of inheritance as spam.
+:::
+
+### Predictions and evaluation
+
+Evaluate your fit model by predicting on your test data. Bind both the probabilities, predicted classes, and original columns of the test data to the results object. Retrieve a confusion matrix (`conf_mat()`) from the results. Also, use the results to calculate the `accuracy()` of your model.
+
+```{r}
+#| label: q-token-predict
+
+token_results <- bind_cols(
+  predict(token_fit, test_data, type = "prob"),
+  predict(token_fit, test_data),
+  test_data
+)
+
+token_results |> conf_mat(truth = type, estimate = .pred_class)
+
+token_results |> accuracy(truth = type, estimate = .pred_class)
+```
+
+### Visualization
+
+Create a histogram visualizing the probabilities of observations in the test data being spam. To match my chart exactly, you will need 10 bins in your histogram, and partial transparency.
+
+```{r}
+#| label: q-token-hist
+
+token_results |>
+  ggplot(aes(x = .pred_1, fill = type)) +
+  geom_histogram(alpha = 0.5, bins = 10) +
+  scale_fill_brewer(palette = "Dark2")
+```
+
+What does this visualization tell you about:
+
+- the model's performance?
+- the distribution of the training data?
+
+
+### Interpretation
+
+#### Words
+
+Combining the results of the confusion matrix and the accuracy, do you observe relative strengths or weaknesses in the model's performance?
+
+Below, extract the twenty terms from the model that are most strongly associated with spam messages.
+
+```{r}
+#| label: q-spam-words
+
+token_fit |>
+  tidy() |>
+  slice_max(estimate, n = 20)
+```
+
+Now, do the same but for the terms most strongly associated with ham messages:
+
+```{r}
+#| label: q-ham-words
+
+token_fit |>
+  tidy() |>
+  slice_min(estimate, n = 20)
+```
+
+Do these results conform to your expectations? Do the spam words seem "spammy?" What about the ham words?
+
+#### Messages
+
+Pull the text of the 5 messages that were most likely to be spam:
+
+```{r}
+#| label: q-spam-messages
+
+token_results |>
+  arrange(desc(.pred_1)) |>
+  slice_head(n = 5) |>
+  pull(text)
+```
+
+Pull the text of the 5 messages that were least likely to be spam:
+
+```{r}
+#| label: q-not-spam
+
+token_results |>
+  arrange(desc(.pred_1)) |>
+  slice_tail(n = 5) |>
+  pull(text)
+```
+
+Pull the text of the 5 messages that were most likely to be ham:
+
+```{r}
+#| label: q-ham-messages
+
+token_results |>
+  arrange(desc(.pred_0)) |>
+  slice_head(n = 5) |>
+  pull(text)
+```
+
+Finally, pull the text of the 5 messages that were least likely to be ham:
+
+```{r}
+#| label: q-not-ham
+
+token_results |>
+  arrange(desc(.pred_0)) |>
+  slice_tail(n = 5) |>
+  pull(text)
+```
+
+These categories ('most likely spam' and 'least likely ham') overlap. Differences in the list of messages for these responses occur due to ties or rounding. Messages most likely to be spam are also the least likely to be ham, and vice versa.
+
+Finally, let's see a few examples of ambiguous cases. Pull the text of five random messages that were misclassified:
+
+```{r}
+#| label: q-misclassified-messages
+
+token_results |>
+  filter(type != .pred_class) |>
+  slice_sample(n = 5) |>
+  pull(text)
+```
+
+What do you observe from reading these sample passages? Are there any similarities between these messages?
+
+## Word Vector-Based Logistic Regression
+
+Now, we are going to repreat the logistic regression model above with a difference: Instead of using term frequencies, we will use *word embeddings* as features.
+
+### Download and Load GloVe Embeddings
+
+Load the GloVe embeddings. This requires a download of approximately 900 MB. Please run the cell below *before* attempting to download the embeddings. Having a high `timeout` value will prevent your computer from dropping the connection to the server as it downloads the embeddings.
+
+```{r}
+#| label: timeout
+
+options(timeout = 1000)
+```
+
+Once they have downloaded, print five random rows from the embeddings:
+
+```{r}
+#| label: q-glove
+
+glove <- textdata::embedding_glove6b(dim = 300)
+
+glove |>
+  slice_sample(n = 5)
+```
+
+You may notice some unusual words in the output! The GloVe embeddings are trained on a large corpus (Wikipedia plus news articles), and they have a *large* vocabulary of 400,000 unique word types. [One article](https://doi.org/10.3389/fpsyg.2016.01116) estimates that,
+
+> an average 20-year-old native speaker of American English knows **42,000 lemmas** and 4,200 non-transparent multiword expressions, derived from 11,100 word families. The numbers range from 27,000 lemmas for the lowest 5% to 52,000 for the highest 5%.
+
+A "lemma" is a dictionary form of a word (e.g., "run" for "running" or "ran"), and a "word family" is a root word and all its inflections (e.g., "run," "runs," "ran," "running"). This means that you probably *don't* know most of the words in the GloVe embeddings.
+
+### Logistic regression specification
+
+When conducting logistic regression with high-dimensional data---like word embeddings---it is often necessary to use regularization to prevent overfitting. We will use the `glmnet` package to fit a logistic regression model with elastic net regularization and tune our penalty parameter. We are going to use lasso regularization to try to reduce the number of features in the model, so set your `mixture` accordingly.
+
+```{r}
+#| label: q-embed-spec
+
+log_spec <- logistic_reg(penalty = tune(), mixture = 1) |>
+  set_engine("glmnet") |>
+  set_mode("classification")
+
+log_spec
+```
+
+### Embedding Recipe
+
+Create a recipe that converts text into word embeddings. Remove stopwords but do *not* use the filter as in the previous model. Because we are embedding documents (i.e., each text message), we do not want to lose information by filtering out rare words.
+
+:::{.callout-note}
+`step_word_embeddings` aggregates word vectors into a single vector per *message*. Where the unit of observation in the previous model was a word, the unit of observation in this model is an entire message.
+:::
+
+```{r}
+#| label: q-embed-recipe
+
+embedding_recipe <- recipe(type ~ text, data = train_data) |>
+  step_tokenize(text) |>
+  step_stopwords(text) |>
+  step_word_embeddings(text, embeddings = glove)
+```
+
+### Workflow and Model Fitting
+
+Create another workflow and fit the logistic regression model using word embeddings:
+
+```{r}
+#| label: q-embed-wf
+
+embedding_wf <- workflow() |>
+  add_recipe(embedding_recipe) |>
+  add_model(log_spec)
+```
+
+#### Tuning and getting our best values
+
+Set up five-fold cross validation stratified by `type`. Then, tune your `penalty` using `grid_regular()` with 20 levels. Tune over your grid, and select the best result based on accuracy. Finalize your wokflow using your best values, and return your final workflow object.
+
+```{r}
+#| label: q-embed-tune
+
+embedding_folds <- vfold_cv(train_data, v = 5, strata = type)
+
+embedding_grid <- grid_regular(penalty(), levels = 20)
+
+embedding_tune_results <- tune_grid(
+  embedding_wf,
+  resamples = embedding_folds,
+  grid = embedding_grid,
+  metrics = metric_set(accuracy)
+)
+
+embedding_best <- select_best(embedding_tune_results, metric = "accuracy")
+
+embedding_final_wf <- finalize_workflow(embedding_wf, embedding_best)
+
+embedding_final_wf
+```
+
+#### Fitting with best values
+
+```{r}
+#| label: q-embedding-fit
+
+embedding_fit <- embedding_final_wf |> fit(data = train_data)
+
+embedding_results <- bind_cols(
+  predict(embedding_fit, test_data, type = "prob"),
+  predict(embedding_fit, test_data),
+  test_data
+)
+
+embedding_results |> conf_mat(truth = type, estimate = .pred_class)
+
+embedding_results |> accuracy(truth = type, estimate = .pred_class)
+```
+
+## Comparing Model Performance Objectively
+
+You may have noticed that the accuracy scores for both models are pretty similar. Is there a statistically significant difference between them? We can find out with a *paired* t-test since we have two different predictions on the same test data.
+
+Use a statistical test to evaluate whether the difference in accuracy between the token-based and embedding-based models is significant. Since we have paired predictions on the same test data, we can compare their correctness directly using a t-test on their `TRUE|FALSE` correctness vectors.
+
+The lines below create logical vectors indicating whether the predictions were correct for each model. Then, we conduct a paired t-test on correctness.
+
+:::{.callout-tip}
+You may need to change the variable names for your results tables if they differ from mine!
+:::
+
+```{r}
+#| label: logical-vectors
+
+token_correct <- token_results |> pull(.pred_class) ==
+  token_results |> pull(type)
+
+embed_correct <- embedding_results |> pull(.pred_class) ==
+  embedding_results |> pull(type)
+
+token_correct |> sample(10)
+```
+
+Now, pass both of those logical vectors to `t.test()`, setting the option `paired` to true.
+
+```{r}
+#| label: q-paired-t-test
+
+token_correct |> t.test(embed_correct, paired = TRUE)
+```
+
+Interpret the output of the t-test. Is the difference between the performance of the models statistically significant?
+
+If so, which of the two models is better, and how do you know?
+
+### McNemar Test for Paired Classification
+
+We will use [McNemar's test](https://en.wikipedia.org/wiki/McNemar%27s_test) to evaluate these two models. Where the t-test evaluates the difference in means, McNemar's test evaluates the difference in errors. This is especially useful when models make different types of mistakes on the same data points.
+
+Begin by making a tibble of the `token_correct` and `embed_correct` vectors created above, then counting them. Save the result into a variable called `mcnemar_counts`, and output that table.
+
+```{r}
+#| label: q-mcnemar-table
+
+mcnemar_counts <- tibble(token_correct, embed_correct) |>
+  count(token_correct, embed_correct)
+
+mcnemar_counts
+```
+
+The code below extracts the off-diagonal counts, which reflect cases where the models disagreed---specifically, where one model was correct and the other was not. We use the frequencies of these disagreements for the McNemar test.
+
+```{r}
+#| label: mcnemar-test
+
+b <- mcnemar_counts |>
+  filter(token_correct == TRUE, embed_correct == FALSE) |>
+  pull(n)
+
+c <- mcnemar_counts |>
+  filter(token_correct == FALSE, embed_correct == TRUE) |>
+  pull(n)
+
+mcnemar_result <- mcnemar.test(matrix(c(0, b, c, 0), nrow = 2))
+mcnemar_result
+```
+
+You will observe that the McNemar test reports a large [chi-squared](https://en.wikipedia.org/wiki/Chi-squared_test) value and a low p-value, confirming what was observed above.
+
+### Comparing model performance subjectively
+
+Are you surprised that the word vector model performed better than the term frequency model? Why or why not? Think about the unit of observation in each (i.e., individual words vs. vector embeddings for entire messages). How might this difference affect the models' performance? 
+
+## Summary
+
+You built and evaluated two different logistic regression models---one using token frequencies and another using word embeddings---to predict whether SMS messages are spam. After data preprocessing and exploratory analysis, you trained, tuned, and evaluated each model's performance. A paired t-test and McNemar's test were conducted to statistically compare the models.

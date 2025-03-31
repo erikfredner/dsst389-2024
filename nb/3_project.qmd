@@ -1,0 +1,180 @@
+---
+title: "Group Project 3"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+execute:
+  echo: true
+  warning: false
+format:
+  html:
+    anchor-sections: true
+    code-tools: false
+    code-link: true
+    embed-resources: true
+    link-external-icon: true
+    link-external-newwindow: true
+    number-sections: true
+    smooth-scroll: true
+    toc: true
+editor:
+  markdown:
+    wrap: 72
+---
+
+## Deadline
+
+This project is due by the start of class on Wednesday, April 16.
+
+## Modeling
+
+For this assignment, you will build *at least* two models that perform either classification or regression on one of the recommended datasets below and interpret the results. I recommend choosing a dataset that you and your partner(s) find interesting and know something about to help evaluate the quality of your model's predictions.
+
+### Requirements
+
+- You do not need to use the dataset in the way that it was originally intended to be used, but you may.
+- You must include results from at least two models in the document. You may include more if you wish.
+
+### Suggestion
+
+I recommend setting the following options in the YAML of your document:
+
+```yaml
+---
+title: "Your title"
+author: "Your names"
+format: pdf
+execute:
+  cache: true
+---
+```
+
+While all of these options are important in their own ways, `cache: true` in the `execute` block is especially important for this project. Running models can be time-consuming, and you don't want to regenerate your whole model every time you need to fix a typo in your PDF. `cache` will save the results of your code chunks so that you can quickly regenerate your document without having to re-run chunks that have not been changed.
+
+### Argument ("So what?")
+
+As in your previous projects, you need to include an argument ("so what?") to anchor your discussion. That argument should emerge from or use as evidence either 1) the results of the models themselves and/or 2) the results of your modeling process.
+
+#### Example
+
+Imagine that you were working with the `wine` data for this project. You could argue that, because there are sometimes inverted chemical properties that are associated with increased quality scores for red wines as compared to white wines (e.g., residual sugars), it is better to model the wines *separately* to facilitate interpretation. You could then compare the important factors for red and white wines separately, and report your findings that, for example, residual sugar is associated with a considerable improvement in white wine quality, but a decrease in red wine quality.
+
+## Data sets
+
+Each of the datasets described and linked below come from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/index.php). On each page, you can find a description of the dataset, a data dictionary ("variables table"), and you can download the data.
+
+- [Student Performance in Math and Portuguese classes in Portugal](https://archive.ics.uci.edu/dataset/320/student+performance)
+- [Estimation of Obesity Levels Based On Eating Habits and Physical Condition of people in Mexico, Peru and Colombia](https://archive.ics.uci.edu/dataset/544/estimation+of+obesity+levels+based+on+eating+habits+and+physical+condition)
+- [Default of Credit Card Clients](https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients)
+- [Predicting whether a US adult's income is over $50,000/year (1994 dollars) based on their characteristics](https://archive.ics.uci.edu/dataset/2/adult)
+
+### Using other datasets
+
+If you would rather use another dataset, you may do so with my approval. Either ask me in class or email me. You must do so by no later than **April 9** (one week before the deadline).
+
+## External resources
+
+As the purpose of this group project is to imitate data science work that one might do outside of school, it is an **open-resource** project. This means that you may use books, websites, and, yes, generative artificial intelligence (GenAI) tools in order to complete this work.
+
+All external resources, including GenAI, **must be cited** in your final document. I recommend using [The Chicago Manual of Style](https://richmond.primo.exlibrisgroup.com/permalink/01URICH_INST/191gg5k/alma9928619711206241).
+
+Your use of all external resources, including GenAI, is constrained by the rules set out in the syllabus, which include the following:
+
+### Prohibited Uses of GenAI
+
+- Submitting model output, in part or in whole, as if it were your original work. This includes code *or* writing.
+- Uploading any data used in this course (e.g., `.csv` files) directly to multimodal GenAI tools like ChatGPT.
+- Using models for assistance *without* citing your interaction with the model.
+- Using models to generate outputs that you cannot verify, explain, or understand.^[However, if a model does produce an output that you cannot verify, explain, or understand, you may use the model to improve your understanding of that output.]
+
+### Permitted Uses of GenAI
+
+I ask you to do these things in this order when you can't figure something out:
+
+1. Review the course notes and slides, if relevant.
+2. Talk to your classmates.
+3. Search for credible information online (e.g., StackOverflow).
+4. Chat with the [Custom GPT](https://chatgpt.com/g/g-6783c8a8603c8191862f677689207682-dsst389-gpt) for this class.
+5. If you use information from the Custom GPT, **cite** your interactions with it.
+
+[This page](https://help.openai.com/en/articles/7925741-chatgpt-shared-links-faq) explains how to share a link to a ChatGPT interaction.
+
+### Things to consider when using GenAI
+
+#### Style
+
+The [Custom GPT](https://chatgpt.com/g/g-6783c8a8603c8191862f677689207682-dsst389-gpt) for this course is designed to help you with programming problems while following the conventions of this class. However, **you** are ultimately responsible for ensuring that your code follows the class style requirements:
+
+- Use the base R pipe (`|>`), not the `magrittr` pipe (`|>`)
+- Use `<-` to assign outputs to objects. *Do not* use `=`.
+- Use `tidyverse` functions instead of base R whenever possible.
+  - e.g., `as_factor()` is `tidyverse`; `as.factor()` is `{base}`.
+- Style your code in accordance with the [`tidyverse` style guide](https://style.tidyverse.org/).
+- Code without comments and/or documentation is incomplete.
+
+#### Accuracy
+
+LLMs get things wrong. That can happen because the model makes a mistake, or the person prompting the model makes a mistake. Either way, the accuracy of your code is your responsibility.
+
+## Rubric
+
+| Criterion                   | Description                                                                                                                                                                                                                                                                                             | Weight |
+|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------|
+| Significance                | Clearly states and addresses a meaningful modeling question using classification or regression, explaining its relevance and importance.                                                                                                                                                              | 30%    |
+| Analysis & Data Integration | Briefly explains how you selected, cleaned, or transformed your dataset for modeling. Clearly identifies and justifies any external resources or GenAI tools used in your analysis.                                                                                                                                      | 20%    |
+| Outputs                     | Presents clear, interpretable results from at least two models. Outputs (tables, graphs, calculated values) must be labeled, directly referenced in the text, and clearly support the argument.                                                                                                        | 20%    |
+| Code Quality & Style        | R code adheres to the `tidyverse` style guide. Appropriately integrates advanced Quarto features (such as figure captions, cross-references, caching, or inline computations).                                                                                                                   | 10%    |
+| Prose                       | Includes **at most** 500 words of body text explaining the rationale for your analysis, interpreting the results, and clearly stating your main argument ("so what?") derived from your models or modeling process. Prose is clear, concise, and engaging, effectively guiding the reader through the project narrative.                   | 20%    |
+
+## Groups
+
+```{r}
+#| warning: false
+#| echo: false
+
+library(tidyverse)
+library(knitr)
+library(readxl)
+
+set.seed(200)
+
+df <- read_excel("../GITIGNORED/dsst389_roster.xlsx", sheet = "all")
+
+df <- df |>
+  select(Section, `First Name in Use`, `Last Name`) |>
+  mutate(Section = as.integer(Section)) |>
+  rename(
+    section = Section,
+    first_name = `First Name in Use`,
+    last_name = `Last Name`
+  ) |>
+  mutate(last_initial = str_sub(last_name, 1, 1))
+
+df |>
+  group_by(section) |>
+  slice_sample(prop = 1) |>
+  mutate(
+    row = row_number(),
+    group_id = case_when(
+      n() %% 2 == 0 ~ as.integer(ceiling(row / 2)),
+      row <= 3 ~ 1L,
+      TRUE ~ as.integer(1L + ceiling((row - 3) / 2))
+    )
+  ) |>
+  ungroup() |>
+  select(-row) |>
+  arrange(section, last_initial, first_name) |>
+  select(section, first_name, last_initial, group_id) |>
+  kable()
+```
+
+## Contribution to learning goals
+
+This project directly addresses the following learning goals for this course:
+
+- Collect, manipulate, tidy, visualize, and explore data using basic and advanced techniques.
+- Understand key aspects of the [R programming language](https://www.r-project.org) and the [`tidyverse`](https://www.tidyverse.org).
+- Use the [RStudio](https://posit.co/products/open-source/rstudio/) integrated development environment.
+- Use [Quarto](https://quarto.org/) to create high-quality research documents and websites.
+- Use programming language documentation, cookbooks, and large language models to solve programming problems.
