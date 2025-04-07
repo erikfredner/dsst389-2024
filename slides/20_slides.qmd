@@ -1,0 +1,523 @@
+---
+title: "Topic Modeling"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  cache: true
+  echo: true
+  message: false
+  warning: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    toc-depth: 2
+    slide-level: 4
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+```{r}
+#| label: get-packages
+#| echo: false
+
+packages <- c(
+  "tidyverse", "tidymodels", "textrecipes", "kknn",
+  "xgboost", "glmnet", "corrplot", "parallel", "future",
+  "textdata", "stm", "topicmodels", "tidytext", "reshape2",
+  "ldatuning", "tm", "glue"
+)
+
+for (pkg in packages) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+  }
+}
+
+for (pkg in packages) {
+  library(pkg, character.only = TRUE)
+}
+
+theme_set(theme_minimal())
+
+set.seed(123)
+
+all_cores <- parallel::detectCores()
+plan(multisession, workers = all_cores)
+```
+
+## Final project overview
+
+See assignment description on Blackboard.
+
+### Dataset selection
+
+Complete the [dataset selection form](https://forms.gle/vdZTTpp6eraVLJ1v6) as soon as possible, and no later than April 16.
+
+## Topic modeling
+
+- Unsupervised learning technique for identifying latent themes in a corpus of documents
+- Especially useful if you want to figure out what a large collection of text is "about"
+
+### Key aspects of topic modeling
+
+- Each document is represented as a mixture of topics
+- Each topic is a distribution over words
+- Topics are discovered based on patterns of word co-occurrence across documents  
+- Requires pre-processing like tokenization and stopword removal
+- Number of topics (`k`) must be specified in advance
+- Output typically includes topic-word distributions and document-topic distributions
+
+### What can you do with topic models?
+
+- Explore and summarize large text corpora without reading every document  
+- Track how topics change over time (e.g., in news articles, academic papers, social media)  
+- Cluster documents by dominant topic
+- Identify thematic structure for qualitative analysis
+- Use topic proportions as features for classification or regression  
+- Visualize topic distributions to reveal hidden patterns in the data 
+
+### In-depth overview of topic modeling
+
+Watch on your own time:
+
+{{< video https://www.youtube.com/watch?v=IUAHUEy1V0Q >}}
+
+## Example: Topics in Taylor Swift lyrics
+
+### Data: Swift lyrics
+
+```{r}
+#| echo: false
+songs <- read_tsv("../data/swift_corpus/cots-song-details.tsv") |>
+  select(Album, Track, Title, FeaturedArtists, FromTheVault) |>
+  rename(song_title = Title)
+
+albums <- read_tsv("../data/swift_corpus/cots-album-details.tsv") |>
+  select(Code, Title, SubTitle, Year) |>
+  rename(album_title = Title)
+
+lyrics <- read_tsv(
+  file = "../data/swift_corpus/cots-lyric-details.tsv",
+  col_names = FALSE
+)
+
+lyrics <- lyrics |>
+  rename(metadata = 1, text = 2) |>
+  separate(
+    metadata,
+    into = c("album_code", "track", "line", "part"),
+    sep = ":",
+    convert = TRUE
+  )
+
+lyrics <- lyrics |>
+  left_join(albums, join_by(album_code == Code)) |>
+  left_join(songs, join_by(album_code == Album, track == Track)) |>
+  mutate(part = case_when(
+    part == "V" ~ "Verse",
+    part == "C" ~ "Chorus",
+    part == "B" ~ "Bridge",
+    part == "I" ~ "IntroOutro",
+    part == "R" ~ "Refrain",
+    TRUE ~ part
+  )) |>
+  rename(
+    album_subtitle = SubTitle,
+    year = Year,
+    featured_artists = FeaturedArtists,
+    from_the_vault = FromTheVault
+  ) |>
+  select(
+    song_title, featured_artists, album_title, album_subtitle,
+    track, from_the_vault, year, line, part, text
+  )
+
+lyrics |>
+  group_by(album_title, album_subtitle) |>
+  slice_sample(n = 1) |>
+  select(song_title, line, text)
+```
+
+## Topic modeling in R
+
+We will use [the `topicmodels` package](https://cran.r-project.org/web/packages/topicmodels/index.html).
+
+### Preparing Documents from Lyrics
+
+- Topic models perform best on documents of at least a few sentences.
+- So, we aggregate individual lines into full songs using [`glue_collapse()`](https://glue.tidyverse.org/reference/glue_collapse.html).
+
+```{r}
+swift_songs <- lyrics |>
+  group_by(album_title, song_title, track) |>
+  summarize(full_text = glue_collapse(text, sep = " ")) |>
+  ungroup() |>
+  mutate(doc_id = row_number()) |>
+  arrange(doc_id)
+
+swift_songs
+```
+
+### Swift's stopwords
+
+- Some words (e.g., "oh," "yeah") appear in lots of Swift's songs, do not carry much meaning, and are not in the standard stopword list.
+- We are going to identify these words and add them to our stopword list.
+
+#### Retrieving Swift's stopwords
+
+```{r}
+n_songs <- swift_songs |>
+  summarize(n_songs = n_distinct(doc_id)) |>
+  pull(n_songs)
+
+top_common_words <- swift_songs |>
+  unnest_tokens(word, full_text) |>
+  distinct(doc_id, word) |>
+  count(word, name = "doc_count") |>
+  mutate(prop_docs = doc_count / n_songs) |>
+  filter(prop_docs >= 0.5) |>
+  arrange(desc(doc_count)) |>
+  pull(word)
+
+custom_stopwords <- bind_rows(
+  get_stopwords(),
+  tibble(word = top_common_words, lexicon = "swift")
+)
+
+custom_stopwords |>
+  group_by(lexicon) |>
+  slice_sample(n = 2)
+```
+
+### Creating a Document-Term Matrix
+
+- `topicmodels` takes a [document-term matrix (DTM)](https://en.wikipedia.org/wiki/Document-term_matrix) as input
+- `cast_dtm()` converts a tidy data frame to a DTM
+
+```{r}
+swift_words <- swift_songs |>
+  unnest_tokens(word, full_text) |>
+  anti_join(custom_stopwords, join_by(word)) |>
+  filter(str_length(word) > 3)
+
+swift_dtm <- swift_words |>
+  count(doc_id, word) |>
+  cast_dtm(document = doc_id, term = word, value = n)
+
+swift_dtm
+```
+
+### Fitting a topic model
+
+We'll start by fitting a [Latent Dirichlet Allocation (LDA) topic model](https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation) with 10 topics (`k`).
+
+```{r}
+k_small <- 5
+lda_small <- LDA(
+  swift_dtm,
+  method = "Gibbs",
+  k = k_small,
+  control = list(seed = 123)
+)
+
+lda_small |>
+  tidy()
+```
+
+### Top Terms for Each Topic (`k_small`)
+
+`beta` measures the probability of a term given a topic. Words with high beta values are more likely to appear in documents from that topic.
+
+```{r}
+#| output-location: slide
+tidy_lda_small <- tidy(lda_small, matrix = "beta")
+
+plot_terms_small <- tidy_lda_small |>
+  group_by(topic) |>
+  slice_max(beta, n = 10) |>
+  ungroup() |>
+  mutate(term = reorder_within(term, beta, topic)) |>
+  ggplot(aes(beta, term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~topic, scales = "free") +
+  scale_y_reordered() +
+  labs(title = "Top Terms per Topic (k = 5)", x = "Beta", y = NULL)
+
+plot_terms_small
+```
+
+### Observations where `k = 5`
+
+- "Love" is a top term for multiple topics.
+- This suggests that we likely need a higher value of `k` because love is such a frequent topic that it does not separate.
+- Let's try a larger value for `k`
+
+### Fitting a Larger LDA Model
+
+```{r}
+k_large <- 10
+lda_large <- LDA(
+  swift_dtm,
+  method = "Gibbs",
+  k = k_large,
+  control = list(seed = 123)
+)
+```
+
+### Top Terms for Each Topic (`k_large`)
+
+```{r}
+#| output-location: slide
+tidy_lda_large <- tidy(lda_large, matrix = "beta")
+
+plot_terms_large <- tidy_lda_large |>
+  group_by(topic) |>
+  slice_max(beta, n = 10) |>
+  ungroup() |>
+  mutate(term = reorder_within(term, beta, topic)) |>
+  ggplot(aes(beta, term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~topic, scales = "free") +
+  scale_y_reordered()
+
+plot_terms_large
+```
+
+## How to find the best value for `k`?
+
+Here are two commonly used metrics for finding the best value of `k`:
+
+- Perplexity: Measures how well the model predicts a sample; lower perplexity indicates better generalization to unseen data.
+- Log-likelihood: Measures how probable the observed data is under the model; higher log-likelihood suggests a better fit to the training data.
+
+### Finding the best value for `k`
+
+```{r}
+perplexity_small <- perplexity(lda_small, swift_dtm)
+logLik_small <- logLik(lda_small)
+
+perplexity_large <- perplexity(lda_large, swift_dtm)
+logLik_large <- logLik(lda_large)
+
+tibble(
+  k = c(k_small, k_large),
+  perplexity = c(perplexity_small, perplexity_large),
+  log_likelihood = c(
+    as.numeric(logLik_small),
+    as.numeric(logLik_large)
+  )
+)
+```
+
+### Searching for `k`
+
+- We can use `seq()` to generate a sequence of `k` values to test.
+- We will iteratively `map()` those values of `k` to fit LDA models and evaluate them using perplexity and log-likelihood.
+
+```{r}
+#| output-location: slide
+k_values <- seq(10, 30, by = 5)
+
+model_metrics <- map(k_values, function(k) {
+  lda_model <- LDA(
+    swift_dtm,
+    method = "Gibbs",
+    k = k,
+    control = list(seed = 123)
+  )
+  tibble(
+    k = k,
+    perplexity = perplexity(lda_model, swift_dtm),
+    log_likelihood = as.numeric(logLik(lda_model))
+  )
+}) |>
+  list_rbind()
+
+model_metrics
+```
+
+### Coherence
+
+- Perplexity and log-likelihood favor models with many topics.
+- Coherence measures the semantic interpretability of topics by evaluating how frequently top words in a topic co-occur in the corpus; higher coherence indicates more meaningful and human-interpretable topics.
+- We want to find a `k` value that balances perplexity, log-likelihood, and coherence.
+
+```{r}
+#| output-location: slide
+
+coherence_result <- FindTopicsNumber(
+  swift_dtm,
+  topics = k_values,
+  metrics = c("CaoJuan2009", "Arun2010", "Griffiths2004", "Deveaud2014"),
+  method = "Gibbs",
+  control = list(seed = 123)
+)
+
+FindTopicsNumber_plot(coherence_result)
+```
+
+### Fitting the Best Model
+
+- The previous slide identified multiple coherence metrics. We want to pick a value for `k` that balances their responses.
+- Based on the evaluations, it appears that `k = 20` balances perplexity, log-likelihood, and coherence well.
+  - If we wanted to be fussy, we could test `k` values between, say, 15 and 25 one by one.
+
+```{r}
+k_best <- 20
+
+lda_best <- LDA(
+  swift_dtm,
+  method = "Gibbs",
+  k = k_best,
+  control = list(seed = 123)
+)
+```
+
+### Finding the "love" topics
+
+Which topics contain "love" as a top term?
+
+```{r}
+tidy_lda_best <- tidy(lda_best, matrix = "beta")
+
+love_topics <- tidy_lda_best |>
+  group_by(topic) |>
+  arrange(desc(beta)) |>
+  mutate(topic_rank = row_number()) |>
+  filter(topic_rank <= 3, term == "love") |>
+  pull(topic)
+
+love_topics
+```
+
+### Top Terms for Love Topics
+
+```{r}
+#| output-location: slide
+
+tidy_lda_best |>
+  filter(topic %in% love_topics) |>
+  group_by(topic) |>
+  slice_max(beta, n = 10) |>
+  ungroup() |>
+  mutate(term = reorder_within(term, beta, topic)) |>
+  ggplot(aes(beta, term, fill = as_factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~topic, scales = "free") +
+  scale_y_reordered()
+```
+
+### Document-Topic Proportions
+
+Let's examine how this topic is distributed across the corpus.
+
+First, let's find out which songs have the highest proportion of each of our love topics:
+
+```{r}
+doc_topics <- tidy(lda_best, matrix = "gamma") |>
+  mutate(doc_id = as.integer(document))
+
+doc_topics |>
+  filter(topic %in% love_topics) |>
+  arrange(desc(gamma)) |>
+  group_by(topic) |>
+  slice_max(gamma, n = 5) |>
+  ungroup() |>
+  left_join(swift_songs, join_by(doc_id)) |>
+  select(song_title, album_title, gamma, topic)
+```
+
+### Interpretation
+
+- High values for `gamma` (close to 1) indicate that those songs are largely comprised of a single topic.
+- High gamma values can be a warning sign when only one document has a very high gamma; that typically means that topic is just that one document
+- However, in this model, we have multiple documents with high gamma values, indicating that these particular songs share vocabularies and topics
+
+## Prevalence over time
+
+```{r}
+#| echo: false
+
+album_order <- tribble(
+  ~album_title, ~order,
+  "Fearless", 1, # 2008
+  "Speak Now", 2, # 2010
+  "Red", 3, # 2012
+  "1989", 4, # 2014
+  "Reputation", 5, # 2017
+  "Lover", 6, # 2019
+  "Folklore", 7, # 2020 (July)
+  "Evermore", 8, # 2020 (December)
+  "Midnights", 9, # 2022
+  "The Tortured Poets Department", 10
+)
+```
+
+```{r}
+#| output-location: slide
+topic_distributions <- doc_topics |>
+  left_join(swift_songs, by = "doc_id") |>
+  left_join(album_order, by = "album_title") |>
+  filter(!is.na(order))
+
+plot_data <- topic_distributions |>
+  group_by(album_title, order, topic) |>
+  summarize(mean_gamma = mean(gamma), .groups = "drop")
+
+plot_data |>
+  ggplot(aes(
+    x = mean_gamma,
+    y = reorder(album_title, order),
+    fill = as_factor(topic)
+  )) +
+  geom_col(position = "stack") +
+  scale_fill_viridis_d() +
+  labs(title = "Topic Distribution by Album")
+```
+
+### Love vs. non-love topics
+
+Earlier, we identified a few topics for which love is a keyword. How does the prevalence of these love topics vary by album?
+
+```{r}
+#| output-location: slide
+plot_love_data <- topic_distributions |>
+  mutate(
+    topic_type = if_else(topic %in% love_topics, "Love", "Non-Love")
+  ) |>
+  group_by(album_title, order, topic_type) |>
+  summarize(total_gamma = sum(gamma), .groups = "drop") |>
+  group_by(album_title, order) |>
+  mutate(prop_gamma = total_gamma / sum(total_gamma)) |>
+  ungroup()
+
+plot_love_data |>
+  ggplot(aes(
+    x = prop_gamma,
+    y = fct_reorder(album_title, order),
+    fill = topic_type
+  )) +
+  geom_col(position = "stack") +
+  scale_fill_brewer(palette = "Set1")
+```
+
+## Summary
+
+- Used **topic modeling** to uncover themes in Taylor Swift’s lyrics  
+- Built a **custom stopword list** and aggregated lyrics into songs  
+- Fit **LDA topic models** and evaluated with perplexity, log-likelihood, and coherence  
+- Identified **“love” topics** and tracked their presence across albums
+- Showed how topic modeling reveals patterns and thematic change over time

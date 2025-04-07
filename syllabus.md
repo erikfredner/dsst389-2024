@@ -215,7 +215,7 @@ Meeting  Date      Topic
 18       03-26     Modeling text data 
 19       03-31     Text classification
 20       04-02     Topic modeling
-21       04-07     LLMs
+21       04-07     Review
 22       04-09     **Group Project 3 workshop**
 23       04-14     **Code Interviews**
 24       04-16     Workshop

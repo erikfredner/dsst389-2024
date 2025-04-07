@@ -25,53 +25,89 @@ editor:
 
 ## Deadline
 
-This project is due by the start of class on Wednesday, April 16.
+This project is due by the start of class on Wednesday, April 23.
 
-## Modeling
+## Teaching with data
 
-For this assignment, you will build *at least* two models that perform either classification or regression on one of the recommended datasets below and interpret the results. I recommend choosing a dataset that you and your partner(s) find interesting and know something about to help evaluate the quality of your model's predictions.
+Your final assignment is to teach your classmates something using data. This project is open-ended by design.
 
-### Requirements
+You should choose a topic that you already know something about and are interested in so that you can make a good argument.
 
-- You do not need to use the dataset in the way that it was originally intended to be used, but you may.
-- You must include results from at least two models in the document. You may include more if you wish.
+### Data
 
-### Suggestion
+You may choose or create any dataset with my approval. You may also use datasets we have used in previous classes if they happen to be appropriate for your topic.
 
-I recommend setting the following options in the YAML of your document:
+#### Choosing
 
-```yaml
----
-title: "Your title"
-author: "Your names"
-format: pdf
-execute:
-  cache: true
----
-```
+If you plan to look for a dataset, considering searching in the following places:
 
-While all of these options are important in their own ways, `cache: true` in the `execute` block is especially important for this project. Running models can be time-consuming, and you don't want to regenerate your whole model every time you need to fix a typo in your PDF. `cache` will save the results of your code chunks so that you can quickly regenerate your document without having to re-run chunks that have not been changed.
+- [Google Dataset Search](https://datasetsearch.research.google.com)
+  - A search engine for datasets.
+- [Data.gov](https://data.gov)
+  - The US Government's repository for public data.
+- [United Nations data](http://data.un.org)
+  - The UN's repository for public data.
+- [Data is Plural](https://www.data-is-plural.com)
+  - A newsletter highlighting interesting datasets.
+- [Our World in Data](https://ourworldindata.org/data)
+  - A repository of public data on global issues.
+- [Harvard Dataverse](https://dataverse.harvard.edu)
+  - A research data repository.
+- [Awesome Public Datasets](https://github.com/awesomedata/awesome-public-datasets)
+  - A GitHub repository of curated public datasets.
+  
+:::{.callout-warning}
+As a general rule, I would advise against using [Kaggle Datasets](https://www.kaggle.com/datasets). Anyone can upload data to Kaggle, and uploaders do not always document their datasets. Moreover, many Kaggle datasets partially duplicate some of the sources above. That said, **if** the data you are interested in is only available on Kaggle, you may use it if you receive my approval.
+:::
 
-### Argument ("So what?")
+#### Creating
 
-As in your previous projects, you need to include an argument ("so what?") to anchor your discussion. That argument should emerge from or use as evidence either 1) the results of the models themselves and/or 2) the results of your modeling process.
+If you want to create a dataset of your own (e.g., collect text documents for analysis), you may do so, but you need to document your process.
 
-#### Example
+## Work products
 
-Imagine that you were working with the `wine` data for this project. You could argue that, because there are sometimes inverted chemical properties that are associated with increased quality scores for red wines as compared to white wines (e.g., residual sugars), it is better to model the wines *separately* to facilitate interpretation. You could then compare the important factors for red and white wines separately, and report your findings that, for example, residual sugar is associated with a considerable improvement in white wine quality, but a decrease in red wine quality.
+Final projects will consist of the following components:
 
-## Data sets
+1. Dataset description (survey response)
+2. Write-up (`.qmd` + PDF)
+3. Presentation (`.qmd` + slides)
 
-Each of the datasets described and linked below come from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/index.php). On each page, you can find a description of the dataset, a data dictionary ("variables table"), and you can download the data.
+I will review your proposed datasets via the survey response. If you do *not* get a response from me by April 16, your dataset is approved.
 
-- [Student Performance in Math and Portuguese classes in Portugal](https://archive.ics.uci.edu/dataset/320/student+performance)
-- [Estimation of Obesity Levels Based On Eating Habits and Physical Condition of people in Mexico, Peru and Colombia](https://archive.ics.uci.edu/dataset/544/estimation+of+obesity+levels+based+on+eating+habits+and+physical+condition)
-- [Default of Credit Card Clients](https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients)
-- [Predicting whether a US adult's income is over $50,000/year (1994 dollars) based on their characteristics](https://archive.ics.uci.edu/dataset/2/adult)
+### Dataset description
 
-### Using other datasets
+Follow the instructions on [the form](https://forms.gle/xuNbKDs5vrsFaZn49).
 
-If you would rather use another dataset, you may do so with my approval. Either ask me in class or email me. You must do so by no later than **April 9** (one week before the deadline).
+:::{.callout-tip}
+You will have to log in to Google with your `@richmond.edu` email to complete the form.
+:::
+
+### Write-up
+
+Your final project document will be similar to those of your previous three group projects, but this one will be your own work. It must include:
+
+- An argumentative frame for the analysis ("So what? Who cares?")
+- An analysis consisting of at least two outputs (graphs, tables, calculated values)
+- At most 500 words of prose explaining your rationale, interpreting your results, and stating your argument
+
+### Presentation
+
+Unlike the group projects, the final project also involves a presentation. On the final day of class, everyone will present their project. Here are the requirements for the presentation:
+
+- No more than 4 minutes long
+- Must describe your dataset
+- Must include at least one of your outputs from the write-up
+
+## Example project: Distinctive topics in children's stories
+
+How have the topics adults discuss with children changed over time? This project compares English-language children's stories from the nineteenth century to those of the twentieth century to see which topics appear in both groups, and which differ across time. I created a corpus of children's stories using anthologies from Project Gutenberg, and analyzed the distribution of topics by year of publication. Nineteenth-century children's stories feature both more violence and more explicit moralizing than twentieth century stories. In certain ways, nineteenth-century children were more "grown-up" than twentieth-century children.
+
+### Why is this be a good example?
+
+- Clear motivation for the question
+- Good fit between topic and data
+- Good fit between method (topic modeling) and question
+- Interesting result supported by evidence
 
 ## External resources
 
@@ -119,55 +155,14 @@ LLMs get things wrong. That can happen because the model makes a mistake, or the
 
 ## Rubric
 
-| Criterion                   | Description                                                                                                                                                                                                                                                                                             | Weight |
-|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------|
-| Significance                | Clearly states and addresses a meaningful modeling question using classification or regression, explaining its relevance and importance.                                                                                                                                                              | 30%    |
-| Analysis & Data Integration | Briefly explains how you selected, cleaned, or transformed your dataset for modeling. Clearly identifies and justifies any external resources or GenAI tools used in your analysis.                                                                                                                                      | 20%    |
-| Outputs                     | Presents clear, interpretable results from at least two models. Outputs (tables, graphs, calculated values) must be labeled, directly referenced in the text, and clearly support the argument.                                                                                                        | 20%    |
-| Code Quality & Style        | R code adheres to the `tidyverse` style guide. Appropriately integrates advanced Quarto features (such as figure captions, cross-references, caching, or inline computations).                                                                                                                   | 10%    |
-| Prose                       | Includes **at most** 500 words of body text explaining the rationale for your analysis, interpreting the results, and clearly stating your main argument ("so what?") derived from your models or modeling process. Prose is clear, concise, and engaging, effectively guiding the reader through the project narrative.                   | 20%    |
+| Criterion                    | Description                                                                                      | Weight |
+|-----------------------------|--------------------------------------------------------------------------------------------------|--------|
+| Argument & Motivation       | Clear question or argument; explains topic significance                                           | 25%    |
+| Data & Analysis             | Appropriate data; prepares and analyzes data; includes two or more outputs                       | 25%    |
+| Presentation                | Clear 4-minute talk; shows dataset and at least one output                                        | 20%    |
+| Code Quality & Documentation | Clean, accurate code; follows tidyverse style; includes comments and Quarto features              | 10%    |
+| Prose & Interpretation      | Maximum 500 words; explains rationale; interprets results and draws conclusions                   | 20%    |
 
-## Groups
-
-```{r}
-#| warning: false
-#| echo: false
-
-library(tidyverse)
-library(knitr)
-library(readxl)
-
-set.seed(200)
-
-df <- read_excel("../GITIGNORED/dsst389_roster.xlsx", sheet = "all")
-
-df <- df |>
-  select(Section, `First Name in Use`, `Last Name`) |>
-  mutate(Section = as.integer(Section)) |>
-  rename(
-    section = Section,
-    first_name = `First Name in Use`,
-    last_name = `Last Name`
-  ) |>
-  mutate(last_initial = str_sub(last_name, 1, 1))
-
-df |>
-  group_by(section) |>
-  slice_sample(prop = 1) |>
-  mutate(
-    row = row_number(),
-    group_id = case_when(
-      n() %% 2 == 0 ~ as.integer(ceiling(row / 2)),
-      row <= 3 ~ 1L,
-      TRUE ~ as.integer(1L + ceiling((row - 3) / 2))
-    )
-  ) |>
-  ungroup() |>
-  select(-row) |>
-  arrange(section, last_initial, first_name) |>
-  select(section, first_name, last_initial, group_id) |>
-  kable()
-```
 
 ## Contribution to learning goals
 

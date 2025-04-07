@@ -1,0 +1,313 @@
+---
+title: "Review"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  cache: true
+  echo: true
+  message: false
+  warning: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+## Review
+
+- Review of recent notebooks
+- Simulation of code interview (**Monday, April 14**)
+
+## Major topics and themes
+
+- R, `tidyverse`, Quarto, Markdown
+- Text data as a special case for general data science
+  - Special considerations for collection (e.g., tokenization)
+  - Special considerations for cleaning (e.g., stopwords)
+  - Special considerations for analysis
+- Data modeling
+  - Linear regression
+  - Logistic regression
+  - K-nearest neighbors
+  - Classification
+  - Lasso and elastic nets
+  - Ensemble methods (e.g., gradient boosted trees)
+- Text-specific modeling
+  - Word embeddings
+  - Topic modeling
+
+## Notebook 19 data
+
+```{r}
+#| label: get-packages
+#| echo: false
+
+packages <- c(
+  "tidyverse", "tidymodels", "textrecipes", "kknn",
+  "xgboost", "glmnet", "corrplot", "parallel", "future",
+  "textdata", "glue", "stats"
+)
+
+for (pkg in packages) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+  }
+}
+
+for (pkg in packages) {
+  library(pkg, character.only = TRUE)
+}
+
+theme_set(theme_minimal())
+
+set.seed(123)
+
+all_cores <- parallel::detectCores()
+plan(multisession, workers = all_cores)
+```
+
+```{r}
+#| label: load-data
+
+texts <- read_csv("../data/sms.csv")
+
+texts |>
+  group_by(type) |>
+  slice_sample(n = 2)
+```
+
+```{r}
+#| label: q-clean-data
+#| echo: false
+
+texts <- texts |>
+  mutate(
+    type = if_else(type == "ham", 0, 1),
+    type = as_factor(type)
+  )
+
+data_split <- initial_split(texts, prop = 0.8, strata = type)
+train_data <- training(data_split)
+test_data <- testing(data_split)
+```
+
+## Recipe
+
+Explain the purpose of `step_tokenfilter()` here.
+
+```{r}
+token_recipe <- recipe(type ~ text, data = train_data) |>
+  step_tokenize(text) |>
+  step_stopwords(text) |>
+  step_tokenfilter(text, max_tokens = 100) |>
+  step_tf(text)
+
+token_recipe
+```
+
+```{r}
+#| echo: false
+
+log_spec <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+token_wf <- workflow() |>
+  add_recipe(token_recipe) |>
+  add_model(log_spec)
+
+token_fit <- token_wf |> fit(data = train_data)
+```
+
+## Interpreting confusion matrices
+
+Which values in this confusion matrix are the false positives and which are the false negatives? Explain the difference.
+
+```{r}
+token_results <- bind_cols(
+  predict(token_fit, test_data, type = "prob"),
+  predict(token_fit, test_data),
+  test_data
+)
+
+token_results |> conf_mat(truth = type, estimate = .pred_class)
+```
+
+## Histogram
+
+Briefly interpret this histogram.
+
+```{r}
+#| label: q-token-hist
+
+token_results |>
+  ggplot(aes(x = .pred_1, fill = type)) +
+  geom_histogram(bins = 10) +
+  scale_fill_brewer(palette = "Dark2")
+```
+
+## Associated words
+
+Approximately how much more important is the word "txt" than the word "cash" in predicting whether a message is spam? How do you know?
+
+```{r}
+#| label: q-spam-words
+
+token_fit |>
+  tidy() |>
+  filter(p.value < 0.05) |>
+  slice_max(estimate, n = 20)
+```
+
+## Term frequency vs. word embedding
+
+In this notebook, we created two models using two different predictors: term frequencies and word embeddings. Explain the difference between these two predictors.
+
+```{r}
+#| echo: false
+
+glove <- textdata::embedding_glove6b(dim = 300)
+```
+
+## Tuning our word embedding model
+
+When setting up our logistic regression model for word embeddings, why is regularization important?
+
+```{r}
+log_spec <- logistic_reg(penalty = tune(), mixture = 1) |>
+  set_engine("glmnet") |>
+  set_mode("classification")
+```
+
+```{r}
+#| echo: false
+
+embedding_recipe <- recipe(type ~ text, data = train_data) |>
+  step_tokenize(text) |>
+  step_stopwords(text) |>
+  step_word_embeddings(text, embeddings = glove)
+
+embedding_wf <- workflow() |>
+  add_recipe(embedding_recipe) |>
+  add_model(log_spec)
+
+embedding_folds <- vfold_cv(train_data, v = 5, strata = type)
+
+embedding_grid <- grid_regular(penalty(), levels = 20)
+```
+
+## Selecting for accuracy
+
+When selecting the best regularization penalty, we used accuracy as our metric. Why is this a good choice in this case?
+
+```{r}
+embedding_tune_results <- tune_grid(
+  embedding_wf,
+  resamples = embedding_folds,
+  grid = embedding_grid,
+  metrics = metric_set(accuracy)
+)
+
+embedding_best <- select_best(
+  embedding_tune_results,
+  metric = "accuracy"
+)
+
+embedding_final_wf <- finalize_workflow(embedding_wf, embedding_best)
+
+embedding_final_wf
+```
+
+## Embedding results
+
+Explain the relationship between the `.pred_0`, `.pred_1`, and `.pred_class` columns in this tibble:
+
+```{r}
+#| label: q-embedding-fit
+
+embedding_fit <- embedding_final_wf |> fit(data = train_data)
+
+embedding_results <- bind_cols(
+  predict(embedding_fit, test_data, type = "prob"),
+  predict(embedding_fit, test_data),
+  test_data
+)
+
+embedding_results
+```
+
+## Accuracy results
+
+The word embedding model performed a little bit better than the term frequency model on accuracy. How could we test if that difference is statistically significant?
+
+```{r}
+token_results |>
+  accuracy(truth = type, estimate = .pred_class)
+
+embedding_results |>
+  accuracy(truth = type, estimate = .pred_class)
+```
+
+## Paired t-test
+
+```{r}
+#| label: logical-vectors
+
+token_correct <- token_results |> pull(.pred_class) ==
+  token_results |> pull(type)
+
+embed_correct <- embedding_results |> pull(.pred_class) ==
+  embedding_results |> pull(type)
+
+token_correct |> t.test(embed_correct, paired = TRUE)
+```
+
+## An alternative to the paired t-test or McNemar
+
+More cross-validation!
+
+```{r}
+folds <- vfold_cv(train_data, v = 10, strata = type)
+
+token_resampled <- fit_resamples(
+  token_wf,
+  resamples = folds,
+  metrics = metric_set(accuracy)
+  )
+
+embedding_resampled <- fit_resamples(
+  embedding_final_wf,
+  resamples = folds,
+  metrics = metric_set(accuracy)
+  )
+
+token_resampled |> collect_metrics()
+
+embedding_resampled |> collect_metrics()
+```
+
+## Project 3 overview
+
+See assignment description on Blackboard.
+
+## Coordinate with your project team
+
+- Meet up with your project team
+- Select a dataset that seems interesting
+- Make a plan for the class workshop on Wednesday
+- Share contact information
+- Schedule a time to meet outside of class

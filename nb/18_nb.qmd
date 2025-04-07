@@ -564,14 +564,17 @@ We saw above that there was no significant difference in means between the two m
 ```{r}
 #| label: q-anova-departure
 
-pop_destinations |>
+economy_flights <- flights |>
+  filter(class == "Economy")
+
+economy_flights |>
   fligner.test(price ~ departure_time, data = _)
 
-pop_destinations |>
+economy_flights |>
   aov(price ~ departure_time, data = _) |>
   summary()
 
-pop_destinations |>
+economy_flights |>
   oneway.test(price ~ departure_time, data = _)
 ```
 
@@ -582,20 +585,17 @@ One possible response would be to *collect more data*. We can simulate that by r
 ```{r}
 #| label: q-anova-test
 
-pop_destinations_test <- flights_test |>
-  filter(
-    class == "Economy",
-    destination_city %in% top_cities
-  )
+economy_flights_test <- flights_test |>
+  filter(class == "Economy")
 
-pop_destinations_test |>
+economy_flights_test |>
   fligner.test(price ~ departure_time, data = _)
 
-pop_destinations_test |>
+economy_flights_test |>
   aov(price ~ departure_time, data = _) |>
   summary()
 
-pop_destinations_test |>
+economy_flights_test |>
   oneway.test(price ~ departure_time, data = _)
 ```
 

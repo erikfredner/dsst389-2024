@@ -1,0 +1,260 @@
+---
+title: "Topic Models"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+execute:
+  cache: true
+  echo: false
+  warning: true
+format:
+  html:
+    anchor-sections: true
+    code-tools: false
+    code-link: true
+    embed-resources: true
+    link-external-icon: true
+    link-external-newwindow: true
+    number-sections: true
+    smooth-scroll: true
+    toc: true
+editor:
+  markdown:
+    wrap: 72
+---
+
+## Environment
+
+### Clean
+
+Run the following code chunk to clean up your environment:
+
+```{r}
+#| eval: false
+#| label: clean-env
+
+if (interactive()) {
+  rstudioapi::restartSession(clean = TRUE)
+}
+```
+
+### Install
+
+You may need to update or install some packages:
+
+```{r}
+#| label: get-packages
+
+packages <- c(
+  "tidyverse", "tidymodels", "textrecipes", "kknn",
+  "xgboost", "glmnet", "corrplot", "parallel", "future",
+  "textdata", "stm", "topicmodels", "tidytext", "reshape2",
+  "ldatuning", "tm", "glue"
+)
+
+for (pkg in packages) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+  }
+}
+```
+
+### Load
+
+Import needed libraries and apply settings:
+
+```{r}
+#| label: libraries-settings
+
+for (pkg in packages) {
+  library(pkg, character.only = TRUE)
+}
+
+theme_set(theme_minimal())
+
+set.seed(123)
+
+all_cores <- parallel::detectCores()
+plan(multisession, workers = all_cores)
+```
+
+## Data: AP Articles
+
+The Associated Press (AP) donated thousands of their articles to be used for text mining.
+
+```{r}
+#| label: load-data
+
+ap <- read_csv("../data/ap.csv")
+ap
+```
+
+## Preparing the Documents
+
+Aggregate articles into a document-term matrix (DTM) suitable for topic modeling. Remove stopwords before creating the DTM.
+
+```{r}
+#| label: q-create-dtm
+
+ap_dtm <- ap |>
+  unnest_tokens(word, text) |>
+  anti_join(get_stopwords(), join_by(word)) |>
+  count(doc_id, word) |>
+  cast_dtm(doc_id, word, n)
+
+ap_dtm
+```
+
+## Initial Topic Modeling
+
+Fit an LDA topic model with 5 topics. Output a sample of rows from the `tidy()` output of your model.
+
+:::{.callout-warning}
+This may take a few minutes to run.
+:::
+
+```{r}
+#| label: q-lda-small
+
+lda_small <- LDA(
+  ap_dtm,
+  method = "Gibbs",
+  k = 5,
+  control = list(seed = 123)
+)
+
+lda_small |>
+  tidy() |>
+  slice_sample(n = 10)
+```
+
+## Top Terms per Topic
+
+Visualize the top 10 terms for each topic from the initial model:
+
+```{r}
+#| label: q-visualize-top-terms
+
+lda_small |>
+  tidy(matrix = "beta") |>
+  group_by(topic) |>
+  slice_max(beta, n = 10) |>
+  ungroup() |>
+  mutate(term = reorder_within(term, beta, topic)) |>
+  ggplot(aes(beta, term, fill = as_factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~topic, scales = "free") +
+  scale_y_reordered() +
+  labs(title = "Top terms per topic", subtitle = "k = 5")
+```
+
+What observations can you make about the coherence and interpretability of the topics?
+
+## Finding the Optimal Number of Topics
+
+Explore perplexity and coherence to find a better number of topics (`k`). To save computing time, just check the values for `k` of 10, 20, and 30.
+
+:::{.callout-warning}
+This will take five to ten minutes to run. Double-check your code!
+:::
+
+```{r}
+#| label: q-search-best-k
+
+k_values <- seq(10, 30, by = 10)
+
+model_metrics <- map(k_values, function(k) {
+  lda_model <- LDA(
+    ap_dtm,
+    method = "Gibbs",
+    k = k,
+    control = list(seed = 123)
+  )
+  tibble(
+    k = k,
+    perplexity = perplexity(lda_model, ap_dtm),
+    log_likelihood = as.numeric(logLik(lda_model))
+  )
+}) |>
+  list_rbind()
+
+model_metrics
+```
+
+Now, calculate and plot coherence measures to figure out which of these values of `k` is best:
+
+```{r}
+#| label: q-coherence-plot
+
+coherence_result <- FindTopicsNumber(
+  ap_dtm,
+  topics = k_values,
+  metrics = c("CaoJuan2009", "Arun2010", "Griffiths2004", "Deveaud2014"),
+  method = "Gibbs",
+  control = list(seed = 123)
+)
+
+FindTopicsNumber_plot(coherence_result)
+```
+
+Based on these metrics, what appears to be the optimal value of `k`?
+
+## Final Model
+
+Fit the final LDA model using your best `k`:
+
+```{r}
+#| label: q-final-model
+
+k_final <- 20
+lda_final <- LDA(
+  ap_dtm,
+  method = "Gibbs",
+  k = k_final,
+  control = list(seed = 123)
+)
+```
+
+Visualize the top terms in your final model:
+
+```{r}
+#| label: q-final-top-terms
+
+lda_final |>
+  tidy(matrix = "beta") |>
+  group_by(topic) |>
+  slice_max(beta, n = 10) |>
+  ungroup() |>
+  mutate(term = reorder_within(term, beta, topic)) |>
+  ggplot(aes(beta, term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~topic, scales = "free") +
+  scale_y_reordered() +
+  labs(title = glue("Top Terms per Topic (k = {k_final})"))
+```
+
+## Interpretation
+
+Examine the final topics. Choose two topics that stand out to you, and discuss:
+
+- What the top words suggest about these topics.
+- Whether these topics make intuitive sense as coherent themes.
+
+Provide examples of AP articles (using the original text) that clearly illustrate each of your selected topics. In my example below, I retrieve articles strongly associated with Topic 1.
+
+```{r}
+#| label: q-articles-example
+
+doc_topics <- tidy(lda_final, matrix = "gamma") |>
+  mutate(doc_id = document)
+
+doc_topics |>
+  filter(topic == 1) |>
+  arrange(desc(gamma)) |>
+  slice_head(n = 3) |>
+  left_join(ap, by = "doc_id") |>
+  select(doc_id, gamma, text)
+```
+
+Repeat for your second chosen topic.

@@ -29,14 +29,23 @@ This project is due by the start of class on Wednesday, April 16.
 
 ## Modeling
 
-For this assignment, you will build *at least* two models that perform either classification or regression on one of the recommended datasets below and interpret the results. I recommend choosing a dataset that you and your partner(s) find interesting and know something about to help evaluate the quality of your model's predictions.
+For this assignment, you will build *at least* two models on one of the recommended datasets below and interpret the results. I recommend choosing a dataset that you and your partner(s) find interesting and know something about to help evaluate the quality of your model's predictions.
 
 ### Requirements
 
 - You do not need to use the dataset in the way that it was originally intended to be used, but you may.
-- You must include results from at least two models in the document. You may include more if you wish.
+- You must include results from at least two models in your document. You may include more if you wish.
+- We have seen several different kinds of models in this class, including:
+  - Linear regression
+  - Logistic regression
+  - *k*-nearest neighbors
+  - Gradient boosted trees
+  - Topic models
+- You may either run multiple different models on the same data, or you may run the same model different ways.
+  - For example, you could run one logistic regression model using term frequencies as predictors, and you could run another using term frequency-inverse document frequency (tf-idf) scores as predictors.
+  - Alternatively, you could model the same data using a logistic regression model and a gradient boosted tree.
 
-### Suggestion
+### Caching output
 
 I recommend setting the following options in the YAML of your document:
 
@@ -54,30 +63,38 @@ While all of these options are important in their own ways, `cache: true` in the
 
 ### Argument ("So what?")
 
-As in your previous projects, you need to include an argument ("so what?") to anchor your discussion. That argument should emerge from or use as evidence either 1) the results of the models themselves and/or 2) the results of your modeling process.
+As in your previous projects, you need to include an argument ("so what?") to frame your discussion. That argument should emerge from the results of the models and/or your modeling process.
 
 #### Example
 
-Imagine that you were working with the `wine` data for this project. You could argue that, because there are sometimes inverted chemical properties that are associated with increased quality scores for red wines as compared to white wines (e.g., residual sugars), it is better to model the wines *separately* to facilitate interpretation. You could then compare the important factors for red and white wines separately, and report your findings that, for example, residual sugar is associated with a considerable improvement in white wine quality, but a decrease in red wine quality.
+Imagine that you were working with the `wine` data for this project. You could argue that, because there are some chemical properties that are red wine quality while increasing white wine quality (e.g., residual sugars), it is better to model the wines *separately* to disambiguate these effects. You could then compare the important factors for red and white wines separately, and report your findings.
 
-## Data sets
+## Datasets
 
-Each of the datasets described and linked below come from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/index.php). On each page, you can find a description of the dataset, a data dictionary ("variables table"), and you can download the data.
+### Text dataset: IMDB reviews
+
+The IMDB movie reviews dataset contains the full text of 50,000 movie reviews from IMDB with numerical ratings as well as a sentiment score for the review (positive or negative). Sentiment scores come directly from the numeric review, with scores of 1-4 being negative and scores of 7-10 being positive.
+
+:::{.callout-warning}
+For this reason, there are *zero* reviews with scores of 5 or 6, which would be treated as neither positive nor negative. This will impact your data modeling!
+:::
+
+The [Large Movie Review Dataset](https://ai.stanford.edu/~amaas/data/sentiment/?utm_source=chatgpt.com) was originally curated by researchers at Stanford; I have organized it into a familiar format for you all, which you can download on Blackboard. (If you would like to do your own pre-processing, you can download the original dataset from the link above.)
+
+### Other datasets
+
+All of the rest of the datasets described and linked below come from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/index.php). On each page, you can find a description of the dataset, a data dictionary ("variables table"), and you can download the data.
 
 - [Student Performance in Math and Portuguese classes in Portugal](https://archive.ics.uci.edu/dataset/320/student+performance)
 - [Estimation of Obesity Levels Based On Eating Habits and Physical Condition of people in Mexico, Peru and Colombia](https://archive.ics.uci.edu/dataset/544/estimation+of+obesity+levels+based+on+eating+habits+and+physical+condition)
 - [Default of Credit Card Clients](https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients)
 - [Predicting whether a US adult's income is over $50,000/year (1994 dollars) based on their characteristics](https://archive.ics.uci.edu/dataset/2/adult)
 
-### Using other datasets
-
-If you would rather use another dataset, you may do so with my approval. Either ask me in class or email me. You must do so by no later than **April 9** (one week before the deadline).
-
 ## External resources
 
 As the purpose of this group project is to imitate data science work that one might do outside of school, it is an **open-resource** project. This means that you may use books, websites, and, yes, generative artificial intelligence (GenAI) tools in order to complete this work.
 
-All external resources, including GenAI, **must be cited** in your final document. I recommend using [The Chicago Manual of Style](https://richmond.primo.exlibrisgroup.com/permalink/01URICH_INST/191gg5k/alma9928619711206241).
+All external resources, including GenAI, **must be cited** in your final document. I recommend using [The Chicago Manual of Style](https://richmond.primo.exlibrisgroup.com/permalink/01URICH_INST/191gg5k/alma9928619711206241) for all citations.
 
 Your use of all external resources, including GenAI, is constrained by the rules set out in the syllabus, which include the following:
 
@@ -107,7 +124,7 @@ I ask you to do these things in this order when you can't figure something out:
 The [Custom GPT](https://chatgpt.com/g/g-6783c8a8603c8191862f677689207682-dsst389-gpt) for this course is designed to help you with programming problems while following the conventions of this class. However, **you** are ultimately responsible for ensuring that your code follows the class style requirements:
 
 - Use the base R pipe (`|>`), not the `magrittr` pipe (`|>`)
-- Use `<-` to assign outputs to objects. *Do not* use `=`.
+- Use `<-` to assign outputs to objects. Do not use `=`.
 - Use `tidyverse` functions instead of base R whenever possible.
   - e.g., `as_factor()` is `tidyverse`; `as.factor()` is `{base}`.
 - Style your code in accordance with the [`tidyverse` style guide](https://style.tidyverse.org/).
@@ -121,7 +138,7 @@ LLMs get things wrong. That can happen because the model makes a mistake, or the
 
 | Criterion                   | Description                                                                                                                                                                                                                                                                                             | Weight |
 |-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------|
-| Significance                | Clearly states and addresses a meaningful modeling question using classification or regression, explaining its relevance and importance.                                                                                                                                                              | 30%    |
+| Significance                | Clearly states and addresses a meaningful modeling argument or question, explaining its relevance and importance.                                                                                                                                                              | 30%    |
 | Analysis & Data Integration | Briefly explains how you selected, cleaned, or transformed your dataset for modeling. Clearly identifies and justifies any external resources or GenAI tools used in your analysis.                                                                                                                                      | 20%    |
 | Outputs                     | Presents clear, interpretable results from at least two models. Outputs (tables, graphs, calculated values) must be labeled, directly referenced in the text, and clearly support the argument.                                                                                                        | 20%    |
 | Code Quality & Style        | R code adheres to the `tidyverse` style guide. Appropriately integrates advanced Quarto features (such as figure captions, cross-references, caching, or inline computations).                                                                                                                   | 10%    |
@@ -135,37 +152,10 @@ LLMs get things wrong. That can happen because the model makes a mistake, or the
 
 library(tidyverse)
 library(knitr)
-library(readxl)
 
-set.seed(200)
+df <- read_csv("../GITIGNORED/p3_groups.csv")
 
-df <- read_excel("../GITIGNORED/dsst389_roster.xlsx", sheet = "all")
-
-df <- df |>
-  select(Section, `First Name in Use`, `Last Name`) |>
-  mutate(Section = as.integer(Section)) |>
-  rename(
-    section = Section,
-    first_name = `First Name in Use`,
-    last_name = `Last Name`
-  ) |>
-  mutate(last_initial = str_sub(last_name, 1, 1))
-
-df |>
-  group_by(section) |>
-  slice_sample(prop = 1) |>
-  mutate(
-    row = row_number(),
-    group_id = case_when(
-      n() %% 2 == 0 ~ as.integer(ceiling(row / 2)),
-      row <= 3 ~ 1L,
-      TRUE ~ as.integer(1L + ceiling((row - 3) / 2))
-    )
-  ) |>
-  ungroup() |>
-  select(-row) |>
-  arrange(section, last_initial, first_name) |>
-  select(section, first_name, last_initial, group_id) |>
+df |> 
   kable()
 ```
 
