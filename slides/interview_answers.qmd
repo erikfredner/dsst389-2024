@@ -1,0 +1,457 @@
+---
+title: "Interview"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  cache: true
+  echo: true
+  message: false
+  warning: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+```{r}
+#| echo: false
+
+library(tidyverse)
+library(textdata)
+library(tidymodels)
+library(ggrepel)
+library(tidytext)
+library(gutenbergr)
+library(janeaustenr)
+library(broom)
+```
+
+## SL3: Visualization
+
+Which `geom_` functions were used to create this plot?
+
+```{r}
+#| echo: false
+pokemon <- read_csv("../data/pokemon.csv")
+
+pokemon |>
+  filter(stat_total < quantile(stat_total, 0.99)) |>
+  mutate(generation = as_factor(generation)) |>
+  ggplot(aes(x = generation, y = stat_total)) +
+  geom_boxplot(outliers = FALSE) +
+  geom_jitter(width = 0.2, alpha = 0.1, color = "darkblue")
+```
+
+## SL3: Visualization answer
+
+Which `geom_` functions were used to create this plot?
+
+> `geom_boxplot()`, `geom_jitter()`
+
+## NB3: `Q3 + 1.5 * IQR`
+
+Which points is this calculation designed to filter out?
+
+```{r}
+#| eval: false
+ward_spending |>
+  group_by(category) |>
+  mutate(
+    Q1 = quantile(total_spend, 0.25),
+    Q3 = quantile(total_spend, 0.75),
+    IQR = Q3 - Q1,
+    upper_bound = Q3 + 1.5 * IQR
+  ) |>
+  filter(total_spend >= upper_bound) |>
+  ungroup()
+```
+
+## NB3: `Q3 + 1.5 * IQR` answer
+
+Which points is this calculation designed to filter out?
+
+> Outliers
+
+```{r}
+#| eval: false
+ward_spending |>
+  group_by(category) |>
+  mutate(
+    Q1 = quantile(total_spend, 0.25),
+    Q3 = quantile(total_spend, 0.75),
+    IQR = Q3 - Q1,
+    upper_bound = Q3 + 1.5 * IQR
+  ) |>
+  filter(total_spend >= upper_bound) |>
+  ungroup()
+```
+
+## NB4: Top words
+
+What preprocessing steps have been applied to Jane Austen's novels to get this result from `tidy_books`?
+
+```{r}
+#| echo: false
+books <- austen_books() |>
+  group_by(book) |>
+  mutate(
+    linenumber = row_number(),
+    chapter = cumsum(str_detect(
+      text,
+      regex("^chapter [\\divxlc]", ignore_case = TRUE)
+    ))
+  ) |>
+  ungroup()
+
+tidy_books <- books |>
+  unnest_tokens(output = word, input = text) |>
+  anti_join(stop_words, join_by(word))
+```
+
+```{r}
+tidy_books |>
+  count(word, sort = TRUE)
+```
+
+## NB4: Top words answer
+
+What preprocessing steps have been applied to Austen's novels to get this result from `tidy_books`?
+
+> Tokenized. Stop words removed.
+
+
+## NB10: tf vs. tf-idf
+
+Explain the difference between term frequency (`tf`) and term frequency-inverse document frequency (`tf-idf`).
+
+```{r}
+#| echo: false
+
+corpus <- read_csv("../data/musician_wiki_corpus.csv")
+
+corpus <- corpus |>
+  unnest_tokens(word, text) |>
+  anti_join(stop_words, join_by(word))
+
+article_lengths <- corpus |>
+  group_by(artist, role) |>
+  summarize(article_length = n()) |>
+  ungroup()
+
+n_docs <- corpus |>
+  select(artist) |>
+  n_distinct()
+
+idf <- corpus |>
+  distinct(artist, word) |>
+  count(word, name = "word_docs") |>
+  mutate(idf = log(n_docs / word_docs))
+```
+
+```{r}
+corpus |>
+  count(artist, role, word) |>
+  left_join(article_lengths, join_by(artist, role)) |>
+  mutate(tf = n / article_length) |>
+  left_join(idf, join_by(word)) |>
+  mutate(tf_idf = tf * idf) |>
+  group_by(artist) |>
+  arrange(desc(tf_idf)) |>
+  group_by(artist) |>
+  slice_head(n = 1) |>
+  select(artist, word, tf, tf_idf)
+```
+
+## NB10: tf vs. tf-idf answer
+
+Explain the difference between term frequency (`tf`) and term frequency-inverse document frequency (`tf-idf`).
+
+> `tf` shows how frequent a word is in one document. `tf-idf` quantifies how distinctive a word is to documents in which it appears relative to other documents in the corpus.
+
+## NB12: Normalization
+
+This code normalizes the `area_worst` variable in the breast cancer dataset. What is the purpose of normalizing continuous variables?
+
+```{r}
+#| echo: false
+
+bc <- read_csv("../data/wisc_bc.csv")
+```
+
+```{r}
+bc |>
+  select(id, diagnosis, area_worst) |>
+  mutate(
+    area_worst_z = (area_worst - mean(area_worst)) / sd(area_worst)
+  ) |>
+  group_by(diagnosis) |>
+  slice_max(n = 1, order_by = area_worst_z)
+```
+
+## NB12: Normalization
+
+This code normalizes the `area_worst` variable in the breast cancer dataset. What is the purpose of normalizing continuous variables?
+
+> Normalizing continuous variables puts them on a common scale, making it easier to compare values, interpret differences, and improve the performance and stability of many statistical methods and machine learning algorithms.
+
+## NB12: Accuracy
+
+Imagine that you ran a *k*-nearest neighbors model on one version of the Amazon reviews dataset containing an equal number of food and book reviews. Then, you ran the same model on a different version of the Amazon reviews dataset containing an equal number of food, book, and movie reviews. Both models got the same accuracy score. Did either model perform better?
+
+## NB12: Accuracy answer
+
+Imagine that you ran a *k*-nearest neighbors model on one version of the Amazon reviews dataset containing an equal number of food and book reviews. Then, you ran the same model on a different version of the Amazon reviews dataset containing an equal number of food, book, and movie reviews. Both models got the same accuracy score. Did either model perform better?
+
+> The second model performed better because it made accurate predictions across more classes. With more classes, accuracy becomes harder to achieve, so matching the first model’s accuracy indicates stronger performance.
+
+## SL15: Density plots
+
+Why are density plots a good choice for exploratory data analysis?
+
+```{r}
+#| echo: false
+
+library(AmesHousing)
+
+ames <- make_ames() |>
+  janitor::clean_names()
+
+ames |>
+  ggplot(aes(x = sale_price)) +
+  geom_density(fill = "red", alpha = 0.5) +
+  scale_x_continuous(labels = scales::dollar_format()) +
+  labs(title = "Density plot of house sale prices")
+```
+
+## SL15: Density plots answer
+
+Why are density plots a good choice for exploratory data analysis?
+
+> Density plots show the shape of a variable’s distribution, helping to identify patterns, skewness, and potential outliers.
+
+
+## NB15: Linear regression
+
+What is the difference between these two model specifications?
+
+```{r}
+#| eval: false
+
+model_1 <- linear_reg() |>
+  set_mode("regression") |>
+  set_engine("glm")
+
+model_2 <- linear_reg(penalty = tune(), mixture = tune()) |>
+  set_mode("regression") |>
+  set_engine("glmnet")
+```
+
+## NB15: Linear regression answer
+
+What is the difference between these two model specifications?
+
+> `model_1` specifies ordinary least squares (OLS) linear regression (`glm`) without regularization. `model_2` specifies a regularized linear regression model (`glmnet`) and includes hyperparameters (`penalty`, `mixture`) to be tuned, enabling shrinkage or feature selection.
+
+## NB15: XGBoost
+
+What is the name of the problem that occurs when a machine learning algorithm like XGBoost performs significantly better on its training data than on its testing data?
+
+## NB15: XGBoost answer
+
+What is the name of the problem that occurs when a machine learning algorithm like XGBoost performs significantly better on its training data than on its testing data?
+
+> Overfitting
+
+## NB15: Train/test
+
+Why do we need to both split our data into training and testing sets *and* use cross-validation?
+
+```{r}
+#| eval: false
+
+wine_split <- initial_split(wine, prop = 0.8, strata = quality)
+wine_train <- training(wine_split)
+wine_test <- testing(wine_split)
+
+folds <- vfold_cv(wine_train, v = 10, strata = quality)
+```
+
+## NB15: Train/test answer
+
+Why do we need to both split our data into training and testing sets *and* use cross-validation?
+
+> We split to evaluate how well our final model generalizes to unseen data (i.e., test data), and **cross-validation** on the training set to reliably estimate performance, tune hyperparameters, and minimize overfitting during model building.
+
+## SL16: Logistic regression estimates
+
+What do the estimates of this logistic regression model represent?
+
+```{r}
+#| echo: false
+
+admissions <- read_csv("../data/admissions.csv") |>
+  mutate(admit = as_factor(admit), rank = as_factor(rank))
+
+logit_recipe <- recipe(admit ~ ., data = admissions)
+
+logit_spec <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+logit_wf <- workflow() |>
+  add_recipe(logit_recipe) |>
+  add_model(logit_spec)
+
+logit_fit <- logit_wf |> fit(admissions)
+
+logit_fit |> tidy()
+```
+
+## SL16: Logistic regression estimates answer
+
+What do the estimates of this logistic regression model represent?
+
+> The estimates represent the change in the log-odds of admission associated with a one-unit increase in a numeric predictor or a change in category for a categorical predictor, holding all other variables constant. We can convert these log-odds estimates to probabilities or odds ratios to make them easier to interpret.
+
+## SL17: ANOVA vs. t-test
+
+Why do we use an ANOVA instead of a t-test to compare the mean sentiment of Taylor Swift's albums?
+
+```{r}
+#| echo: false
+
+songs <- read_tsv("../data/swift_corpus/cots-song-details.tsv") |>
+  select(Album, Track, Title, FeaturedArtists, FromTheVault) |>
+  rename(song_title = Title)
+
+albums <- read_tsv("../data/swift_corpus/cots-album-details.tsv") |>
+  select(Code, Title, SubTitle, Year) |>
+  rename(album_title = Title)
+
+lyrics <- read_tsv(
+  file = "../data/swift_corpus/cots-lyric-details.tsv",
+  col_names = FALSE
+)
+
+lyrics <- lyrics |>
+  rename(metadata = 1, text = 2) |>
+  separate(
+    metadata,
+    into = c("album_code", "track", "line", "part"),
+    sep = ":",
+    convert = TRUE
+  )
+
+lyrics <- lyrics |>
+  left_join(albums, join_by(album_code == Code)) |>
+  left_join(songs, join_by(album_code == Album, track == Track)) |>
+  mutate(part = case_when(
+    part == "V" ~ "Verse",
+    part == "C" ~ "Chorus",
+    part == "B" ~ "Bridge",
+    part == "I" ~ "IntroOutro",
+    part == "R" ~ "Refrain",
+    TRUE ~ part
+  )) |>
+  rename(
+    album_subtitle = SubTitle,
+    year = Year,
+    featured_artists = FeaturedArtists,
+    from_the_vault = FromTheVault
+  ) |>
+  select(
+    song_title, featured_artists, album_code, album_title,
+    album_subtitle, track, from_the_vault, year,
+    line, part, text
+  )
+
+album_order <- tribble(
+  ~album_title, ~order,
+  "Fearless", 1, # 2008
+  "Speak Now", 2, # 2010
+  "Red", 3, # 2012
+  "1989", 4, # 2014
+  "Reputation", 5, # 2017
+  "Lover", 6, # 2019
+  "Folklore", 7, # 2020 (July)
+  "Evermore", 8, # 2020 (December)
+  "Midnights", 9, # 2022
+  "The Tortured Poets Department", 10
+)
+
+afinn <- get_sentiments("afinn")
+
+song_afinn <- lyrics |>
+  left_join(album_order, join_by(album_title)) |>
+  drop_na(order) |>
+  unnest_tokens(word, text) |>
+  left_join(afinn, join_by(word)) |>
+  mutate(value = replace_na(value, 0)) |>
+  group_by(album_title, song_title, order) |>
+  summarize(
+    afinn_net = sum(value),
+    word_count = n(),
+    afinn_normalized = afinn_net / word_count,
+    .groups = "drop"
+  ) |>
+  mutate(afinn_normalized = scale(afinn_normalized)) |>
+  arrange(order) |>
+  mutate(album_group = ifelse(order <= 5, "Early", "Late"))
+```
+
+```{r}
+song_afinn |>
+  aov(afinn_normalized ~ album_title, data = _) |>
+  summary()
+```
+
+## SL17: ANOVA vs. t-test answer
+
+Why do we have to use an ANOVA instead of a t-test to compare the mean sentiment of Taylor Swift's albums?
+
+> We use an ANOVA instead of a t-test because a t-test can only compare the means of two groups, while ANOVA allows us to compare the mean sentiment across more than two albums at the same time.
+
+
+## NB18: Linear regression
+
+What are the estimates of this model expressed in relation to?
+
+```{r}
+#| echo: false
+
+flights <- read_csv("../data/flights.csv") |>
+  arrange(destination_city)
+
+flights_delhi <- flights |>
+  filter(source_city == "Delhi")
+```
+
+```{r}
+flights_delhi |>
+  distinct(destination_city) |>
+  pull()
+
+flights_delhi |>
+  lm(price ~ destination_city, data = _) |>
+  tidy()
+```
+
+## NB18: Linear regression answer
+
+What are the estimates of this model expressed in relation to?
+
+> The estimates are expressed in relation to the reference category, which is Bangalore— the first level of `destination_city`. The intercept is the estimated mean price for flights to Bangalore, and the other estimates show the difference in mean price between each city and Bangalore.

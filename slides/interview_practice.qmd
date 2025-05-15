@@ -1,0 +1,230 @@
+---
+title: "Interview Practice"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  cache: true
+  echo: true
+  message: false
+  warning: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+```{r}
+#| echo: false
+
+library(tidyverse)
+library(tidymodels)
+library(ggrepel)
+library(tidytext)
+library(gutenbergr)
+library(janeaustenr)
+library(broom)
+```
+
+## SL3: Visualization
+
+Which `geom_` functions were used to create this plot?
+
+```{r}
+#| echo: false
+pokemon <- read_csv("../data/pokemon.csv")
+
+pokemon |>
+  filter(stat_total < quantile(stat_total, 0.99)) |>
+  mutate(generation = as_factor(generation)) |>
+  ggplot(aes(x = generation, y = stat_total)) +
+  geom_boxplot(outliers = FALSE) +
+  geom_jitter(width = 0.2, alpha = 0.1, color = "darkblue")
+```
+
+
+## NB3: `Q3 + 1.5 * IQR`
+
+Which points is this calculation designed to filter out?
+
+```{r}
+#| echo: false
+
+funds <- read_csv("../data/chicago_spending.csv")
+
+funds <- funds |>
+  mutate(cost = parse_number(cost)) |>
+  select(year, ward, cost, category)
+
+ward_spending <- funds |>
+  group_by(category, ward) |>
+  summarize(total_spend = sum(cost, na.rm = TRUE), .groups = "drop")
+```
+
+
+```{r}
+ward_spending |>
+  group_by(category) |>
+  mutate(
+    Q1 = quantile(total_spend, 0.25),
+    Q3 = quantile(total_spend, 0.75),
+    IQR = Q3 - Q1,
+    upper_bound = Q3 + 1.5 * IQR
+  ) |>
+  filter(total_spend >= upper_bound) |>
+  ungroup() |> 
+  arrange(desc(total_spend)) |> 
+  group_by(category) |>
+  select(category, ward, upper_bound, total_spend) |> 
+  slice_max(total_spend, n = 1, with_ties = FALSE)
+```
+
+## NB10: tf vs. tf-idf
+
+Explain the difference between term frequency (`tf`) and term frequency-inverse document frequency (`tf-idf`).
+
+```{r}
+#| echo: false
+
+corpus <- read_csv("../data/musician_wiki_corpus.csv")
+
+corpus <- corpus |>
+  unnest_tokens(word, text) |> 
+  anti_join(stop_words, join_by(word))
+
+article_lengths <- corpus |>
+  group_by(artist, role) |>
+  summarize(article_length = n()) |>
+  ungroup()
+
+n_docs <- corpus |>
+  select(artist) |>
+  n_distinct()
+
+idf <- corpus |>
+  distinct(artist, word) |>
+  count(word, name = "word_docs") |>
+  mutate(idf = log(n_docs / word_docs))
+```
+
+```{r}
+corpus |>
+  count(artist, role, word) |>
+  left_join(article_lengths, join_by(artist, role)) |>
+  mutate(tf = n / article_length) |>
+  left_join(idf, join_by(word)) |>
+  mutate(tf_idf = tf * idf) |>
+  group_by(artist) |>
+  arrange(desc(tf_idf)) |>
+  group_by(artist) |> 
+  slice_head(n = 1) |>
+  select(artist, word, tf, tf_idf)
+```
+
+## NB12: Accuracy
+
+Imagine that you ran a *k*-nearest neighbors model on one version of the Amazon reviews dataset containing an equal number of food and book reviews. Then, you ran the same model on a different version of the Amazon reviews dataset containing an equal number of food, book, and movie reviews. Both models got the same accuracy score. Did either model perform better?
+
+## SL15: Density plots
+
+Why are density plots a good choice for exploratory data analysis?
+
+```{r}
+#| echo: false
+
+library(AmesHousing)
+
+ames <- make_ames() |>
+  janitor::clean_names()
+
+ames |>
+  ggplot(aes(x = sale_price)) +
+  geom_density(fill = "red", alpha = 0.5) +
+  scale_x_continuous(labels = scales::dollar_format()) +
+  labs(title = "Density plot of house sale prices")
+```
+
+## NB15: XGBoost
+
+What is the name of the problem that occurs when a machine learning algorithm like XGBoost performs significantly better on its training data than on its testing data?
+
+## SL16: Logistic regression estimates
+
+What do the estimates of this logistic regression model represent?
+
+```{r}
+#| echo: false
+
+admissions <- read_csv("../data/admissions.csv") |>
+  mutate(admit = as_factor(admit), rank = as_factor(rank))
+
+logit_recipe <- recipe(admit ~ ., data = admissions)
+
+logit_spec <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+logit_wf <- workflow() |>
+  add_recipe(logit_recipe) |>
+  add_model(logit_spec)
+
+logit_fit <- logit_wf |> fit(admissions)
+
+logit_fit |> tidy()
+```
+
+
+## SL3: Visualization answer
+
+Which `geom_` functions were used to create this plot?
+
+> `geom_boxplot()`, `geom_jitter()`
+
+## NB3: `Q3 + 1.5 * IQR` answer
+
+Which points is this calculation designed to filter out?
+
+> Outliers
+
+## NB10: tf vs. tf-idf answer
+
+Explain the difference between term frequency (`tf`) and term frequency-inverse document frequency (`tf-idf`).
+
+> `tf` shows how frequent a word is in one document. `tf-idf` quantifies how distinctive a word is to documents in which it appears relative to other documents in the corpus.
+
+## NB12: Accuracy answer
+
+Imagine that you ran a *k*-nearest neighbors model on one version of the Amazon reviews dataset containing an equal number of food and book reviews. Then, you ran the same model on a different version of the Amazon reviews dataset containing an equal number of food, book, and movie reviews. Both models got the same accuracy score. Did either model perform better?
+
+> The second model performed better because it made equally accurate predictions across more classes. With more classes, accuracy becomes harder to achieve, so matching the first model’s accuracy indicates stronger performance.
+
+## SL15: Density plots answer
+
+Why are density plots a good choice for exploratory data analysis?
+
+> Density plots show the shape of a variable’s distribution, helping to identify patterns, skewness, and potential outliers.
+
+## NB15: XGBoost answer
+
+What is the name of the problem that occurs when a machine learning algorithm like XGBoost performs significantly better on its training data than on its testing data?
+
+> Overfitting
+
+## SL16: Logistic regression estimates answer
+
+What do the estimates of this logistic regression model represent?
+
+> The estimates represent the change in the log-odds of admission associated with a one-unit increase in a numeric predictor or a change in category for a categorical predictor, holding all other variables constant. We can convert these log-odds estimates to probabilities or odds ratios to make them easier to interpret.

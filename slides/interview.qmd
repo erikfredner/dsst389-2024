@@ -1,0 +1,229 @@
+---
+title: "Interview"
+subtitle: "DSST389: Advanced Data Science"
+author: "Erik Fredner"
+institute: "University of Richmond"
+date: today
+bibliography: /Users/erik/book/references.bib
+csl: /Users/erik/code/styles/chicago-fullnote-bibliography.csl
+execute:
+  cache: true
+  echo: true
+  message: false
+  warning: false
+format:
+  revealjs:
+    logo: "images/by-sa.png"
+    footer: "https://fredner.org"
+    embed-resources: true
+    scrollable: true
+    slide-number: true
+    preview-links: auto
+    mermaid:
+      theme: neutral
+editor_options:
+  markdown:
+    wrap: 72
+  chunk_output_type: console
+---
+
+```{r}
+#| echo: false
+
+library(tidyverse)
+library(tidymodels)
+library(ggrepel)
+library(tidytext)
+library(gutenbergr)
+library(janeaustenr)
+library(broom)
+```
+
+## Q1 Top words
+
+What preprocessing steps have been applied to Jane Austen's novels to get this result from `tidy_books`?
+
+```{r}
+#| echo: false
+books <- austen_books() |>
+  group_by(book) |>
+  mutate(
+    linenumber = row_number(),
+    chapter = cumsum(str_detect(
+      text,
+      regex("^chapter [\\divxlc]", ignore_case = TRUE)
+    ))
+  ) |>
+  ungroup()
+
+tidy_books <- books |>
+  unnest_tokens(output = word, input = text) |> 
+  anti_join(stop_words, join_by(word))
+```
+
+```{r}
+tidy_books |> 
+  count(word, sort = TRUE)
+```
+
+## Q2 Normalization
+
+This code normalizes the `area_worst` variable in the breast cancer dataset. What is the purpose of normalizing continuous variables?
+
+```{r}
+#| echo: false
+
+bc <- read_csv("../data/wisc_bc.csv")
+```
+
+```{r}
+bc |>
+  select(id, diagnosis, area_worst) |>
+  mutate(
+    area_worst_z = (area_worst - mean(area_worst)) / sd(area_worst)
+  ) |> 
+  group_by(diagnosis) |>
+  slice_max(n = 1, order_by = area_worst_z)
+```
+
+## Q3 Model specifications
+
+What is the difference between these two model specifications?
+
+```{r}
+#| eval: false
+
+model_1 <- linear_reg() |>
+  set_mode("regression") |>
+  set_engine("glm")
+
+model_2 <- linear_reg(penalty = tune(), mixture = tune()) |>
+  set_mode("regression") |>
+  set_engine("glmnet")
+```
+
+## Q4 Train/test
+
+What is the purpose of splitting our data into training and testing sets? And why do you have to stratify the split?
+
+```{r}
+#| eval: false
+
+wine_split <- initial_split(wine, prop = 0.8, strata = quality)
+wine_train <- training(wine_split)
+wine_test <- testing(wine_split)
+```
+
+## Q5 ANOVA vs. t-test
+
+Why do we use an ANOVA instead of a t-test to compare the mean sentiment of Taylor Swift's albums?
+
+```{r}
+#| echo: false
+
+afinn <- get_sentiments("afinn")
+
+songs <- read_tsv("../data/swift_corpus/cots-song-details.tsv") |>
+  select(Album, Track, Title, FeaturedArtists, FromTheVault) |>
+  rename(song_title = Title)
+
+albums <- read_tsv("../data/swift_corpus/cots-album-details.tsv") |>
+  select(Code, Title, SubTitle, Year) |>
+  rename(album_title = Title)
+
+lyrics <- read_tsv(
+  file = "../data/swift_corpus/cots-lyric-details.tsv",
+  col_names = FALSE
+)
+
+lyrics <- lyrics |>
+  rename(metadata = 1, text = 2) |>
+  separate(
+    metadata,
+    into = c("album_code", "track", "line", "part"),
+    sep = ":",
+    convert = TRUE
+  )
+
+lyrics <- lyrics |>
+  left_join(albums, join_by(album_code == Code)) |>
+  left_join(songs, join_by(album_code == Album, track == Track)) |>
+  mutate(part = case_when(
+    part == "V" ~ "Verse",
+    part == "C" ~ "Chorus",
+    part == "B" ~ "Bridge",
+    part == "I" ~ "IntroOutro",
+    part == "R" ~ "Refrain",
+    TRUE ~ part
+  )) |>
+  rename(
+    album_subtitle = SubTitle,
+    year = Year,
+    featured_artists = FeaturedArtists,
+    from_the_vault = FromTheVault
+  ) |>
+  select(
+    song_title, featured_artists, album_code, album_title,
+    album_subtitle, track, from_the_vault, year,
+    line, part, text
+  )
+
+album_order <- tribble(
+  ~album_title, ~order,
+  "Fearless", 1, # 2008
+  "Speak Now", 2, # 2010
+  "Red", 3, # 2012
+  "1989", 4, # 2014
+  "Reputation", 5, # 2017
+  "Lover", 6, # 2019
+  "Folklore", 7, # 2020 (July)
+  "Evermore", 8, # 2020 (December)
+  "Midnights", 9, # 2022
+  "The Tortured Poets Department", 10
+)
+
+song_afinn <- lyrics |>
+  left_join(album_order, join_by(album_title)) |>
+  drop_na(order) |>
+  unnest_tokens(word, text) |>
+  left_join(afinn, join_by(word)) |>
+  mutate(value = replace_na(value, 0)) |>
+  group_by(album_title, song_title, order) |>
+  summarize(
+    afinn_net = sum(value),
+    word_count = n(),
+    afinn_normalized = afinn_net / word_count,
+    .groups = "drop"
+  ) |>
+  mutate(afinn_normalized = scale(afinn_normalized)) |>
+  arrange(order) |>
+  mutate(album_group = ifelse(order <= 5, "Early", "Late"))
+```
+
+```{r}
+song_afinn |>
+  aov(afinn_normalized ~ album_title, data = _) |>
+  summary()
+```
+
+## Q6 Linear regression
+
+What are the estimates of this model expressed in relation to?
+
+```{r}
+#| echo: false
+
+flights <- read_csv("../data/flights.csv") |> 
+  arrange(destination_city)
+
+flights_delhi <- flights |>
+  filter(source_city == "Delhi")
+```
+
+```{r}
+flights_delhi |> distinct(destination_city) |> pull()
+
+flights_delhi |> 
+  lm(price ~ destination_city, data = _) |>
+  tidy()
+```
